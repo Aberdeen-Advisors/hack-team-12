@@ -1,0 +1,32 @@
+# This repository is PUBLIC. Client data must never be committed here, and
+# neither must licensed third-party vendor templates - cite them, don't commit
+# them. The named entries below are files the team shared in Slack; the broader
+# patterns are there to catch near-misses and renamed copies.
+
+# --- Client data and licensed vendor templates shared in Slack ---
+DNUDecomission List_Master_11.19.24.xlsx
+02-Application-Portfolio-Management-Diagnostic-Tool.xlsx
+02-Build-an-Application-Rationalization-Framework--Phases-1-4*.pptx
+04-Rationalize-Your-Application-Portfolio-Tool.xlsx
+05-Application-TCO-Calculator.xlsx
+10-Disposition-Prioritization-Tool.xlsx
+Novant_App Rat_Playbook_MVP.pptx
+
+# --- Broader guards against renamed or derived copies ---
+data/
+*DNU*
+*Decomission*
+*Decommission*
+*-Master-*
+
+# Office lock / autosave files
+~$*
+
+# --- Normal noise ---
+.DS_Store
+__pycache__/
+*.pyc
+.venv/
+venv/
+node_modules/
+.env
