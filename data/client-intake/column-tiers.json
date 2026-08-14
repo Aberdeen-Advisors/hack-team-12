@@ -1,0 +1,770 @@
+{
+  "action": {
+    "fallback": "",
+    "label": "The specific verb to be done",
+    "source": "REQ 64: proposed from disposition, sourcing_type and cluster role; a human confirms it",
+    "tier": "tool_derives"
+  },
+  "active_users": {
+    "fallback": "",
+    "label": "Distinct users with real activity",
+    "source": "identity provider",
+    "tier": "system_extract"
+  },
+  "ai_already_entitled_elsewhere": {
+    "fallback": "",
+    "label": "Already paid for inside another licence",
+    "source": "REQ 26 entitlement overlap check across the portfolio",
+    "tier": "tool_derives"
+  },
+  "ai_capability_class": {
+    "fallback": "",
+    "label": "Which AI capability it delivers",
+    "source": "REQ 11 classification from description and product documentation",
+    "tier": "tool_derives"
+  },
+  "ai_delivery_form": {
+    "fallback": "",
+    "label": "Standalone AI product or embedded feature",
+    "source": "REQ 11 classification; embedded features found in the licence entitlement",
+    "tier": "tool_derives"
+  },
+  "ai_entitled_alternative_app_id": {
+    "fallback": "",
+    "label": "The already-paid-for alternative",
+    "source": "REQ 26 - the host app carrying the same capability",
+    "tier": "tool_derives"
+  },
+  "ai_host_app_id": {
+    "fallback": "",
+    "label": "The app whose licence already entitles it",
+    "source": "REQ 26 join from the embedded feature to its host product",
+    "tier": "tool_derives"
+  },
+  "amortised_one_time_migration_cost": {
+    "fallback": "one_time_implementation_cost / 5, or a modelled migration estimate. LOSS: net saving overstated on every consolidate and replace.",
+    "label": "Migration cost, spread over five years",
+    "source": "",
+    "tier": "client_if_available"
+  },
+  "annual_contract_value": {
+    "fallback": "",
+    "label": "Annual contract value",
+    "source": "contract management",
+    "tier": "system_extract"
+  },
+  "annual_tco_recurring": {
+    "fallback": "",
+    "label": "Annual run-rate cost",
+    "source": "tco_five_category_subtotal + consumption_based_cost",
+    "tier": "tool_derives"
+  },
+  "app_id": {
+    "fallback": "",
+    "label": "Row key for the application",
+    "source": "",
+    "tier": "client_mandatory"
+  },
+  "app_name": {
+    "fallback": "",
+    "label": "Application name as you call it",
+    "source": "",
+    "tier": "client_mandatory"
+  },
+  "auto_renewal_flag": {
+    "fallback": "",
+    "label": "Renews itself unless notice is served",
+    "source": "contract management",
+    "tier": "system_extract"
+  },
+  "business_owner": {
+    "fallback": "",
+    "label": "Accountable business owner",
+    "source": "ITSM/CMDB",
+    "tier": "system_extract"
+  },
+  "business_unit": {
+    "fallback": "",
+    "label": "Business unit",
+    "source": "GL/AP",
+    "tier": "system_extract"
+  },
+  "business_value_score": {
+    "fallback": "",
+    "label": "Business value (V)",
+    "source": "Weighted mean of the five V criteria, renormalised over the populated ones",
+    "tier": "tool_derives"
+  },
+  "c_absolute_cost_band": {
+    "fallback": "",
+    "label": "C4 - absolute dollar band",
+    "source": "Band over annual_tco_recurring",
+    "tier": "tool_derives"
+  },
+  "c_consumption_price_variance": {
+    "fallback": "",
+    "label": "C3 - metered spend against plan",
+    "source": "consumption_based_cost against the REQ 55 modelled plan",
+    "tier": "tool_derives"
+  },
+  "c_cost_per_active_user_vs_peers": {
+    "fallback": "",
+    "label": "C1 - cost per user against peers",
+    "source": "cost_per_active_user percentile within the primary_capability peer group (REQ 23)",
+    "tier": "tool_derives"
+  },
+  "c_pass": {
+    "fallback": "",
+    "label": "Cost gate",
+    "source": "cost_efficiency_score >= 3.0",
+    "tier": "tool_derives"
+  },
+  "c_unused_licence_waste": {
+    "fallback": "",
+    "label": "C2 - wasted seats",
+    "source": "Rubric band over licence_utilisation_rate (REQ 23)",
+    "tier": "tool_derives"
+  },
+  "capability_tag_confidence": {
+    "fallback": "",
+    "label": "Confidence in the capability tag",
+    "source": "Emitted by the REQ 19 tagger; 1.0 only where the client stated the tag",
+    "tier": "tool_derives"
+  },
+  "cluster_role": {
+    "fallback": "",
+    "label": "Survivor or absorbed",
+    "source": "REQ 25 survivor selection on value, cost, users and contract runway (REQ 60 for M&A pairs)",
+    "tier": "tool_derives"
+  },
+  "completeness_score": {
+    "fallback": "",
+    "label": "Share of model-consumed fields populated",
+    "source": "1 - missing/44 over the fields the scoring model consumes (REQ 12)",
+    "tier": "tool_derives"
+  },
+  "confidence": {
+    "fallback": "",
+    "label": "How much to trust this row",
+    "source": "completeness_score band plus whether every weighted criterion is populated",
+    "tier": "tool_derives"
+  },
+  "consolidation_saving": {
+    "fallback": "",
+    "label": "Saving from absorbing this app",
+    "source": "net_saving_annual on absorbed rows, blank on survivors to avoid double counting",
+    "tier": "tool_derives"
+  },
+  "consumption_based_cost": {
+    "fallback": "",
+    "label": "Metered / per-request / per-token spend",
+    "source": "GL/AP (and vendor billing portal)",
+    "tier": "system_extract"
+  },
+  "contract_id": {
+    "fallback": "",
+    "label": "Contract or subscription record id",
+    "source": "contract management",
+    "tier": "system_extract"
+  },
+  "contract_runway_months": {
+    "fallback": "",
+    "label": "Months of contract left",
+    "source": "Whole months from the analysis date to term_end",
+    "tier": "tool_derives"
+  },
+  "cost_centre": {
+    "fallback": "",
+    "label": "Cost centre carrying the spend",
+    "source": "GL/AP",
+    "tier": "system_extract"
+  },
+  "cost_efficiency_score": {
+    "fallback": "",
+    "label": "Cost efficiency (C)",
+    "source": "Weighted mean of the C criteria (C4 disabled)",
+    "tier": "tool_derives"
+  },
+  "cost_indirect_and_training": {
+    "fallback": "REQ 55 rule - year-one percentage of licence plus an annual churn allowance. LOSS: labelled 'estimated'.",
+    "label": "Help desk, training, skilled-staff premium",
+    "source": "",
+    "tier": "client_if_available"
+  },
+  "cost_infrastructure_peripherals": {
+    "fallback": "REQ 55 allocates only for on-prem and hosted, driven off the REQ 57 footprint. LOSS: on-prem TCO understated, so on-prem savings understated.",
+    "label": "Servers, storage, network, endpoints",
+    "source": "",
+    "tier": "client_if_available"
+  },
+  "cost_licence_subscription": {
+    "fallback": "",
+    "label": "Licence and subscription spend",
+    "source": "GL/AP",
+    "tier": "system_extract"
+  },
+  "cost_maintenance_dev_labour": {
+    "fallback": "REQ 55 rule - circa 0.25 FTE per COTS/SaaS app and 1.0 FTE per custom app, scaled by user band, times a loaded FTE rate. LOSS: labelled 'estimated'; usually the largest modelled component.",
+    "label": "Internal support and developer labour",
+    "source": "",
+    "tier": "client_if_available"
+  },
+  "cost_per_active_user": {
+    "fallback": "",
+    "label": "Cost per person actually using it",
+    "source": "annual_tco_recurring / active_users",
+    "tier": "tool_derives"
+  },
+  "cost_upgrade_and_modules": {
+    "fallback": "REQ 55 rule - a percentage of licence for on-prem COTS, zero for SaaS where bundled. LOSS: the component is labelled 'estimated', not 'actual', so a CFO can challenge the rule.",
+    "label": "Annual upgrade and add-on module fees",
+    "source": "",
+    "tier": "client_if_available"
+  },
+  "data_source": {
+    "fallback": "",
+    "label": "Which sources this row came from",
+    "source": "Emitted by ingestion - REQ 48 provenance and the REQ 61 presence flags",
+    "tier": "tool_derives"
+  },
+  "data_types_held": {
+    "fallback": "",
+    "label": "Kinds of data held",
+    "source": "ITSM/CMDB",
+    "tier": "system_extract"
+  },
+  "department": {
+    "fallback": "",
+    "label": "Department",
+    "source": "GL/AP",
+    "tier": "system_extract"
+  },
+  "dependency_count": {
+    "fallback": "",
+    "label": "Number of integration edges touching it",
+    "source": "REQ 10 edge count, either direction",
+    "tier": "tool_derives"
+  },
+  "deployment_model": {
+    "fallback": "",
+    "label": "SaaS, hosted or on-prem",
+    "source": "ITSM/CMDB",
+    "tier": "system_extract"
+  },
+  "description": {
+    "fallback": "capability inferred from app_name + vendor alone. LOSS: capability_tag_confidence drops, and REQ 19 warns that wrong capability tags make every REQ 25 redundancy finding wrong.",
+    "label": "One-line description of what it does",
+    "source": "",
+    "tier": "client_if_available"
+  },
+  "disposition": {
+    "fallback": "",
+    "label": "What we recommend",
+    "source": "vtcr_key looked up in the REQ 52 table, the retain/invest split on a Reward pattern, then the REQ 51 guards and the REQ 25 override",
+    "tier": "tool_derives"
+  },
+  "early_termination_penalty": {
+    "fallback": "",
+    "label": "Penalty for terminating early",
+    "source": "contract management",
+    "tier": "system_extract"
+  },
+  "five_year_cumulative_tco": {
+    "fallback": "",
+    "label": "Five-year cost",
+    "source": "annual_tco_recurring x 5, undiscounted",
+    "tier": "tool_derives"
+  },
+  "governance_visibility": {
+    "fallback": "",
+    "label": "Managed, Unmanaged, Unknown or Unsanctioned",
+    "source": "REQ 63 from the REQ 61 presence flags plus owner and contract resolution",
+    "tier": "tool_derives"
+  },
+  "gross_saving_annual": {
+    "fallback": "",
+    "label": "Saving before netting",
+    "source": "Run-rate for retire/consolidate/replace, or a licence reharvest net of a seat reserve",
+    "tier": "tool_derives"
+  },
+  "has_downstream_dependents": {
+    "fallback": "",
+    "label": "Something breaks if this is switched off",
+    "source": "REQ 10 rollup of the dependency edge list built from interface and middleware inventories",
+    "tier": "tool_derives"
+  },
+  "implementation_date": {
+    "fallback": "",
+    "label": "Go-live date",
+    "source": "ITSM/CMDB",
+    "tier": "system_extract"
+  },
+  "in_notice_window_now": {
+    "fallback": "",
+    "label": "Notice deadline is within 180 days",
+    "source": "notice_deadline_date within 0-180 days of the analysis date",
+    "tier": "tool_derives"
+  },
+  "information_classification": {
+    "fallback": "",
+    "label": "Most sensitive class of data held",
+    "source": "data governance",
+    "tier": "system_extract"
+  },
+  "infotech_template_disposition": {
+    "fallback": "",
+    "label": "What the licensed reference table returns",
+    "source": "vtcr_key looked up in the reference 16-row table",
+    "tier": "tool_derives"
+  },
+  "integration_pattern": {
+    "fallback": "",
+    "label": "How it integrates",
+    "source": "ITSM/CMDB (integration and middleware inventory)",
+    "tier": "system_extract"
+  },
+  "is_ai_tool": {
+    "fallback": "",
+    "label": "Is this an AI tool or agent",
+    "source": "REQ 11 classifier over name, vendor and description",
+    "tier": "tool_derives"
+  },
+  "is_orphaned": {
+    "fallback": "",
+    "label": "No accountable owner could be established",
+    "source": "REQ 18: business_owner and technical_owner both unresolvable after triangulating CMDB, cost centre and SSO",
+    "tier": "tool_derives"
+  },
+  "is_shadow_it": {
+    "fallback": "",
+    "label": "Paid for or in use but not governed",
+    "source": "REQ 8: AP spend or SSO activity with no CMDB record",
+    "tier": "tool_derives"
+  },
+  "last_signin_date": {
+    "fallback": "",
+    "label": "Most recent sign-in seen",
+    "source": "identity provider",
+    "tier": "system_extract"
+  },
+  "legal_entity": {
+    "fallback": "",
+    "label": "Legal entity carrying the app",
+    "source": "GL/AP",
+    "tier": "system_extract"
+  },
+  "licence_metric": {
+    "fallback": "",
+    "label": "What the contract prices on",
+    "source": "contract management",
+    "tier": "system_extract"
+  },
+  "licence_utilisation_rate": {
+    "fallback": "",
+    "label": "Share of bought seats actually used",
+    "source": "active_users / licences_purchased",
+    "tier": "tool_derives"
+  },
+  "licences_purchased": {
+    "fallback": "",
+    "label": "Entitlements bought",
+    "source": "licence portal",
+    "tier": "system_extract"
+  },
+  "lifecycle_exclusion_applied": {
+    "fallback": "",
+    "label": "Birth/Growth guard is armed",
+    "source": "lifecycle_stage in Birth or Growth (REQ 51)",
+    "tier": "tool_derives"
+  },
+  "lifecycle_stage": {
+    "fallback": "",
+    "label": "Where the app is in its own life",
+    "source": "ITSM/CMDB",
+    "tier": "system_extract"
+  },
+  "missing_fields": {
+    "fallback": "",
+    "label": "Which model-consumed fields are empty",
+    "source": "The empty subset of those 44 fields; 'unknown' counts as empty",
+    "tier": "tool_derives"
+  },
+  "net_saving_annual": {
+    "fallback": "",
+    "label": "Saving after netting",
+    "source": "gross - successor run cost - amortised one-time - residual archival (REQ 32/54)",
+    "tier": "tool_derives"
+  },
+  "net_saving_five_year": {
+    "fallback": "",
+    "label": "Five-year net saving",
+    "source": "net_saving_annual x 5, undiscounted",
+    "tier": "tool_derives"
+  },
+  "notice_deadline_date": {
+    "fallback": "",
+    "label": "The real deadline to serve notice",
+    "source": "term_end - renewal_notice_days",
+    "tier": "tool_derives"
+  },
+  "one_time_implementation_cost": {
+    "fallback": "omitted. Never enters the run-rate anyway (REQ 20); it only feeds the amortisation line. LOSS: none to the disposition.",
+    "label": "Original implementation cost",
+    "source": "",
+    "tier": "client_if_available"
+  },
+  "ov_enhance_services": {
+    "fallback": "",
+    "label": "V4 - does clinical work stop without it? (v1 name for ov_patient_care_criticality)",
+    "source": "clinical leadership",
+    "tier": "sme_judgement"
+  },
+  "ov_governance_compliance": {
+    "fallback": "",
+    "label": "V5 - regulatory and trust alignment",
+    "source": "security",
+    "tier": "sme_judgement"
+  },
+  "ov_increase_value": {
+    "fallback": "",
+    "label": "V1 - does it carry money in or out?",
+    "source": "application owner",
+    "tier": "sme_judgement"
+  },
+  "ov_patient_care_criticality": {
+    "fallback": "",
+    "label": "V4 - does clinical work stop without it?",
+    "source": "clinical leadership",
+    "tier": "sme_judgement"
+  },
+  "ov_reach_consumers": {
+    "fallback": "",
+    "label": "V2 - breadth of use",
+    "source": "Rubric band over active_users vs licences_purchased (REQ 21)",
+    "tier": "tool_derives"
+  },
+  "ov_reduce_costs_efficiency": {
+    "fallback": "",
+    "label": "V3 - process centrality",
+    "source": "Rubric band over the process_centrality answer (REQ 21)",
+    "tier": "tool_derives"
+  },
+  "overlap_cluster_id": {
+    "fallback": "",
+    "label": "Overlap cluster it belongs to",
+    "source": "REQ 25 clustering on capability, feature coverage, user overlap and cost",
+    "tier": "tool_derives"
+  },
+  "owner_stated_strategic_importance": {
+    "fallback": "",
+    "label": "What the owner says it is worth strategically",
+    "source": "application owner",
+    "tier": "sme_judgement"
+  },
+  "primary_capability": {
+    "fallback": "REQ 19 infers from description. LOSS: the C1 cost-per-user peer group and all redundancy clustering are built on this field.",
+    "label": "Primary business capability",
+    "source": "",
+    "tier": "client_if_available"
+  },
+  "priority": {
+    "fallback": "",
+    "label": "How urgent",
+    "source": "The table's priority, stepped by the retention constraint, the successor bump and the override rule",
+    "tier": "tool_derives"
+  },
+  "process_centrality": {
+    "fallback": "",
+    "label": "How central to the process it serves",
+    "source": "application owner",
+    "tier": "sme_judgement"
+  },
+  "r_business_compliance_risk": {
+    "fallback": "",
+    "label": "R2 - PHI exposure, residency, SOC 2 / HITRUST",
+    "source": "security",
+    "tier": "sme_judgement"
+  },
+  "r_clinical_safety_risk": {
+    "fallback": "",
+    "label": "R3 - patient-safety consequence of an outage",
+    "source": "clinical leadership",
+    "tier": "sme_judgement"
+  },
+  "r_end_user_perceived_quality": {
+    "fallback": "",
+    "label": "R4 - what users think of it",
+    "source": "application owner",
+    "tier": "sme_judgement"
+  },
+  "r_pass": {
+    "fallback": "",
+    "label": "Risk gate",
+    "source": "risk_posture_score >= 3.0",
+    "tier": "tool_derives"
+  },
+  "r_technical_risk": {
+    "fallback": "",
+    "label": "R1 - single points of failure, DR, hardening",
+    "source": "security",
+    "tier": "sme_judgement"
+  },
+  "rationale": {
+    "fallback": "",
+    "label": "The written reason",
+    "source": "Composed from the gate key, the scores, the evidence and the saving arithmetic (REQ 27)",
+    "tier": "tool_derives"
+  },
+  "realization_lag_months": {
+    "fallback": "a default lag per disposition. LOSS: affects when the saving lands in the roadmap, not whether it exists.",
+    "label": "Months from decision to first saved dollar",
+    "source": "",
+    "tier": "client_if_available"
+  },
+  "redundancy_override_applied": {
+    "fallback": "",
+    "label": "Cluster membership forced consolidate",
+    "source": "cluster_role == absorbed (REQ 25)",
+    "tier": "tool_derives"
+  },
+  "renewal_notice_days": {
+    "fallback": "",
+    "label": "Days notice required before term end",
+    "source": "contract management",
+    "tier": "system_extract"
+  },
+  "replacement_app_id": {
+    "fallback": "",
+    "label": "The named successor",
+    "source": "The cluster survivor, or a human-named target (REQ 58)",
+    "tier": "tool_derives"
+  },
+  "replacement_cost_already_in_baseline": {
+    "fallback": "",
+    "label": "Successor is already a paid line here",
+    "source": "True when replacement_app_id resolves to a row already in the portfolio",
+    "tier": "tool_derives"
+  },
+  "replacement_ongoing_tco": {
+    "fallback": "",
+    "label": "Successor's cost to carry this workload",
+    "source": "Looked up from the successor's own annual_tco_recurring",
+    "tier": "tool_derives"
+  },
+  "residual_archival_cost": {
+    "fallback": "modelled from data_types_held and the REQ 57 footprint (REQ 53 marks full archival costing a stretch). LOSS: net saving overstated on every retire.",
+    "label": "Cost that survives switch-off (archive)",
+    "source": "",
+    "tier": "client_if_available"
+  },
+  "retain_or_invest_basis": {
+    "fallback": "",
+    "label": "Why a Reward row was called retain or invest",
+    "source": "split_reward(): which test of the retain/invest split fired. Blank on every non-Reward pattern",
+    "tier": "tool_derives"
+  },
+  "retention_expiry_date": {
+    "fallback": "",
+    "label": "Date the data may actually be deleted",
+    "source": "records management",
+    "tier": "system_extract"
+  },
+  "retention_obligation_flag": {
+    "fallback": "",
+    "label": "Data must be kept after switch-off",
+    "source": "records management",
+    "tier": "system_extract"
+  },
+  "retention_override_applied": {
+    "fallback": "",
+    "label": "A live retention obligation constrains retire",
+    "source": "retire + retention_obligation_flag + retention_expiry_date in the future (REQ 53)",
+    "tier": "tool_derives"
+  },
+  "reward_split_basis": {
+    "fallback": "",
+    "label": "Why a Reward row was called retain or invest",
+    "source": "split_reward(): which test of the retain/invest split fired. Blank on every non-Reward pattern",
+    "tier": "tool_derives"
+  },
+  "risk_posture_score": {
+    "fallback": "",
+    "label": "Risk posture (R)",
+    "source": "Weighted mean of the R criteria (R4 disabled)",
+    "tier": "tool_derives"
+  },
+  "saving_type": {
+    "fallback": "",
+    "label": "Recurring, one-time or none",
+    "source": "Seeded by the analyst, then forced to 'none' by the engine wherever gross saving is zero",
+    "tier": "tool_derives"
+  },
+  "secondary_capabilities": {
+    "fallback": "REQ 19 inference. LOSS: partial-overlap clusters are missed; only primary-capability duplicates are found.",
+    "label": "Other capabilities it also covers",
+    "source": "",
+    "tier": "client_if_available"
+  },
+  "sourcing_exclusion_applied": {
+    "fallback": "",
+    "label": "Sourcing made a disposition illegal",
+    "source": "sourcing_type SaaS with a replace disposition (REQ 51)",
+    "tier": "tool_derives"
+  },
+  "sourcing_type": {
+    "fallback": "",
+    "label": "Bought, built or hybrid",
+    "source": "ITSM/CMDB",
+    "tier": "system_extract"
+  },
+  "suppressed_recommendation": {
+    "fallback": "",
+    "label": "What a guard suppressed",
+    "source": "Recorded whenever a guard changed or armed against the gate result",
+    "tier": "tool_derives"
+  },
+  "suppression_reason": {
+    "fallback": "",
+    "label": "Why it was suppressed",
+    "source": "Accumulated guard reasons",
+    "tier": "tool_derives"
+  },
+  "t_pass": {
+    "fallback": "",
+    "label": "Technical gate",
+    "source": "technical_health_score >= 3.0",
+    "tier": "tool_derives"
+  },
+  "tco_five_category_subtotal": {
+    "fallback": "",
+    "label": "The five reference cost categories",
+    "source": "Sum of the five cost_* components",
+    "tier": "tool_derives"
+  },
+  "technical_health_score": {
+    "fallback": "",
+    "label": "Technical health (T)",
+    "source": "Weighted mean of the five T criteria",
+    "tier": "tool_derives"
+  },
+  "technical_obsolescence_flag": {
+    "fallback": "",
+    "label": "Obsolescence is material, not notional",
+    "source": "REQ 17: version_installed vs version_vendor_supported, and vendor_eos_date against the analysis date",
+    "tier": "tool_derives"
+  },
+  "technical_owner": {
+    "fallback": "",
+    "label": "Accountable technical owner",
+    "source": "ITSM/CMDB",
+    "tier": "system_extract"
+  },
+  "term_end": {
+    "fallback": "",
+    "label": "Current term end",
+    "source": "contract management",
+    "tier": "system_extract"
+  },
+  "term_start": {
+    "fallback": "",
+    "label": "Current term start",
+    "source": "contract management",
+    "tier": "system_extract"
+  },
+  "th_architecture_fit": {
+    "fallback": "",
+    "label": "T2 - architecture and cloud fit",
+    "source": "technical owner",
+    "tier": "sme_judgement"
+  },
+  "th_customization_debt": {
+    "fallback": "",
+    "label": "T5 - how much we have bent it",
+    "source": "technical owner",
+    "tier": "sme_judgement"
+  },
+  "th_operational_stability": {
+    "fallback": "",
+    "label": "T3 - how much it breaks",
+    "source": "technical owner",
+    "tier": "sme_judgement"
+  },
+  "th_supportability": {
+    "fallback": "",
+    "label": "T1 - version currency and end-of-support proximity",
+    "source": "Rubric band over version_installed vs version_vendor_supported and vendor_eos_date (REQ 22)",
+    "tier": "tool_derives"
+  },
+  "th_vendor_viability": {
+    "fallback": "",
+    "label": "T4 - is the vendor going to be here?",
+    "source": "technical owner",
+    "tier": "sme_judgement"
+  },
+  "unused_licence_count": {
+    "fallback": "",
+    "label": "Licensed but inactive seats",
+    "source": "licences_purchased - active_users",
+    "tier": "tool_derives"
+  },
+  "unused_licence_spend": {
+    "fallback": "",
+    "label": "Licence spend on inactive seats",
+    "source": "cost_licence_subscription x (1 - licence_utilisation_rate)",
+    "tier": "tool_derives"
+  },
+  "urg_risk_pain_severity": {
+    "fallback": "",
+    "label": "How much pain the current state causes",
+    "source": "application owner",
+    "tier": "sme_judgement"
+  },
+  "urg_timeline_sensitivity": {
+    "fallback": "",
+    "label": "How time-bound the decision is",
+    "source": "Bands over term_end, notice_deadline_date and vendor_eos_date (REQ 56)",
+    "tier": "tool_derives"
+  },
+  "urgency_score": {
+    "fallback": "",
+    "label": "Urgency, 0-1",
+    "source": "Mean of the two urgency bands",
+    "tier": "tool_derives"
+  },
+  "v_pass": {
+    "fallback": "",
+    "label": "Value gate",
+    "source": "business_value_score >= 3.0",
+    "tier": "tool_derives"
+  },
+  "vendor_eos_date": {
+    "fallback": "",
+    "label": "Vendor end-of-support date",
+    "source": "Vendor lifecycle lookup by the tool",
+    "tier": "tool_derives"
+  },
+  "vendor_name": {
+    "fallback": "",
+    "label": "Vendor or publisher",
+    "source": "",
+    "tier": "client_mandatory"
+  },
+  "version_installed": {
+    "fallback": "",
+    "label": "Version actually running",
+    "source": "ITSM/CMDB (or software discovery - SCCM, Intune)",
+    "tier": "system_extract"
+  },
+  "version_vendor_supported": {
+    "fallback": "",
+    "label": "Version the vendor currently supports",
+    "source": "Vendor lifecycle lookup by the tool, not a client field",
+    "tier": "tool_derives"
+  },
+  "vtcr_key": {
+    "fallback": "",
+    "label": "The four gates concatenated",
+    "source": "v_pass + t_pass + c_pass + r_pass",
+    "tier": "tool_derives"
+  }
+}

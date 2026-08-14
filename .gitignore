@@ -13,11 +13,15 @@ DNUDecomission List_Master_11.19.24.xlsx
 Novant_App Rat_Playbook_MVP.pptx
 
 # --- Broader guards against renamed or derived copies ---
-data/
+# These patterns have no leading slash, so they apply at every depth, data/
+# included. data/ itself is no longer ignored: it now holds the team's own
+# synthetic datasets, committed with the team's sign-off. Nothing client-supplied
+# or licensed may be put in it.
 *DNU*
 *Decomission*
 *Decommission*
 *-Master-*
+*.bin
 
 # Office lock / autosave files
 ~$*

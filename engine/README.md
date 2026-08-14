@@ -62,13 +62,16 @@ the code whose output was verified. To run one, you will need to supply the inpu
 | `score_northstar_v3.py` | `Northstar-Disposition-Analysis-v3.xlsx`, `northstar-dispositions-v3.csv` |
 | `build_client_input.py` | `Client-Input-Dataset-v1.xlsx`, `client-input.csv` |
 
-## The datasets are not in this repo
+## Where the datasets are
 
-**No data files are committed here** — no spreadsheets, no CSV outputs. The datasets these
-scripts generate and consume are shared in the team's Slack channel instead, and stay there
-until the team agrees to commit them. This repository is public, and client-supplied material
-and licensed third-party vendor templates must never land in it; `.gitignore` blocks the known
-ones by name. If you need a dataset to run against, get it from the channel.
+The datasets these scripts generate and consume are committed, in `data/` — including the two
+Northstar sample workbooks the `score_northstar*.py` runs read, so point `SOURCE_XLSX` at
+`data/northstar/healthcare_app_rationalization_sample_20.xlsx` (v1) or
+`…-with-risk.xlsx` (v2 and v3). `data/README.md` explains every file. All of it is synthetic:
+invented figures for fictional organisations, with only the product and vendor names real.
+
+This repository is public, and client-supplied material and licensed third-party vendor
+templates must never land in it; `.gitignore` blocks the known ones by name.
 
 ## The scoring model in brief
 

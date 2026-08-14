@@ -115,10 +115,16 @@ plus a sheet recording assumptions, data gaps and open questions.
 | `src/build-wrapper.py` | Regenerates `index.html` from the source. |
 | `docs/wireframe-README.md` | How the two HTML files relate, and how to rebuild. |
 | `docs/requirements/` | The requirements workbook and its README. |
+| `data/` | The synthetic datasets and the disposition analyses, with its own README. |
 | `.gitignore` | Guards against committing client data or licensed vendor templates. |
 
 ## Where the data is
 
-The synthetic datasets and the disposition analyses are shared in the team's Slack
-channel and are deliberately not committed here yet, pending the team's sign-off. This
-repository is public, so nothing goes in until the team agrees it should.
+The synthetic datasets and the disposition analyses are committed, in `data/` — the team's
+own portfolio, the client-intake view of it, and the three Northstar scoring runs, with
+`data/README.md` explaining each file and which version is current. Every figure in them is
+invented; only the product and vendor names are real, and both portfolios are fictional.
+
+This repository is public, so what stays out stays out: no client data and no licensed
+third-party vendor templates, in `data/` or anywhere else. `.gitignore` blocks the known
+ones by name.
