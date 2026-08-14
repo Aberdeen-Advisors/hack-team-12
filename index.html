@@ -1,0 +1,949 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Static wireframe for AppRat AI, an application rationalization workspace. Executive overview, rationalization workbench and decision detail.">
+<meta name="robots" content="noindex">
+<title>AppRat AI &mdash; Application Rationalization</title>
+
+<!-- Poppins, with a full system fallback stack if Google Fonts is unavailable. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap">
+
+<style>
+/* ---------------------------------------------------------------------------
+   Host design system.
+
+   The wireframe fragment below is written against a host application's design
+   system. It never ships those styles itself, so this block supplies them:
+   the CSS custom properties it reads (--foreground, --card, --muted,
+   --muted-foreground, --border) and the utility/component classes it uses
+   (.card, .btn and variants, .viz-badge, .viz-stat, .table and variants,
+   .form-select, and the text helpers). Deliberately neutral -- the intent is
+   to make the fragment legible, not to give it a new visual language.
+   --------------------------------------------------------------------------- */
+
+:root {
+  color-scheme: light;
+
+  --foreground: #1a1a1a;
+  --muted-foreground: #6b7280;
+  --card: #ffffff;
+  --muted: #eef1f4;
+  --border: #dfe3e8;
+
+  --page-bg: #f6f8fa;
+  --accent: #09375f;
+
+  --font-sans: Poppins, "Segoe UI", Calibri, system-ui, -apple-system,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --radius: 8px;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  padding: 24px 20px 56px;
+  background: var(--page-bg);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page-shell { max-width: 1360px; margin: 0 auto; }
+
+h1, h2, h3, h4 { font-weight: 500; line-height: 1.25; }
+h2 { font-size: 1.4rem; }
+h3 { font-size: 1.05rem; }
+p { line-height: 1.55; }
+
+/* --- surfaces ------------------------------------------------------------ */
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+/* --- buttons ------------------------------------------------------------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card);
+  color: inherit;
+  font: inherit;
+  line-height: 1.3;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+
+.btn:hover { background: var(--muted); }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn-primary:hover { background: #0b4478; }
+
+.btn-ghost { background: transparent; border-color: transparent; }
+.btn-ghost:hover { background: var(--muted); }
+
+.btn-block { display: flex; width: 100%; margin-top: 0.75rem; }
+
+/* --- badges and stats ---------------------------------------------------- */
+
+.viz-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.viz-stat { display: block; }
+.viz-stat-value { display: block; font-size: 1.9rem; line-height: 1.15; }
+
+/* --- tables -------------------------------------------------------------- */
+
+.table { width: 100%; border-collapse: collapse; }
+
+.table th,
+.table td {
+  padding: 0.5rem 0.4rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.table th {
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--muted-foreground);
+  white-space: nowrap;
+}
+
+.table tbody tr:last-child td { border-bottom: 0; }
+
+.table-sm th,
+.table-sm td { padding: 0.4rem 0.35rem; }
+
+/* Wide tables scroll inside their own box; the page body never scrolls
+   sideways. */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* --- forms --------------------------------------------------------------- */
+
+.form-select {
+  width: 100%;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card);
+  color: inherit;
+  font: inherit;
+}
+
+.form-select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* --- text helpers -------------------------------------------------------- */
+
+.text-small { font-size: 12px; }
+.text-muted { color: var(--muted-foreground); }
+.text-end { text-align: right; }
+
+/* --- icons --------------------------------------------------------------- */
+
+/* Lucide swaps each <i data-lucide> for an inline <svg class="lucide">. Both
+   states are sized here so the layout is identical whether or not the icon
+   script loaded -- no reflow, and no broken-image boxes if it never arrives. */
+i[data-lucide],
+svg.lucide {
+  display: inline-block;
+  flex: none;
+  width: 16px;
+  height: 16px;
+  vertical-align: -0.15em;
+}
+
+svg.lucide {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (max-width: 720px) {
+  body { padding: 16px 12px 40px; }
+}
+</style>
+</head>
+<body>
+<main class="page-shell">
+<div id="apprat-wireframe">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap');
+
+    #apprat-wireframe {
+      --ab-blue: #09375F;
+      --ab-teal: #44B0B1;
+      --ab-onyx: #404040;
+      --ab-sky: #5CC8FF;
+      --ab-jade: #00A676;
+      --ab-jasper: #DB504A;
+      --ab-gold: #F7D002;
+      font-family: Poppins, Calibri, sans-serif;
+      color: var(--foreground);
+      width: 100%;
+    }
+
+    #apprat-wireframe * { box-sizing: border-box; }
+
+    #apprat-wireframe .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      padding-bottom: 0.85rem;
+      border-bottom: 3px solid var(--ab-teal);
+    }
+
+    #apprat-wireframe .brand-block,
+    #apprat-wireframe .header-actions,
+    #apprat-wireframe .nav-row,
+    #apprat-wireframe .progress-labels,
+    #apprat-wireframe .cluster-title,
+    #apprat-wireframe .recommendation-title,
+    #apprat-wireframe .detail-heading,
+    #apprat-wireframe .evidence-row {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    #apprat-wireframe .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 2.4rem;
+      height: 2.4rem;
+      background: var(--ab-blue);
+      color: #FFFFFF;
+      font-weight: 500;
+      border-radius: 0.35rem;
+    }
+
+    #apprat-wireframe .eyebrow {
+      color: var(--ab-blue);
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    #apprat-wireframe .product-name {
+      color: var(--ab-blue);
+      font-weight: 500;
+    }
+
+    #apprat-wireframe .header-actions { flex-wrap: wrap; }
+
+    #apprat-wireframe .nav-row {
+      padding: 0.85rem 0;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--border);
+    }
+
+    #apprat-wireframe .nav-row .btn.is-selected {
+      color: var(--ab-blue);
+      box-shadow: inset 0 -2px 0 var(--ab-teal);
+    }
+
+    #apprat-wireframe .view { display: none; }
+    #apprat-wireframe .view.is-active { display: block; }
+
+    #apprat-wireframe .page-intro {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: flex-start;
+      margin: 1rem 0;
+    }
+
+    #apprat-wireframe .page-intro h2,
+    #apprat-wireframe .section-title,
+    #apprat-wireframe .detail-heading h3 {
+      color: var(--ab-blue);
+      margin: 0;
+    }
+
+    #apprat-wireframe .page-intro p { margin: 0.25rem 0 0; }
+
+    #apprat-wireframe .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 0.85rem;
+    }
+
+    #apprat-wireframe .kpi-grid .card,
+    #apprat-wireframe .section-card { padding: 0.9rem; }
+
+    #apprat-wireframe .viz-stat-value {
+      color: var(--ab-blue);
+      font-weight: 500;
+    }
+
+    #apprat-wireframe .target-value { color: var(--ab-jade); }
+
+    #apprat-wireframe .progress-labels {
+      justify-content: space-between;
+      margin-bottom: 0.45rem;
+      flex-wrap: wrap;
+    }
+
+    #apprat-wireframe .progress-track {
+      position: relative;
+      height: 0.85rem;
+      background: color-mix(in srgb, var(--muted) 82%, var(--ab-blue));
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    #apprat-wireframe .progress-target,
+    #apprat-wireframe .progress-identified {
+      height: 100%;
+    }
+
+    #apprat-wireframe .progress-target {
+      width: 75%;
+      background: var(--ab-blue);
+    }
+
+    #apprat-wireframe .progress-identified {
+      width: 83%;
+      background: var(--ab-teal);
+    }
+
+    #apprat-wireframe .savings-comparison {
+      display: grid;
+      gap: 0.65rem;
+    }
+
+    #apprat-wireframe .savings-row {
+      display: grid;
+      grid-template-columns: minmax(10rem, 0.8fr) minmax(0, 2fr);
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    #apprat-wireframe .savings-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      align-items: baseline;
+    }
+
+    #apprat-wireframe .savings-note {
+      margin: 0.65rem 0 0;
+    }
+
+    #apprat-wireframe .overview-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+      gap: 0.85rem;
+      margin: 0.85rem 0;
+    }
+
+    #apprat-wireframe .section-title { margin-bottom: 0.75rem; }
+
+    #apprat-wireframe .mix-bar {
+      display: flex;
+      width: 100%;
+      height: 1.15rem;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--muted);
+    }
+
+    #apprat-wireframe .mix-invest { width: 14.6%; background: var(--ab-jade); }
+    #apprat-wireframe .mix-retain { width: 26.7%; background: var(--ab-blue); }
+    #apprat-wireframe .mix-consolidate { width: 19.7%; background: var(--ab-teal); }
+    #apprat-wireframe .mix-replace { width: 7%; background: var(--ab-sky); }
+    #apprat-wireframe .mix-retire { width: 16%; background: var(--ab-jasper); }
+    #apprat-wireframe .mix-validate { width: 16%; background: var(--ab-gold); }
+
+    #apprat-wireframe .legend-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.55rem;
+      margin-top: 0.75rem;
+    }
+
+    #apprat-wireframe .legend-item {
+      display: flex;
+      gap: 0.45rem;
+      align-items: center;
+    }
+
+    #apprat-wireframe .legend-dot {
+      width: 0.7rem;
+      height: 0.7rem;
+      border-radius: 999px;
+      flex: none;
+    }
+
+    #apprat-wireframe .guardrail-list {
+      display: grid;
+      gap: 0.55rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    #apprat-wireframe .guardrail-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 0.55rem;
+      align-items: start;
+    }
+
+    #apprat-wireframe .guardrail-icon {
+      color: var(--ab-blue);
+      margin-top: 0.1rem;
+    }
+
+    #apprat-wireframe .table-row-action {
+      color: var(--ab-blue);
+      font-weight: 500;
+    }
+
+    #apprat-wireframe .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      border-radius: 999px;
+      padding: 0.2rem 0.5rem;
+      font-weight: 500;
+      white-space: nowrap;
+      color: var(--ab-blue);
+      background: color-mix(in srgb, var(--card) 70%, var(--ab-teal));
+    }
+
+    #apprat-wireframe .status-retire {
+      color: color-mix(in srgb, var(--foreground) 70%, var(--ab-jasper));
+      background: color-mix(in srgb, var(--card) 82%, var(--ab-jasper));
+    }
+
+    #apprat-wireframe .status-retain {
+      color: var(--ab-blue);
+      background: color-mix(in srgb, var(--card) 82%, var(--ab-blue));
+    }
+
+    #apprat-wireframe .status-invest {
+      color: color-mix(in srgb, var(--foreground) 72%, var(--ab-jade));
+      background: color-mix(in srgb, var(--card) 82%, var(--ab-jade));
+    }
+
+    #apprat-wireframe .status-validate {
+      color: var(--ab-blue);
+      background: color-mix(in srgb, var(--card) 76%, var(--ab-gold));
+    }
+
+    #apprat-wireframe .cluster-list {
+      display: grid;
+      gap: 0.7rem;
+    }
+
+    #apprat-wireframe .cluster-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 0.75fr)) auto;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.65rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    #apprat-wireframe .cluster-row:last-child { border-bottom: 0; }
+
+    #apprat-wireframe .cluster-title { align-items: flex-start; }
+
+    #apprat-wireframe .cluster-count {
+      display: grid;
+      place-items: center;
+      min-width: 2rem;
+      height: 2rem;
+      border-radius: 999px;
+      background: var(--ab-blue);
+      color: #FFFFFF;
+      font-weight: 500;
+    }
+
+    #apprat-wireframe .field-label,
+    #apprat-wireframe .metric-label {
+      color: var(--muted-foreground);
+    }
+
+    #apprat-wireframe .cluster-value { font-weight: 500; color: var(--ab-blue); }
+
+    #apprat-wireframe .workbench-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(15rem, 0.65fr);
+      gap: 0.85rem;
+    }
+
+    #apprat-wireframe .filter-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.65rem;
+      margin-bottom: 0.75rem;
+    }
+
+    #apprat-wireframe .form-label { display: grid; gap: 0.25rem; }
+
+    #apprat-wireframe .detail-heading {
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.7rem;
+    }
+
+    #apprat-wireframe .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.65rem;
+      padding: 0.75rem 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    #apprat-wireframe .evidence-list {
+      display: grid;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+
+    #apprat-wireframe .evidence-row {
+      align-items: flex-start;
+    }
+
+    #apprat-wireframe .evidence-check { color: var(--ab-jade); }
+    #apprat-wireframe .evidence-warning { color: var(--ab-gold); }
+
+    #apprat-wireframe .rationale-box {
+      margin-top: 0.75rem;
+      padding-left: 0.75rem;
+      border-left: 3px solid var(--ab-teal);
+    }
+
+    #apprat-wireframe .detail-empty {
+      display: grid;
+      place-items: center;
+      min-height: 17rem;
+      text-align: center;
+      color: var(--muted-foreground);
+    }
+
+    #apprat-wireframe .numeric { font-variant-numeric: tabular-nums; }
+
+    @media (max-width: 680px) {
+      #apprat-wireframe .kpi-grid,
+      #apprat-wireframe .overview-grid,
+      #apprat-wireframe .workbench-layout,
+      #apprat-wireframe .filter-row {
+        grid-template-columns: 1fr;
+      }
+
+      #apprat-wireframe .cluster-row {
+        grid-template-columns: minmax(0, 1fr) auto;
+      }
+
+      #apprat-wireframe .cluster-row .cluster-metric { display: none; }
+      #apprat-wireframe .page-intro { flex-direction: column; }
+      #apprat-wireframe .savings-row { grid-template-columns: 1fr; gap: 0.3rem; }
+    }
+  </style>
+
+  <header class="app-header">
+    <div class="brand-block">
+      <div class="brand-mark" aria-hidden="true">A</div>
+      <div>
+        <div class="eyebrow text-small">Aberdeen Advisors</div>
+        <div class="product-name">AppRat AI</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <span class="viz-badge">Global portfolio · 600 tools</span>
+      <button type="button" class="btn" data-action="upload"><i data-lucide="upload" aria-hidden="true"></i> Upload inventory</button>
+      <button type="button" class="btn btn-primary" data-action="analyze"><i data-lucide="sparkles" aria-hidden="true"></i> Analyze portfolio</button>
+    </div>
+  </header>
+
+  <nav class="nav-row" aria-label="AppRat AI views">
+    <button type="button" class="btn btn-ghost is-selected" data-view="overview" aria-pressed="true">Executive overview</button>
+    <button type="button" class="btn btn-ghost" data-view="workbench" aria-pressed="false">Rationalization workbench</button>
+    <button type="button" class="btn btn-ghost" data-view="detail" aria-pressed="false">Decision detail</button>
+  </nav>
+
+  <main>
+    <section class="view is-active" data-panel="overview">
+      <div class="page-intro">
+        <div>
+          <h2>Portfolio decision overview</h2>
+          <p class="text-muted">Explainable recommendations that protect critical business operations.</p>
+        </div>
+        <span class="status-badge"><i data-lucide="shield-check" aria-hidden="true"></i> 74 critical apps protected</span>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="card viz-stat">
+          <div class="text-muted">Annual technology spend</div>
+          <div class="viz-stat-value numeric">$42.8M</div>
+          <div class="text-small text-muted">600 applications, SaaS and AI tools</div>
+        </div>
+        <div class="card viz-stat">
+          <div class="text-muted">CIO savings target</div>
+          <div class="viz-stat-value numeric">$6.42M</div>
+          <div class="text-small text-muted">15.0% of annual spend</div>
+        </div>
+        <div class="card viz-stat">
+          <div class="text-muted">Safe savings identified</div>
+          <div class="viz-stat-value target-value numeric">$7.10M</div>
+          <div class="text-small text-muted">16.6% · high-confidence actions</div>
+        </div>
+      </div>
+
+      <section class="card section-card" aria-label="Savings progress">
+        <div class="progress-labels">
+          <strong>Safe savings progress</strong>
+          <span class="text-small">Common scale: 20% of annual spend</span>
+        </div>
+        <div class="savings-comparison" role="img" aria-label="CIO target is 6.42 million dollars or 15 percent of spend. Safe savings identified are 7.10 million dollars or 16.6 percent of spend.">
+          <div class="savings-row">
+            <div class="savings-label"><span>CIO target</span><strong class="numeric">$6.42M · 15.0%</strong></div>
+            <div class="progress-track"><div class="progress-target"></div></div>
+          </div>
+          <div class="savings-row">
+            <div class="savings-label"><span>Safe savings identified</span><strong class="numeric">$7.10M · 16.6%</strong></div>
+            <div class="progress-track"><div class="progress-identified"></div></div>
+          </div>
+        </div>
+        <p class="savings-note text-small text-muted"><strong>Safe savings</strong> are avoidable annual savings from high-confidence actions that pass critical-operation and dependency guardrails. One-time transition costs are tracked separately.</p>
+      </section>
+
+      <div class="overview-grid">
+        <section class="card section-card">
+          <h3 class="section-title">Recommended decision mix</h3>
+          <div class="mix-bar" role="img" aria-label="88 invest, 160 retain, 118 consolidate, 42 replace, 96 retire, and 96 need validation">
+            <div class="mix-invest"></div>
+            <div class="mix-retain"></div>
+            <div class="mix-consolidate"></div>
+            <div class="mix-replace"></div>
+            <div class="mix-retire"></div>
+            <div class="mix-validate"></div>
+          </div>
+          <div class="legend-grid text-small">
+            <div class="legend-item"><span class="legend-dot mix-invest"></span><span>Invest · 88</span></div>
+            <div class="legend-item"><span class="legend-dot mix-retain"></span><span>Retain · 160</span></div>
+            <div class="legend-item"><span class="legend-dot mix-consolidate"></span><span>Consolidate · 118</span></div>
+            <div class="legend-item"><span class="legend-dot mix-replace"></span><span>Replace · 42</span></div>
+            <div class="legend-item"><span class="legend-dot mix-retire"></span><span>Retire · 96</span></div>
+            <div class="legend-item"><span class="legend-dot mix-validate"></span><span>Needs validation · 96</span></div>
+          </div>
+          <p class="savings-note text-small text-muted"><strong>Retain</strong> means keep as-is; <strong>Invest</strong> means keep and strengthen because it is strategic or needs improvement.</p>
+        </section>
+
+        <section class="card section-card">
+          <h3 class="section-title">Critical-operation guardrails</h3>
+          <ul class="guardrail-list text-small">
+            <li class="guardrail-item"><i class="guardrail-icon" data-lucide="shield-check" aria-hidden="true"></i><span><strong>0 critical capabilities</strong> left without a primary application.</span></li>
+            <li class="guardrail-item"><i class="guardrail-icon" data-lucide="git-branch" aria-hidden="true"></i><span><strong>12 retirements blocked</strong> by unresolved downstream dependencies.</span></li>
+            <li class="guardrail-item"><i class="guardrail-icon" data-lucide="circle-alert" aria-hidden="true"></i><span><strong>96 tools held</strong> for missing usage, cost or risk evidence.</span></li>
+          </ul>
+        </section>
+      </div>
+
+      <section class="card section-card">
+        <h3 class="section-title">Highest-value redundancy clusters</h3>
+        <div class="cluster-list">
+          <div class="cluster-row">
+            <div class="cluster-title"><span class="cluster-count">8</span><span><strong>Enterprise collaboration</strong><br><span class="text-small text-muted">Microsoft 365, Slack, Webex and niche messaging tools</span></span></div>
+            <div class="cluster-metric"><div class="metric-label text-small">Spend</div><div class="cluster-value numeric">$3.8M</div></div>
+            <div class="cluster-metric"><div class="metric-label text-small">Savings</div><div class="cluster-value numeric">$1.2M</div></div>
+            <div class="cluster-metric"><div class="metric-label text-small">Risk</div><div><span class="status-badge">Guarded</span></div></div>
+            <button type="button" class="btn btn-ghost table-row-action" data-cluster="collaboration">Review</button>
+          </div>
+          <div class="cluster-row">
+            <div class="cluster-title"><span class="cluster-count">6</span><span><strong>AI meeting assistants</strong><br><span class="text-small text-muted">Recording, transcription and action-item agents</span></span></div>
+            <div class="cluster-metric"><div class="metric-label text-small">Spend</div><div class="cluster-value numeric">$1.4M</div></div>
+            <div class="cluster-metric"><div class="metric-label text-small">Savings</div><div class="cluster-value numeric">$0.7M</div></div>
+            <div class="cluster-metric"><div class="metric-label text-small">Risk</div><div><span class="status-badge">Low</span></div></div>
+            <button type="button" class="btn btn-ghost table-row-action" data-cluster="ai-meetings">Review</button>
+          </div>
+          <div class="cluster-row">
+            <div class="cluster-title"><span class="cluster-count">5</span><span><strong>Contract management</strong><br><span class="text-small text-muted">Enterprise CLM and departmental SaaS products</span></span></div>
+            <div class="cluster-metric"><div class="metric-label text-small">Spend</div><div class="cluster-value numeric">$2.2M</div></div>
+            <div class="cluster-metric"><div class="metric-label text-small">Savings</div><div class="cluster-value numeric">$0.6M</div></div>
+            <div class="cluster-metric"><div class="metric-label text-small">Risk</div><div><span class="status-badge status-validate">Validate</span></div></div>
+            <button type="button" class="btn btn-ghost table-row-action" data-cluster="contracts">Review</button>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section class="view" data-panel="workbench">
+      <div class="page-intro">
+        <div>
+          <h2>Rationalization workbench</h2>
+          <p class="text-muted">Move from portfolio evidence to an auditable recommendation.</p>
+        </div>
+        <button type="button" class="btn"><i data-lucide="download" aria-hidden="true"></i> Export decisions</button>
+      </div>
+
+      <div class="filter-row">
+        <label class="form-label text-small">Business capability
+          <select class="form-select"><option>All capabilities</option><option>Enterprise collaboration</option><option>Clinical operations</option><option>Contract management</option></select>
+        </label>
+        <label class="form-label text-small">Recommendation
+          <select class="form-select"><option>All decisions</option><option>Invest</option><option>Retain</option><option>Consolidate</option><option>Replace</option><option>Retire</option><option>Needs validation</option></select>
+        </label>
+        <label class="form-label text-small">Critical operation
+          <select class="form-select"><option>All</option><option>Critical only</option><option>Noncritical only</option></select>
+        </label>
+      </div>
+
+      <div class="workbench-layout">
+        <section class="card section-card">
+          <div class="table-responsive">
+            <table class="table table-sm">
+              <thead><tr><th>Application</th><th>Capability</th><th>Decision</th><th class="text-end" data-tooltip="Recurring annual run-rate spend that disappears after the action is completed; excludes one-time transition costs.">Avoidable annual savings</th><th>Confidence</th></tr></thead>
+              <tbody>
+                <tr data-app="slack"><td><button type="button" class="btn btn-ghost table-row-action" data-select-app="slack">Slack Enterprise</button></td><td>Enterprise collaboration</td><td><span class="status-badge">Consolidate</span></td><td class="text-end numeric">$820K</td><td>High</td></tr>
+                <tr data-app="notetaker"><td><button type="button" class="btn btn-ghost table-row-action" data-select-app="notetaker">AI NoteTaker Pro</button></td><td>Meeting assistance</td><td><span class="status-badge status-retire">Retire</span></td><td class="text-end numeric">$310K</td><td>High</td></tr>
+                <tr data-app="legacy-clm"><td><button type="button" class="btn btn-ghost table-row-action" data-select-app="legacy-clm">Legacy CLM</button></td><td>Contract management</td><td><span class="status-badge status-validate">Needs validation</span></td><td class="text-end numeric">—</td><td>Low</td></tr>
+                <tr data-app="patient-flow"><td><button type="button" class="btn btn-ghost table-row-action" data-select-app="patient-flow">Patient Flow Hub</button></td><td>Clinical operations</td><td><span class="status-badge status-invest">Invest</span></td><td class="text-end numeric">$0</td><td>High</td></tr>
+                <tr data-app="workday"><td><button type="button" class="btn btn-ghost table-row-action" data-select-app="workday">Workday HCM</button></td><td>Human capital management</td><td><span class="status-badge status-retain">Retain</span></td><td class="text-end numeric">$0</td><td>High</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <aside class="card section-card" aria-live="polite">
+          <div id="inline-detail" class="detail-empty">
+            <div><i data-lucide="mouse-pointer-click" aria-hidden="true"></i><br>Select an application to see the decision evidence.</div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="view" data-panel="detail">
+      <div class="page-intro">
+        <div>
+          <h2>Decision detail</h2>
+          <p class="text-muted">A defensible recommendation with target, rationale, guardrails and savings.</p>
+        </div>
+        <button type="button" class="btn"><i data-lucide="file-text" aria-hidden="true"></i> Generate executive readout</button>
+      </div>
+
+      <section class="card section-card">
+        <div class="detail-heading">
+          <div>
+            <div class="text-small text-muted">APP-0148 · Enterprise collaboration</div>
+            <h3>Slack Enterprise</h3>
+          </div>
+          <span class="status-badge">Consolidate into Microsoft Teams</span>
+        </div>
+
+        <div class="detail-grid">
+          <div><div class="field-label text-small">Annual run-rate cost</div><strong class="numeric">$1.05M</strong></div>
+          <div><div class="field-label text-small" data-tooltip="Recurring annual run-rate spend eliminated after consolidation; one-time migration costs are tracked separately.">Avoidable annual savings</div><strong class="numeric target-value">$820K</strong></div>
+          <div><div class="field-label text-small">90-day active usage</div><strong>38% of licensed users</strong></div>
+          <div><div class="field-label text-small">Recommendation confidence</div><strong>High · 92%</strong></div>
+        </div>
+
+        <div class="rationale-box">
+          <strong>Why this decision</strong>
+          <p>Slack and Microsoft Teams support the same enterprise collaboration capability for substantially the same user population. Teams has broader adoption, lower incremental cost and meets the required security controls.</p>
+        </div>
+
+        <div class="evidence-list">
+          <div class="evidence-row"><i class="evidence-check" data-lucide="circle-check" aria-hidden="true"></i><span><strong>Capability coverage:</strong> Teams covers messaging, channels, meetings and external collaboration.</span></div>
+          <div class="evidence-row"><i class="evidence-check" data-lucide="circle-check" aria-hidden="true"></i><span><strong>Critical operations:</strong> No unique critical capability depends exclusively on Slack.</span></div>
+          <div class="evidence-row"><i class="evidence-warning" data-lucide="triangle-alert" aria-hidden="true"></i><span><strong>Dependency precondition:</strong> Migrate 14 workflow integrations and archive regulated channel history before contract exit.</span></div>
+          <div class="evidence-row"><i class="evidence-check" data-lucide="circle-check" aria-hidden="true"></i><span><strong>Contract timing:</strong> Complete migration before the January 31 renewal date.</span></div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      var root = document.getElementById("apprat-wireframe");
+      if (!root) return;
+
+      var detailData = {
+        slack: {
+          title: "Slack Enterprise",
+          decision: "Consolidate",
+          target: "Microsoft Teams",
+          savings: "$820K",
+          reason: "Same capability and user population; Teams has broader adoption and lower incremental cost."
+        },
+        notetaker: {
+          title: "AI NoteTaker Pro",
+          decision: "Retire",
+          target: "Microsoft Teams transcription",
+          savings: "$310K",
+          reason: "Low usage and fully replaceable meeting-transcription capability with no critical dependency."
+        },
+        "legacy-clm": {
+          title: "Legacy CLM",
+          decision: "Needs validation",
+          target: "Pending evidence",
+          savings: "Not committed",
+          reason: "Contract exit date and two legal-system dependencies are unresolved."
+        },
+        "patient-flow": {
+          title: "Patient Flow Hub",
+          decision: "Invest",
+          target: "Retain and modernize",
+          savings: "$0",
+          reason: "Primary support for a critical clinical operation with high usage and no viable replacement."
+        },
+        workday: {
+          title: "Workday HCM",
+          decision: "Retain",
+          target: "Keep as-is",
+          savings: "$0",
+          reason: "Healthy cost, usage and risk profile with no stronger consolidation target."
+        }
+      };
+
+      function activateView(name) {
+        root.querySelectorAll("[data-panel]").forEach(function (panel) {
+          panel.classList.toggle("is-active", panel.getAttribute("data-panel") === name);
+        });
+        root.querySelectorAll("[data-view]").forEach(function (button) {
+          var selected = button.getAttribute("data-view") === name;
+          button.classList.toggle("is-selected", selected);
+          button.setAttribute("aria-pressed", selected ? "true" : "false");
+        });
+      }
+
+      root.querySelectorAll("[data-view]").forEach(function (button) {
+        button.addEventListener("click", function () {
+          activateView(button.getAttribute("data-view"));
+        });
+      });
+
+      root.querySelectorAll("[data-cluster]").forEach(function (button) {
+        button.addEventListener("click", function () {
+          activateView("workbench");
+        });
+      });
+
+      root.querySelectorAll("[data-select-app]").forEach(function (button) {
+        button.addEventListener("click", function () {
+          var app = detailData[button.getAttribute("data-select-app")];
+          var panel = root.querySelector("#inline-detail");
+          if (!app || !panel) return;
+          panel.className = "";
+          panel.innerHTML =
+            '<div class="detail-heading"><div><div class="text-small text-muted">Selected application</div><h3>' + app.title + '</h3></div></div>' +
+            '<div class="detail-grid"><div><div class="field-label text-small">Decision</div><strong>' + app.decision + '</strong></div><div><div class="field-label text-small">Target</div><strong>' + app.target + '</strong></div><div><div class="field-label text-small">Savings</div><strong class="numeric">' + app.savings + '</strong></div><div><div class="field-label text-small">Confidence</div><strong>' + (app.decision === "Needs validation" ? "Low" : "High") + '</strong></div></div>' +
+            '<div class="rationale-box"><strong>Rationale</strong><p>' + app.reason + '</p></div>' +
+            '<button type="button" class="btn btn-primary btn-block" data-open-detail>Open full decision</button>';
+          var openButton = panel.querySelector("[data-open-detail]");
+          if (openButton) {
+            openButton.addEventListener("click", function () { activateView("detail"); });
+          }
+          if (window.lucide) window.lucide.createIcons({ attrs: { width: 16, height: 16 } });
+        });
+      });
+
+      root.querySelectorAll("[data-action]").forEach(function (button) {
+        button.addEventListener("click", function () {
+          if (button.getAttribute("data-action") === "analyze") activateView("overview");
+        });
+      });
+    })();
+  </script>
+</div>
+</main>
+
+<!-- Icons: Lucide from CDN when reachable. -->
+<script src="https://unpkg.com/lucide@0.544.0/dist/umd/lucide.min.js" crossorigin="anonymous"></script>
+<script>
+/* Offline fallback. If the CDN did not load, stand up a minimal window.lucide
+   with the same createIcons() surface, carrying only the ten icons this
+   wireframe actually asks for. The fragment's own script calls
+   window.lucide.createIcons() when it rebuilds the evidence rail, so the shim
+   has to satisfy that call too. Real Lucide always wins when it is present. */
+(function () {
+  if (!window.lucide || typeof window.lucide.createIcons !== "function") {
+    var ICONS = {
+      "upload": '<path d="M12 3v12"/><path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>',
+      "download": '<path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/>',
+      "sparkles": '<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/>',
+      "shield-check": '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
+      "git-branch": '<line x1="6" x2="6" y1="3" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/>',
+      "circle-alert": '<circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>',
+      "circle-check": '<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
+      "triangle-alert": '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+      "file-text": '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>',
+      "mouse-pointer-click": '<path d="M14 4.1 12 6"/><path d="m5.1 8-2.9-.8"/><path d="m6 12-1.9 2"/><path d="M7.2 2.2 8 5.1"/><path d="M9.037 9.69a.498.498 0 0 1 .653-.653l11 4.5a.5.5 0 0 1-.074.949l-4.349 1.041a1 1 0 0 0-.74.739l-1.04 4.35a.5.5 0 0 1-.95.074z"/>'
+    };
+
+    var SVG_NS = "http://www.w3.org/2000/svg";
+
+    window.lucide = {
+      createIcons: function (options) {
+        var attrs = (options && options.attrs) || {};
+        var nodes = document.querySelectorAll("[data-lucide]");
+        for (var i = 0; i < nodes.length; i++) {
+          var node = nodes[i];
+          var body = ICONS[node.getAttribute("data-lucide")];
+          if (!body) continue;
+
+          var svg = document.createElementNS(SVG_NS, "svg");
+          svg.setAttribute("xmlns", SVG_NS);
+          svg.setAttribute("viewBox", "0 0 24 24");
+          svg.setAttribute("fill", "none");
+          svg.setAttribute("stroke", "currentColor");
+          svg.setAttribute("stroke-width", "2");
+          svg.setAttribute("stroke-linecap", "round");
+          svg.setAttribute("stroke-linejoin", "round");
+          svg.setAttribute("width", attrs.width || 16);
+          svg.setAttribute("height", attrs.height || 16);
+          svg.setAttribute("aria-hidden", "true");
+          svg.setAttribute("class", ("lucide " + (node.getAttribute("class") || "")).trim());
+          svg.innerHTML = body;
+
+          if (node.parentNode) node.parentNode.replaceChild(svg, node);
+        }
+      }
+    };
+  }
+
+  window.lucide.createIcons({ attrs: { width: 16, height: 16 } });
+})();
+</script>
+</body>
+</html>
