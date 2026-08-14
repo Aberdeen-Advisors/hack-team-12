@@ -532,6 +532,20 @@ svg.lucide {
       background: color-mix(in srgb, var(--card) 70%, var(--ab-jade));
     }
 
+    /* Marks a figure as a whole-portfolio total, so a filtered table beside it can
+     * never be mistaken for the number the figure describes. */
+    #apprat-wireframe .scope-flag {
+      display: inline-block;
+      margin-left: 0.35rem;
+      padding: 0.05rem 0.4rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      white-space: nowrap;
+      color: var(--muted-foreground);
+    }
+
     #apprat-wireframe .visually-hidden {
       position: absolute;
       width: 1px;
@@ -606,12 +620,50 @@ svg.lucide {
 
     #apprat-wireframe .filter-row {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
       gap: 0.65rem;
+      align-items: start;
       margin-bottom: 0.75rem;
     }
 
     #apprat-wireframe .form-label { display: grid; gap: 0.25rem; }
+
+    #apprat-wireframe .filter-field { display: grid; gap: 0.25rem; align-content: start; }
+
+    #apprat-wireframe .filter-hint {
+      display: block;
+      font-size: 0.72rem;
+      line-height: 1.35;
+      color: var(--muted-foreground);
+    }
+
+    #apprat-wireframe .filter-actions { display: grid; align-content: start; gap: 0.25rem; }
+
+    /* The clear button sits level with the three selects, below their labels. */
+    #apprat-wireframe .filter-actions .filter-spacer { font-size: 0.8rem; visibility: hidden; }
+
+    #apprat-wireframe .form-select:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    #apprat-wireframe .table-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.3rem 0.7rem;
+      margin: 0 0 0.6rem;
+    }
+
+    #apprat-wireframe .table-meta-count { font-weight: 600; }
+
+    #apprat-wireframe .table-empty {
+      padding: 1.5rem 0.75rem;
+      text-align: center;
+      color: var(--muted-foreground);
+    }
+
+    #apprat-wireframe .table-empty p { margin: 0 0 0.75rem; }
 
     #apprat-wireframe .detail-heading {
       justify-content: space-between;
@@ -718,17 +770,17 @@ svg.lucide {
 
       <div class="kpi-grid">
         <div class="card viz-stat">
-          <div class="text-muted">Annual technology spend<span class="sample-flag" data-sample-flag>Sample</span></div>
+          <div class="text-muted">Annual technology spend<span class="scope-flag">Portfolio total</span><span class="sample-flag" data-sample-flag>Sample</span></div>
           <div class="viz-stat-value numeric" data-kpi="spend">$42.8M</div>
           <div class="text-small text-muted" data-kpi-sub="spend">600 applications, SaaS and AI tools</div>
         </div>
         <div class="card viz-stat">
-          <div class="text-muted">CIO savings target<span class="sample-flag" data-sample-flag>Sample</span></div>
+          <div class="text-muted">CIO savings target<span class="scope-flag">Portfolio total</span><span class="sample-flag" data-sample-flag>Sample</span></div>
           <div class="viz-stat-value numeric" data-kpi="target">$6.42M</div>
           <div class="text-small text-muted" data-kpi-sub="target">15.0% of annual spend</div>
         </div>
         <div class="card viz-stat">
-          <div class="text-muted" data-kpi-label="saving">Safe savings identified<span class="sample-flag" data-sample-flag>Sample</span></div>
+          <div class="text-muted" data-kpi-label="saving">Safe savings identified<span class="scope-flag">Portfolio total</span><span class="sample-flag" data-sample-flag>Sample</span></div>
           <div class="viz-stat-value target-value numeric" data-kpi="saving">$7.10M</div>
           <div class="text-small text-muted" data-kpi-sub="saving">16.6% · high-confidence actions</div>
         </div>
@@ -822,28 +874,58 @@ svg.lucide {
       </div>
 
       <div class="filter-row">
-        <label class="form-label text-small">Business capability
-          <select class="form-select"><option>All capabilities</option><option>Enterprise collaboration</option><option>Clinical operations</option><option>Contract management</option></select>
-        </label>
-        <label class="form-label text-small">Recommendation
-          <select class="form-select"><option>All decisions</option><option>Invest</option><option>Retain</option><option>Consolidate</option><option>Replace</option><option>Retire</option><option>Needs validation</option></select>
-        </label>
-        <label class="form-label text-small">Critical operation
-          <select class="form-select"><option>All</option><option>Critical only</option><option>Noncritical only</option></select>
-        </label>
+        <div class="filter-field">
+          <label class="form-label text-small">Business capability
+            <select class="form-select" data-filter="capability" aria-describedby="filter-hint-capability">
+              <option value="">All capabilities</option>
+            </select>
+          </label>
+          <span class="filter-hint" id="filter-hint-capability" data-filter-hint="capability"></span>
+        </div>
+        <div class="filter-field">
+          <label class="form-label text-small">Recommendation
+            <select class="form-select" data-filter="decision">
+              <option value="">All decisions</option>
+              <option value="invest">Invest</option>
+              <option value="retain">Retain</option>
+              <option value="consolidate">Consolidate</option>
+              <option value="replace">Replace</option>
+              <option value="retire">Retire</option>
+              <option value="needs validation">Needs validation</option>
+            </select>
+          </label>
+          <span class="filter-hint" data-filter-hint="decision"></span>
+        </div>
+        <div class="filter-field">
+          <label class="form-label text-small">Critical operation
+            <select class="form-select" data-filter="critical" aria-describedby="filter-hint-critical">
+              <option value="">All levels</option>
+            </select>
+          </label>
+          <span class="filter-hint" id="filter-hint-critical" data-filter-hint="critical"></span>
+        </div>
+        <div class="filter-actions">
+          <span class="filter-spacer text-small" aria-hidden="true">&nbsp;</span>
+          <button type="button" class="btn btn-ghost" data-filter-clear disabled>Clear filters</button>
+        </div>
       </div>
 
       <div class="workbench-layout">
         <section class="card section-card">
+          <div class="table-meta" aria-live="polite">
+            <span class="table-meta-count text-small" data-table-count>Showing 5 of 5 applications</span>
+            <span class="text-small text-muted" data-table-scope>Filters scope this table only; the portfolio figures above stay whole.</span>
+          </div>
           <div class="table-responsive">
             <table class="table table-sm">
               <thead><tr><th>Application</th><th>Capability</th><th>Decision</th><th class="text-end" data-tooltip="Recurring annual run-rate spend that disappears after the action is completed; excludes one-time transition costs.">Avoidable annual savings</th><th>Confidence</th></tr></thead>
               <tbody data-app-table>
-                <tr data-app="slack"><td><button type="button" class="btn btn-ghost table-row-action" data-select-app="slack">Slack Enterprise</button></td><td>Enterprise collaboration</td><td><span class="status-badge">Consolidate</span></td><td class="text-end numeric">$820K</td><td>High</td></tr>
-                <tr data-app="notetaker"><td><button type="button" class="btn btn-ghost table-row-action" data-select-app="notetaker">AI NoteTaker Pro</button></td><td>Meeting assistance</td><td><span class="status-badge status-retire">Retire</span></td><td class="text-end numeric">$310K</td><td>High</td></tr>
-                <tr data-app="legacy-clm"><td><button type="button" class="btn btn-ghost table-row-action" data-select-app="legacy-clm">Legacy CLM</button></td><td>Contract management</td><td><span class="status-badge status-validate">Needs validation</span></td><td class="text-end numeric">—</td><td>Low</td></tr>
-                <tr data-app="patient-flow"><td><button type="button" class="btn btn-ghost table-row-action" data-select-app="patient-flow">Patient Flow Hub</button></td><td>Clinical operations</td><td><span class="status-badge status-invest">Invest</span></td><td class="text-end numeric">$0</td><td>High</td></tr>
-                <tr data-app="workday"><td><button type="button" class="btn btn-ghost table-row-action" data-select-app="workday">Workday HCM</button></td><td>Human capital management</td><td><span class="status-badge status-retain">Retain</span></td><td class="text-end numeric">$0</td><td>High</td></tr>
+                <tr data-app="slack" data-capability="Enterprise collaboration" data-decision="consolidate" data-critical=""><td><button type="button" class="btn btn-ghost table-row-action" data-select-app="slack">Slack Enterprise</button></td><td>Enterprise collaboration</td><td><span class="status-badge">Consolidate</span></td><td class="text-end numeric">$820K</td><td>High</td></tr>
+                <tr data-app="notetaker" data-capability="Meeting assistance" data-decision="retire" data-critical=""><td><button type="button" class="btn btn-ghost table-row-action" data-select-app="notetaker">AI NoteTaker Pro</button></td><td>Meeting assistance</td><td><span class="status-badge status-retire">Retire</span></td><td class="text-end numeric">$310K</td><td>High</td></tr>
+                <tr data-app="legacy-clm" data-capability="Contract management" data-decision="needs validation" data-critical=""><td><button type="button" class="btn btn-ghost table-row-action" data-select-app="legacy-clm">Legacy CLM</button></td><td>Contract management</td><td><span class="status-badge status-validate">Needs validation</span></td><td class="text-end numeric">—</td><td>Low</td></tr>
+                <tr data-app="patient-flow" data-capability="Clinical operations" data-decision="invest" data-critical=""><td><button type="button" class="btn btn-ghost table-row-action" data-select-app="patient-flow">Patient Flow Hub</button></td><td>Clinical operations</td><td><span class="status-badge status-invest">Invest</span></td><td class="text-end numeric">$0</td><td>High</td></tr>
+                <tr data-app="workday" data-capability="Human capital management" data-decision="retain" data-critical=""><td><button type="button" class="btn btn-ghost table-row-action" data-select-app="workday">Workday HCM</button></td><td>Human capital management</td><td><span class="status-badge status-retain">Retain</span></td><td class="text-end numeric">$0</td><td>High</td></tr>
+                <tr data-table-empty hidden><td colspan="5" class="table-empty"><p data-table-empty-text>No application matches these filters.</p><button type="button" class="btn btn-ghost" data-filter-clear>Clear filters</button></td></tr>
               </tbody>
             </table>
           </div>
@@ -2923,6 +3005,7 @@ svg.lucide {
         var label = root.querySelector('[data-kpi-label="saving"]');
         if (label) {
           label.innerHTML = "Net annual saving identified"
+            + '<span class="scope-flag">Portfolio total</span>'
             + '<span class="sample-flag is-computed" data-sample-flag>Computed</span>';
         }
         setFigure(root.querySelector('[data-kpi="saving"]'), moneyShort(s.net_saving_all), s.net_saving_all);
@@ -3163,7 +3246,10 @@ svg.lucide {
           var saving = r.net_saving_annual
             ? moneyShort(r.net_saving_annual)
             : (r.disposition === "retain" || r.disposition === "invest" ? "$0" : moneyShort(0));
-          return '<tr data-app="' + esc(r.app_id) + '">'
+          return '<tr data-app="' + esc(r.app_id) + '"'
+            + ' data-capability="' + esc(r.primary_capability || "") + '"'
+            + ' data-decision="' + esc(r.disposition) + '"'
+            + ' data-critical="' + esc(criticalityOf(r)) + '">'
             + '<td><button type="button" class="btn btn-ghost table-row-action" data-select-app="'
             + esc(r.app_id) + '">' + esc(r.app_name) + '</button></td>'
             + '<td>' + esc(r.primary_capability || "—") + '</td>'
@@ -3173,9 +3259,177 @@ svg.lucide {
             + esc(moneyFull(r.net_saving_annual)) + '">' + saving + '</td>'
             + '<td data-confidence="' + esc(r.confidence) + '">' + esc(titleCase(r.confidence)) + '</td>'
             + '</tr>';
-        }).join("");
+        }).join("") + emptyRowHtml();
 
         wireRowButtons();
+        wireFilterClears();
+        rebuildFilterOptions();
+        applyFilters();
+      }
+
+      /* ------------------------------------------------------------------ *
+       * Table filters
+       *
+       * The three selects narrow the rows in the decision table and nothing
+       * else. Every portfolio figure on the page is rendered from the full
+       * analysis and is never touched here, so a filtered table can never be
+       * mistaken for a changed total.
+       * ------------------------------------------------------------------ */
+
+      var FILTER_FACETS = ["capability", "decision", "critical"];
+
+      /* "Critical operation" reads the portfolio's own process-centrality column;
+       * that is the only critical-operation signal an uploaded inventory carries. */
+      function criticalityOf(r) {
+        return arText(r.process_centrality) || "";
+      }
+
+      function emptyRowHtml() {
+        return '<tr data-table-empty hidden><td colspan="5" class="table-empty">'
+          + '<p data-table-empty-text>No application matches these filters.</p>'
+          + '<button type="button" class="btn btn-ghost" data-filter-clear>Clear filters</button>'
+          + '</td></tr>';
+      }
+
+      function dataRows() {
+        var tbody = root.querySelector("[data-app-table]");
+        if (!tbody) return [];
+        return Array.prototype.slice.call(tbody.querySelectorAll("tr[data-app]"));
+      }
+
+      function facetValue(tr, facet) {
+        return (tr.getAttribute("data-" + facet) || "").trim();
+      }
+
+      function selectFor(facet) {
+        return root.querySelector('[data-filter="' + facet + '"]');
+      }
+
+      function currentFilters() {
+        var out = {};
+        FILTER_FACETS.forEach(function (facet) {
+          var sel = selectFor(facet);
+          out[facet] = sel && !sel.disabled ? sel.value : "";
+        });
+        return out;
+      }
+
+      /* Rebuild the capability and critical-operation options from the values the
+       * rendered rows actually carry. A facet with no values in the data is
+       * disabled and says so, rather than offering choices that match nothing. */
+      function rebuildFilterOptions() {
+        var rows = dataRows();
+        ["capability", "critical"].forEach(function (facet) {
+          var sel = selectFor(facet);
+          var hint = root.querySelector('[data-filter-hint="' + facet + '"]');
+          if (!sel) return;
+
+          var seen = {};
+          rows.forEach(function (tr) {
+            var v = facetValue(tr, facet);
+            if (v) seen[v] = true;
+          });
+          var values = Object.keys(seen).sort(function (x, y) {
+            return x.toLowerCase().localeCompare(y.toLowerCase());
+          });
+
+          var allLabel = sel.options.length ? sel.options[0].textContent : "All";
+          var previous = sel.value;
+          sel.innerHTML = '<option value="">' + esc(allLabel) + "</option>"
+            + values.map(function (v) {
+              return '<option value="' + esc(v) + '">' + esc(titleCase(v)) + "</option>";
+            }).join("");
+
+          if (values.length) {
+            sel.disabled = false;
+            sel.value = values.indexOf(previous) >= 0 ? previous : "";
+            if (hint) hint.textContent = "";
+          } else {
+            sel.disabled = true;
+            sel.value = "";
+            if (hint) {
+              hint.textContent = facet === "capability"
+                ? "No capability column in this data, so this filter is off."
+                : "No process-centrality column in this data, so this filter is off.";
+            }
+          }
+        });
+      }
+
+      function applyFilters() {
+        var tbody = root.querySelector("[data-app-table]");
+        if (!tbody) return;
+
+        var filters = currentFilters();
+        var rows = dataRows();
+        var shown = 0;
+
+        rows.forEach(function (tr) {
+          var match = FILTER_FACETS.every(function (facet) {
+            var want = filters[facet];
+            if (!want) return true;
+            return facetValue(tr, facet).toLowerCase() === want.toLowerCase();
+          });
+          tr.hidden = !match;
+          if (match) shown += 1;
+        });
+
+        var active = FILTER_FACETS.filter(function (f) { return filters[f]; });
+
+        var count = root.querySelector("[data-table-count]");
+        if (count) {
+          count.textContent = "Showing " + shown + " of " + rows.length + " "
+            + plural(rows.length, "application");
+        }
+
+        var scope = root.querySelector("[data-table-scope]");
+        if (scope) {
+          scope.textContent = active.length
+            ? "Filters scope this table only; the portfolio figures above stay whole."
+            : "No filters applied.";
+        }
+
+        var emptyRow = tbody.querySelector("[data-table-empty]");
+        if (emptyRow) {
+          emptyRow.hidden = shown !== 0;
+          var text = emptyRow.querySelector("[data-table-empty-text]");
+          if (text) {
+            text.textContent = rows.length === 0
+              ? "There are no applications to show yet. Upload an inventory and press Analyze portfolio."
+              : "No application matches all three filters. Widen or clear them to see the "
+                + rows.length + " " + plural(rows.length, "application") + " in this portfolio.";
+          }
+        }
+
+        root.querySelectorAll("[data-filter-clear]").forEach(function (button) {
+          button.disabled = active.length === 0;
+        });
+      }
+
+      function clearFilters() {
+        FILTER_FACETS.forEach(function (facet) {
+          var sel = selectFor(facet);
+          if (sel) sel.value = "";
+        });
+        applyFilters();
+      }
+
+      function wireFilterClears() {
+        root.querySelectorAll("[data-filter-clear]").forEach(function (button) {
+          if (button.getAttribute("data-wired") === "1") return;
+          button.setAttribute("data-wired", "1");
+          button.addEventListener("click", clearFilters);
+        });
+      }
+
+      function wireFilters() {
+        FILTER_FACETS.forEach(function (facet) {
+          var sel = selectFor(facet);
+          if (sel) sel.addEventListener("change", applyFilters);
+        });
+        wireFilterClears();
+        rebuildFilterOptions();
+        applyFilters();
       }
 
       /* The evidence panel and the full decision view, rebuilt from the computed row. */
@@ -3369,6 +3623,8 @@ svg.lucide {
         refreshIcons();
       }
 
+      wireFilters();
+
       root.querySelectorAll("[data-view]").forEach(function (button) {
         button.addEventListener("click", function () {
           activateView(button.getAttribute("data-view"));
@@ -3488,6 +3744,11 @@ svg.lucide {
         renderMix(a);
         renderGuardrails(a);
         renderClusters(a);
+        /* A new portfolio has new capabilities; start the table unfiltered. */
+        FILTER_FACETS.forEach(function (facet) {
+          var sel = selectFor(facet);
+          if (sel) sel.value = "";
+        });
         renderTable(a);
         setSampleFlags("computed");
 
