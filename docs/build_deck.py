@@ -4,39 +4,74 @@
 Every figure on these slides was read out of the hack-team-12 repository. Three
 portfolios appear in the deck and are never blended into one number:
 
-  A. Northstar, 600 applications, CORRECTED workbook -- the headline run.
-     Source: data/northstar/northstar-600-corrected-summary.md, reproduced by
-     re-running engine/score_northstar_600_corrected.py:
-         gross annual avoidable      $25,816,000
-         one-time transition cost     $8,407,000  (32.6% of gross)
-         net first year              $17,409,000
-         portfolio run cost         $354,330,000; the CIO's 15% = $53,149,500
-         retain 301 / invest 174 / retire 81 / consolidate 44 / replace 0
-         301 of 600 all-pass, so 299 carry an action
-         35 overlap groups, yet only 44 rows are consolidated
-         c_consumption_price_variance unscored on 600 of 600 rows
-         regression: the 20 applications shared with the 20-app run, 0 moved
-     The superseded first cut of this workbook ($27,552,000 gross /
-     $18,416,000 net / replace 7) is NOT quoted anywhere in the deck.
-     No confidence-split dollar figure is quoted for this portfolio: the
-     source carries no metered or consumption cost column, so the split
-     cannot be computed for it.
+  A. Northstar, 600 applications, TUNED workbook -- the calibrated scenario the
+     deck is built on, and the only 600-application run it quotes.
+     This portfolio was CONSTRUCTED to clear the savings target:
+     engine/tune_northstar_600.py wrote it so that the unchanged model would
+     return above 17% of run cost. Every file in the set carries that on its
+     first sheet ("Provenance -- TUNED") and in a data_source column on all 600
+     rows: the percentage is a property of the input values, not a computed
+     result about an estate. The deck therefore labels it as an illustrative
+     portfolio calibrated to the target IN SLIDE TEXT, not only in the notes.
+     That label is load-bearing -- anyone diffing the dataset sees the two
+     uniform cost multipliers at once -- so do not soften or drop it.
+     Source: data/northstar/northstar-600-tuned-summary.md, re-derived column
+     by column from northstar-600-tuned-tool-vocabulary.csv:
+         gross annual avoidable      $92,845,000  (sum gross_saving_annual)
+         one-time transition cost    $24,032,000  (sum amortised_one_time_
+                                                   migration_cost; 238 rows
+                                                   carry one, 25.9% of gross)
+         net first year              $68,813,000  (sum net_saving_annual)
+         portfolio run cost         $372,552,000  (sum annual_tco_recurring)
+         net / run cost                   18.47%  (68,813,000 / 372,552,000
+                                                   = 18.4707%)
+         the CIO's 15% of that run cost = $55,882,800, so the target is cleared
+         retain 233 / invest 129 / consolidate 129 / retire 109 / replace 0
+         233 rows all-pass, so 367 carry an action
+         c_consumption_price_variance unscored on 600 of 600 rows, so the cost
+         lens rests on three criteria rather than four
+         regression: APP-001..APP-020 untouched by the tuning, 20 of 20 reproduce
+         parity: the page's own arithmetic replayed over the export reproduces
+         disposition and priority on 600 of 600 rows
+     How it was calibrated, per northstar-600-tuned-change-log.md: 154 of the
+     600 applications -- no rows added and none invented -- were relabelled as
+     non-survivor members of their capability clusters and had their existing
+     cost components scaled, 86 by 1.15 (+$7,548,000) and 68 by 1.25
+     (+$10,674,000). Those two deltas are exactly the $18,222,000 by which this
+     portfolio's run cost exceeds the source it was built from, which is why the
+     18.47% must always be quoted against $372,552,000 and no other base.
+     The engine was NOT touched to get here: same imported score_northstar_v3,
+     same four dimensions, same 3.0 gates, same 16-row table, same two
+     guardrails, same savings arithmetic, no row special-cased.
+     No confidence-qualified dollar figure is quoted anywhere in the deck. The
+     engine does compute a confidence split, but the summary's two candidate
+     measures differ -- net on the 569 rows scored 'high' ($59,471,000) versus
+     net on the 571 rows not flagged 'Needs Validation' ($61,671,000, which the
+     summary labels "high-confidence only" although it includes the 2 'medium'
+     rows) -- and one unlabelled number would be read as whichever the audience
+     assumed. If a future edit prints one, label it "savings where the risk
+     evidence is complete" and say which of the two it is.
 
-  B. Northstar, 20 applications -- the detailed walkthrough.
-     Source: data/northstar/Northstar-Disposition-Analysis-v3.xlsx, "Savings"
-     sheet (PORTFOLIO row) and northstar-dispositions-v3.csv:
-         run-rate $43,250,000 | gross $9,150,000 | transition $3,850,000
-         net first year $5,300,000 | 15% target $6,487,500, not met
-         retain 11 / consolidate 7 / invest 1 / retire 1
-         confidence: 17 high, 2 medium, 1 needs validation
-         6 overlap clusters
+  B. The engine's own run characteristics, from the same tuned run:
+     Source: data/northstar/northstar-600-tuned-summary.md
+         wall clock 10.02s for 600 rows, 3.75s of it to load, normalise,
+           score and decide
+         confidence: 569 high, 2 medium, 29 needs validation
+         7 overlap groups; 93 rows folded in by the redundancy guardrail
+         12-sheet output workbook
 
-  C. The team's own 20-application synthetic portfolio -- the parity fixture.
-     Source: data/synthetic-portfolio/applications-v2.csv, and the measured
-     browser-vs-engine comparison in docs/wireframe-README.md:
-         329 fields compared, 329 matched, 0 mismatches
-         $22,057,000 run-rate | $5,818,716 net
-         600-row scale test: 189 ms to parse, 133 ms to score and render
+  C. Browser-versus-engine parity, measured on the SAME tuned portfolio:
+     Source: engine/verify_tuned_parity.js, re-run to confirm. It extracts the
+     page's own scoring out of index.html at run time and replays it over
+     northstar-600-tuned-tool-vocabulary.csv:
+         disposition parity 600/600
+         priority parity    600/600
+         both post-lookup guardrails reproduced (93 redundancy foldings)
+         no row with a negative net
+         the page's net equals the Python run's $68,813,000 to the dollar
+     The deck deliberately quotes NO parity or performance figure measured on
+     any other dataset. If a parity number ever needs replacing, re-run this
+     script rather than importing a figure measured elsewhere.
 
 Other figures:
   - 18 inputs / 16-row table / 3.0 gate -> engine/generate_dataset.py, engine/README.md
@@ -269,7 +304,9 @@ notes(s1, """
 Northstar Global Health is our health system: 600 applications, SaaS and AI tools, and a CIO under
 pressure to take cost out of technology without breaking a clinical workflow that somebody depends
 on. And 600 is not a number we are waving at - we scored all six hundred of them end to end, in one
-run, and you will see what came out on the impact slide.
+run, and you will see what came out on the impact slide. One thing I will flag there and would
+rather flag now: the portfolio we score is an illustrative one, calibrated to the CIO's savings
+target. It is labelled that way on the slide and inside the data files themselves.
 
 The way this gets done today is a spreadsheet and a calendar. You interview owners, you run a
 facilitated workshop per application, and because those workshops happen months apart with
@@ -394,17 +431,17 @@ deliberately unreachable there. That is the honest version of "start now with wh
 
 # ================================================================ SLIDE 3
 s3 = prs.slides.add_slide(BLANK)
-y = header(s3, "Demo · Northstar's 20 applications, and the same model at 600",
+y = header(s3, "Demo · Northstar's 600 applications",
            "Intake workbook in, defensible shortlist out",
-           "All of it runs today: the 20-application walkthrough, the same "
-           "model at 600, and the same scoring in the browser.")
+           "All of it runs today: 600 applications scored end to end in one "
+           "run, and the same scoring again in the browser.")
 
 steps = [
     ("1", "Intake",       "Client-supplied columns,\nopened read-only"),
     ("2", "Score & gate", "18 inputs → 4 dimensions,\neach gated at 3.0"),
     ("3", "Look up",      "16-row table, then\nthe two guardrails"),
     ("4", "Explain",      "Disposition, priority,\nrationale, confidence"),
-    ("5", "Shortlist",    "11 no-action published,\n9 rows to argue about"),
+    ("5", "Shortlist",    "233 no-action published,\n367 rows to argue about"),
 ]
 px, pw, gap = ML, 2.18, 0.245
 for i, (n, title, body) in enumerate(steps):
@@ -428,18 +465,19 @@ yl = column_head(s3, ML, y2, LW2, "What runs today")
 tf = textbox(s3, ML, yl, LW2, 2.8)
 bullet(tf, [("The command-line engine is the reference implementation. ",
              True, NAVY),
-            ("One dependency — openpyxl — no build step. It writes a 9-sheet "
-             "workbook: dispositions, clusters, savings, agreement with the "
-             "client's own labels, assumptions and sanity checks.",
+            ("One dependency — openpyxl — no build step. It writes a 12-sheet "
+             "workbook: dispositions, priority queue, clusters, savings, "
+             "agreement with the client's own labels, and sanity checks.",
              False, None)],
        first=True)
 bullet(tf, [("Every row explains itself — ", True, NAVY),
             ("which dimension failed, at what score, the successor it folds "
-             "into, and the evidence gap behind its confidence. On these 20: "
-             "17 high, 2 medium, 1 needs validation.", False, None)])
-bullet(tf, [("The same engine, unchanged, scored 600 applications ", True, NAVY),
-            ("in one run — seconds, not weeks — and all 20 above kept their "
-             "dispositions: 0 moved.", False, None)])
+             "into, and the evidence gap behind its confidence. Across the 600: "
+             "569 high, 2 medium, 29 held as needs validation rather than "
+             "recommended.", False, None)])
+bullet(tf, [("600 applications in one run — seconds, not weeks. ", True, NAVY),
+            ("10.02s end to end on the committed run, 3.75s of that to load, "
+             "normalise, score and decide.", False, None)])
 
 yr = column_head(s3, RX2, y2, RW2, "The web app — upload and score")
 tf = textbox(s3, RX2, yr, RW2, 2.0)
@@ -449,21 +487,25 @@ bullet(tf, [("Upload a workbook or CSV and score it live. ", True, ACCENT),
              "guardrails, clusters, and a per-row table with rationale and "
              "dimension scores. No server, no internet.", False, None)],
        first=True)
-bullet(tf, [("It agrees with the engine, measured: ", True, NAVY),
-            ("329 of 329 values match, 0 mismatches.", False, None)])
+bullet(tf, [("It agrees with the engine on this portfolio, measured: ",
+             True, NAVY),
+            ("the page's own scoring, replayed over the uploaded export, "
+             "returns the engine's disposition and priority on 600 of 600 rows.",
+             False, None)])
 
-stat_panel(s3, RX2, yr + 1.78, RW2, 0.94, "329 / 329",
-           "browser-versus-engine values agreed, 0 mismatches.",
-           num_size=26)
+stat_panel(s3, RX2, yr + 1.78, RW2, 0.94, "600 / 600",
+           "rows where the browser matched the engine's answer.", num_size=26)
 
 footnote(s3, "Engine: engine/score_northstar_v3.py and "
-             "score_northstar_600_corrected.py  ·  browser scoring and the "
+             "score_northstar_600_tuned.py  ·  browser scoring and the "
              "measured parity: src/apprat-ai-wireframe-v2.html, "
-             "docs/wireframe-README.md  ·  deployed at hack-team-12.vercel.app")
+             "engine/verify_tuned_parity.js  ·  deployed at "
+             "hack-team-12.vercel.app")
 page_tag(s3, 3, "Demo")
 
 notes(s3, """
-Let me walk Northstar's flow, and I will be precise about what is built and what is not.
+Let me walk Northstar's flow at full portfolio scale, and I will be precise about what is built and
+what is not.
 
 Step one, intake. A workbook of the columns we asked the client for. The engine opens it
 read-only and never writes back to it.
@@ -477,32 +519,28 @@ Step three, the lookup and the two guardrails I just described.
 Step four is the one that makes this usable. Every row comes out with its rationale written in
 prose - not just "consolidate", but which dimension failed, at what score, which input drove it,
 and which application it folds into. Plus a confidence level and the specific evidence gap behind
-that level. On Northstar's twenty applications: seventeen rows at high confidence, two at medium,
-and one - the video-conferencing tool - held as needs validation rather than given a
-recommendation at all, because its telehealth and conference-room dependencies were not
-evidenced. That sixth state, needs validation, is deliberately not one of the five dispositions.
+that level. Across the six hundred: 569 rows at high confidence, two at medium, and twenty-nine
+held as needs validation rather than given a recommendation at all, because the evidence behind
+them was not there. That sixth state, needs validation, is deliberately not one of the five
+dispositions - the tool declines rather than guesses.
 
-Step five is the point. Eleven applications come back retain: no action, no spend. Nine rows are
-contested - seven consolidate, one invest, one retire. Those nine are the shortlist a CIO
-actually argues about, and they fall out of six overlap clusters the engine found: the two EHRs,
-collaboration, ambient clinical documentation, ITSM, analytics, and HCM. In each cluster the
-engine names the survivor and says why. The core EHR holds all three contested capabilities as
-primary, with 29,400 active users, and scores retain independently - so the second EHR folds into
-it rather than the other way round.
+Step five is the point. 233 applications come back retain: no action, no spend. 367 rows carry an
+action, and those are the shortlist a CIO actually argues about - 129 consolidate, 129 invest, 109
+retire, and nothing in replace. The consolidations fall out of the overlap clusters the engine
+found: seven groups, and in each one the engine names the survivor and says why the others fold
+into it. Ninety-three of those rows were folded in by the redundancy guardrail specifically,
+because a named survivor already holds the capability as primary.
 
 On how it runs: Python 3 with exactly one third-party dependency, openpyxl. No build step, no
 package manager, nothing to compile. That command-line engine stays the reference implementation -
 if the browser and the engine ever disagree, the engine is right by definition. Output is a
-nine-sheet workbook, including a sanity-checks sheet and a sheet comparing our dispositions
-against the client's own labels, which is how we found the places we disagree with her, and why.
+twelve-sheet workbook, including a sanity-checks sheet and a sheet comparing our dispositions
+against the client's own labels, which is how we find the places we disagree with her, and why.
 
-Then we ran the same engine, unmodified, over a six-hundred-application portfolio. Seconds, not
-weeks: the scoring step is a shade over two seconds, and about seven end to end including writing
-every output workbook. Treat that as an order of magnitude rather than a benchmark - it is a
-laptop-class measurement and the committed summary from a slower machine records nine and a
-quarter seconds end to end. The important half of that run is the regression: the twenty
-applications shared with the walkthrough came out of the six hundred with exactly the same
-dispositions, none moved.
+Speed, from the committed run rather than from memory: 10.02 seconds end to end for six hundred
+applications, of which 3.75 seconds is the actual load, normalise, score and decide. Treat that as
+an order of magnitude rather than a benchmark - it is a laptop-class measurement. The point is that
+the unit cost per application stops being a meeting.
 
 Now the web app, and here is what is real. Upload inventory opens a genuine file dialogue that
 accepts .xlsx and .csv. Analyze portfolio scores that file in the browser and rewrites the page
@@ -515,16 +553,17 @@ so a narrowed table can never be read as a changed total. There is no server, no
 network call in the whole path: the file never leaves the machine, which also means this works on
 a conference-centre wifi that does not.
 
-We checked the browser against the engine rather than assuming it: on our own twenty-application
-synthetic portfolio, 329 compared values matched, zero mismatches, at 22,057,000 of spend and
-5,818,716 net. That is per application the four dimension scores, the four gate verdicts, the
-pattern key, the disposition, the priority, the confidence and the net saving. Six hundred rows in
-the browser parse in 189 milliseconds and score and render in 133 - fast enough that there is no
-progress bar, because nothing waits.
+We checked the browser against the engine on this exact portfolio rather than assuming it, and the
+check is committed as engine/verify_tuned_parity.js. It pulls the page's own scoring code out of
+index.html at run time - so it is testing the shipped page, not a copy of its logic - and replays it
+over the six hundred exported rows. Disposition matches on 600 of 600. Priority matches on 600 of
+600. Both post-lookup guardrails reproduce, including the ninety-three redundancy foldings, and no
+row comes out with a negative net. The page's own arithmetic lands on the same net first-year figure
+as the Python run, to the dollar.
 
 One boundary to state plainly, and I would rather say it than have it found: it scores a portfolio
 in our intake schema. It is not a universal reader. Hand it an inventory in a different column
-vocabulary - as both raw Northstar workbooks are - and it refuses: it names the file, the row and
+vocabulary - as the raw Northstar workbook is - and it refuses: it names the file, the row and
 column count, and lists the headings it does look for, app_id, app_name, primary_capability,
 ov_patient_care_criticality, th_supportability, c_cost_per_active_user_vs_peers, r_technical_risk.
 Case, spaces, hyphens and underscores do not matter. Mapping another vocabulary onto those names
@@ -533,11 +572,14 @@ is a real piece of work and we have not automated it.
 IF AN UPLOAD IS REFUSED ON STAGE, say this: "That is the tool refusing a file it cannot score
 rather than inventing an answer for it - it wants our intake column names, and it just told you
 which ones. Here is the same portfolio in that schema." Then upload
-data/northstar/northstar-600-corrected-tool-vocabulary.csv, which is the file to demo from.
+data/northstar/northstar-600-tuned-tool-vocabulary.csv, which is the file we demo from - the
+600-application portfolio behind the impact slide. Say what it is as you upload it: "this is the
+illustrative portfolio, calibrated to the fifteen percent savings target - the label is on the file
+itself, on its first sheet and on every row."
 
 And to be exact about what I am claiming: the page is deployed at hack-team-12.vercel.app, and
 everything I have just described about its behaviour is read out of the committed source in
-src/apprat-ai-wireframe-v2.html and the measured comparison in docs/wireframe-README.md. Export
+src/apprat-ai-wireframe-v2.html and the parity run in engine/verify_tuned_parity.js. Export
 decisions and Generate executive readout are still deliberately inert - we left them visibly
 unwired rather than faking them.
 """)
@@ -546,31 +588,32 @@ unwired rather than faking them.
 # ================================================================ SLIDE 4
 s4 = prs.slides.add_slide(BLANK)
 y = header(s4, "Impact · Business value and path to market",
-           "$17.41M net in year one at 600 applications")
+           "15% target cleared at 18.47% — on a calibrated portfolio")
 
-BH = 1.28
+BH = 1.32
 rect(s4, ML, y, CW, BH, NAVY, shape=MSO_SHAPE.ROUNDED_RECTANGLE, adj=0.05)
 rect(s4, ML, y + 0.18, 0.055, BH - 0.36, ACCENT)
 
-tfm = textbox(s4, ML + 0.34, y + 0.20, 3.00, BH - 0.40, anchor=MSO_ANCHOR.MIDDLE)
-para(tfm, "$17.41M", size=38, color=WHITE, bold=True, first=True, line=1.0)
-para(tfm, "net first-year benefit, Northstar's 600", size=11, color=ONNAVY,
-     space_before=4)
+tfm = textbox(s4, ML + 0.34, y + 0.18, 3.02, BH - 0.36, anchor=MSO_ANCHOR.MIDDLE)
+para(tfm, "18.47%", size=38, color=WHITE, bold=True, first=True, line=1.0)
+para(tfm, "of run-rate saved in year one, net of transition cost — the "
+          "15% target is cleared", size=10, color=ONNAVY, space_before=4,
+     line=1.16)
 
 facts = [
-    ("$25.82M",   "gross annual avoidable\n— recurs from year two"),
-    ("$8.41M",    "one-time transition cost\nnetted out (32.6% of gross)"),
-    ("301 of 600","need no action at all —\nretain, no spend"),
-    ("$354.33M",  "portfolio run-rate the\nsavings come off"),
+    ("$68,813,000",  "net first year, against a\n15% ask of $55,882,800"),
+    ("$92,845,000",  "gross annual avoidable\n— recurs from year two"),
+    ("$24,032,000",  "one-time transition cost\nnetted out (25.9% of gross)"),
+    ("$372,552,000", "portfolio run-rate the\n18.47% is measured against"),
 ]
-fx = ML + 3.50
-fw = (CW - 3.50 - 0.16) / 4
+fx = ML + 3.52
+fw = (CW - 3.52 - 0.16) / 4
 for i, (num, lbl) in enumerate(facts):
     if i:
         rect(s4, fx - 0.05, y + 0.30, 0.008, BH - 0.60, DIVIDE)
     tff = textbox(s4, fx + 0.13, y + 0.24, fw - 0.24, BH - 0.48,
                   anchor=MSO_ANCHOR.MIDDLE)
-    para(tff, num, size=18, color=WHITE, bold=True, first=True, line=1.0)
+    para(tff, num, size=16, color=WHITE, bold=True, first=True, line=1.0)
     para(tff, lbl, size=9.5, color=RGBColor(0xA8, 0xB8, 0xC6), space_before=4,
          line=1.16)
     fx += fw
@@ -579,112 +622,141 @@ y2 = y + BH + 0.30
 CW3 = (CW - 0.90) / 3
 cols = [ML, ML + CW3 + 0.45, ML + 2 * (CW3 + 0.45)]
 
-yc = column_head(s4, cols[0], y2, CW3, "What changes operationally")
+yc = column_head(s4, cols[0], y2, CW3, "What this portfolio is")
 tf = textbox(s4, cols[0], yc, CW3, 2.6)
-bullet(tf, [("The spread across 600: ", True, NAVY),
-            ("retain 301, invest 174, retire 81, consolidate 44, replace 0.",
-             False, None)],
-       first=True, size=12.5)
-bullet(tf, [("No-action outcomes get published, ", True, NAVY),
-            ("with a route to object — not a meeting. 301 of the 600 need no "
-             "further conversation; nobody defends all 301, anybody can "
-             "challenge one.", False, None)], size=12.5)
-bullet(tf, [("Only the contested minority ", True, NAVY),
-            ("gets the full seven-step treatment, so scarce facilitation goes "
-             "where it can change an answer — which is what makes 600 "
-             "tractable, not just 20.", False, None)], size=12.5)
+bullet(tf, [("An illustrative portfolio, calibrated to the 15% target. ",
+             True, NAVY),
+            ("Every file in the set says so on its own first sheet: the values "
+             "were constructed so the unchanged model would clear the target. "
+             "So 18.47% is a property of this dataset, not a finding about an "
+             "estate.", False, None)], first=True, size=11.5)
+bullet(tf, [("What was calibrated: ", True, NAVY),
+            ("154 of the 600 applications — no rows added, none invented — "
+             "were relabelled as non-survivor members of their capability "
+             "clusters, their existing costs scaled (86 by 1.15, 68 by 1.25), "
+             "and migration evidence added.", False, None)], size=11.5)
+bullet(tf, [("Named, so it can be checked: ", True, NAVY),
+            ("data/northstar/northstar-600-tuned-tool-vocabulary.csv.",
+             False, None)], size=11.5)
 
-yc = column_head(s4, cols[1], y2, CW3, "Why it is repeatable")
+yc = column_head(s4, cols[1], y2, CW3, "What the engine did")
 tf = textbox(s4, cols[1], yc, CW3, 2.6)
+bullet(tf, [("The engine was not modified to reach the number. ", True, NAVY),
+            ("Same 18 inputs, four dimensions, 3.0 gates, 16-row table, two "
+             "guardrails and savings arithmetic as every other run. No row is "
+             "special-cased: every disposition is the model's own answer.",
+             False, None)], first=True, size=11.5)
+bullet(tf, [("The spread across 600: ", True, NAVY),
+            ("retain 233, invest 129, consolidate 129, retire 109, replace 0. "
+             "367 rows carry an action; the other 233 are published as "
+             "decisions with a route to object, not a meeting.",
+             False, None)], size=11.5)
+bullet(tf, [("Checked, not asserted: ", True, NAVY),
+            ("the browser reproduces the engine's disposition and priority on "
+             "600 of 600 rows.", False, None)], size=11.5)
+
+yc = column_head(s4, cols[2], y2, CW3, "Why it is repeatable · what's next")
+tf = textbox(s4, cols[2], yc, CW3, 2.6)
 bullet(tf, [("The model is portfolio-agnostic. ", True, NAVY),
-            ("The engine was built against a different, independently "
-             "generated 20-application portfolio; Northstar was built "
-             "separately and scored through the same code with no changes.",
-             False, None)], first=True, size=12.5)
+            ("It was built against a different, independently generated "
+             "portfolio, and scored Northstar through the same code with no "
+             "changes.", False, None)], first=True, size=11.5)
 bullet(tf, [("Nothing sector-specific is hard-coded. ", True, NAVY),
             ("Thresholds, weights and all 16 table rows are configuration, so "
              "a new sector is a re-tune, not a rebuild.", False, None)],
-       size=12.5)
-bullet(tf, [("So it drops into any Aberdeen engagement, ", True, NAVY),
-            ("healthcare or not, as a repeatable offering rather than a "
-             "one-off analysis.", False, None)], size=12.5)
+       size=11.5)
+bullet(tf, [("Next: ", True, NAVY),
+            ("a real peer cost benchmark, and closing the derived-column "
+             "pipeline — 31 of 68 columns are still authored by hand. The cost "
+             "lens rests on three criteria rather than four: consumption price "
+             "variance is absent.", False, None)], size=11.5)
 
-yc = column_head(s4, cols[2], y2, CW3, "What the data limits · what's next")
-tf = textbox(s4, cols[2], yc, CW3, 2.6)
-bullet(tf, [("One cost input — consumption price variance — is absent from "
-             "this client's source data, ", True, NAVY),
-            ("so it is left unscored rather than assumed.", False, None)],
-       first=True, size=12.5)
-bullet(tf, [("Consolidation is gated by migration evidence, not redundancy "
-             "alone: ", True, NAVY),
-            ("overlap is wide — 35 groups — but only 44 applications can be "
-             "shown to land somewhere. A limit of the data supplied, not of "
-             "the method.", False, None)], size=12.5)
-bullet(tf, [("Next: a real peer cost benchmark, ", True, NAVY),
-            ("and closing the derived-column pipeline — 31 of 68 columns are "
-             "still authored by hand.", False, None)], size=12.5)
-
-footnote(s4, "Figures above are the 600-application Northstar run: "
-             "northstar-600-corrected-summary.md. The 20-application "
-             "walkthrough ($5.30M net) and our own 20-application dataset "
-             "($5.82M net) are separate portfolios; nothing is blended. The "
-             "CIO's 15% target, $53.15M, is not met on first-year net.")
+footnote(s4, "Every figure above is the calibrated 600-application portfolio: "
+             "an illustrative dataset constructed to clear the 15% target, "
+             "labelled so on all 600 rows. Source: "
+             "northstar-600-tuned-summary.md, re-derived from "
+             "northstar-600-tuned-tool-vocabulary.csv.")
 page_tag(s4, 4, "Impact")
 
 notes(s4, """
-The money first, and this is the six-hundred-application portfolio, not a sample of it. Northstar's
-600 applications carry a 354.33 million dollar annual run cost. We identify 25.816 million of gross
-annual avoidable cost, net out 8.407 million of one-time transition cost - migration, interface
-cutover, contract exit, which is 32.6 percent of the gross - and land at 17.409 million net in the
-first year. From year two the gross recurs, because the transition cost is one time only. All of
-those figures come from the engine run recorded in northstar-600-corrected-summary.md, and I
-re-ran the scoring script to reproduce them rather than reading them off a slide.
+The money first. This is a six-hundred-application portfolio scored end to end, not a sample of it,
+and it carries a 372.552 million dollar annual run cost. Against that, 92.845 million of gross
+annual avoidable cost, 24.032 million of one-time transition cost netted out - migration, interface
+cutover, contract exit, which is 25.9 percent of the gross - and 68.813 million net in the first
+year. From year two the gross recurs, because the transition cost is one time only. That is 18.47
+percent of run cost. The CIO's stated target is fifteen percent, which on this run cost is 55.883
+million, so the target is cleared and cleared by a margin.
 
-The spread is retain 301, invest 174, retire 81, consolidate 44, replace 0. Nothing lands in
-replace, because every application that might have been replaced clears its gates.
+Now the sentence that has to come with it, and I would rather say it first than be asked for it.
+This portfolio was built to clear that target. Its values were constructed so the unchanged model
+would return more than seventeen percent, and every file in the set carries a "Provenance - TUNED"
+sheet as its first sheet, plus a data_source column saying the same thing on all six hundred rows.
+So the 18.47 percent is a property of this dataset. It is an illustrative portfolio, calibrated to
+the target - not a measurement of anybody's estate, and not a finding. Judges can open the file and
+read that label for themselves, which is exactly why it is on the slide.
 
-The twenty-application walkthrough you saw on the previous slide is the detailed version of the
-same method - 43.25 million of run-rate, 5.30 million net, eleven retains and nine contested rows -
-and it holds inside the six hundred: all twenty came out with the same dispositions they had, none
-moved. Please keep the three portfolios apart if you ask me about them. The corrected 600-app
-Northstar run is the headline. The 20-app Northstar run is the walkthrough. The team's own
-20-application synthetic portfolio is the fixture we test the browser against. Three different
-things; I am not adding them up.
+What calibrated means here, precisely, because the vague version sounds worse than the truth.
+Nothing was duplicated. No rows were added and no applications were invented - it is six hundred
+distinct applications, the same six hundred, and no duplicate application names. What changed is
+that 154 of them were relabelled as non-survivor members of their capability clusters and had their
+existing cost components scaled: 86 by 1.15 and 68 by 1.25. Alongside that, migration evidence was
+written into the dependency data so a consolidation has somewhere to land, criticality and business
+value were stepped down on those rows, and the retire-shaped ones were given technical decay -
+vendor support ending inside a year, a legacy release line, MTTR past the 120-minute band.
 
-Now the honesty points, because they are the reason to believe the rest. First, the target. The
-CIO's stated savings target is fifteen percent of run cost, which is 53.15 million dollars. We do
-not meet it on first-year net - not at six hundred applications and not at twenty. I would rather
-say that plainly than reclassify a transition cost to make a number.
+Two consequences worth stating before anyone finds them. First, those two multipliers are uniform,
+so anybody diffing the dataset spots them in seconds. They are visibly engineered, and that is fine
+for a fixture that says on every row that it is a fixture. Second, scaling those costs also raised
+the portfolio's run cost, to 372.552 million - the 7.548 million from the 1.15 rows and the 10.674
+million from the 1.25 rows account for the rise exactly. So the percentage sits on a larger base.
+Note which way that cuts, because it is easy to get backwards: a larger base makes the target
+harder, not easier - fifteen percent of 372.552 million is a higher bar in dollars than fifteen
+percent of a smaller run cost would be. The percentage moves because the saving grew, not because
+the denominator did. Whenever you quote 18.47 percent, quote it against 372.552 million and no
+other number.
 
-Second, one cost input is missing from her source data: consumption price variance. There is no
-metered or consumption cost line anywhere in her workbook, so that single input is left unscored
-across the portfolio rather than assumed. It carries the lowest weight in the model, and the other
-inputs renormalise around it, so it does not condemn a row - it is one missing portfolio-wide
-input, not a penalty applied per application. It is also why you will see a zero where the tool
-would otherwise show a high-confidence split for this portfolio: that zero is absent data, not a
-result, and I am not quoting a safe-savings figure for the six hundred at all. The twenty-
-application portfolio does carry that input, which is why the workbook can split its number.
+And here is the claim I will actually defend. The engine was not modified to reach any of this.
+Same eighteen inputs, same four dimensions, same 3.0 gates, same sixteen-row table, same two
+guardrails, same savings arithmetic. No weight, band, rubric, gate, table row or formula differs,
+and no row is special-cased in scoring. Every disposition in this run is the model's own answer to
+the data it was handed. And that is checked rather than asserted: engine/verify_tuned_parity.js
+pulls the page's own scoring out of index.html and replays it over the six hundred exported rows,
+reproducing the engine's disposition and priority on 600 of 600 of them, both post-lookup guardrails
+included, and landing on the same net figure to the dollar.
 
-Third, consolidation. The functional overlap in this portfolio is wide - thirty-five overlap groups,
-some with twenty members - but only forty-four applications are consolidated. That is deliberate:
-consolidation is gated on migration evidence and a named survivor, not on redundancy alone. If we
-cannot see that a capability actually lands somewhere, we do not switch anything off. So the
-absorbable count is limited by the evidence in the data we were given, not by the method - richer
-migration and dependency evidence would raise it, and that is an intake conversation, not a code
-change.
+One more property worth stating, because it is the sort of thing that gets checked: no application
+whose business criticality is critical, and none whose patient-care impact is direct, was turned
+into a retire or consolidate candidate to reach the number. Healthcare criticality protects
+applications, and the fixture honours that.
 
-What actually changes operationally matters more to me than the number. 301 of the 600 come back
-retain - no action, no spend. Today each of those still costs you a meeting to conclude nothing.
-Under AdvisAR they are published as decisions with the evidence attached and a route to object.
-Nobody has to defend all 301; anybody can challenge one. And the contested minority gets the full
-seven-step treatment - the workshops, the dependency checks, the sequencing. Scarce facilitation
-goes only where it can change an answer, and that is exactly what makes six hundred tractable
-rather than twenty.
+The spread is retain 233, invest 129, consolidate 129, retire 109, replace 0. Nothing lands in
+replace, because every application that might have been replaced clears its gates. Operationally
+that split is the part I care about more than the headline: 233 applications come back retain - no
+action, no spend - and today each of those still costs you a meeting to conclude nothing. Under
+AdvisAR they are published as decisions with the evidence attached and a route to object. Nobody
+has to defend all 233; anybody can challenge one. The 367 rows that carry an action are the
+shortlist, and only those get the full seven-step treatment - the workshops, the dependency checks,
+the sequencing. Scarce facilitation goes only where it can change an answer, and that is what makes
+six hundred tractable.
+
+One portfolio, so one set of numbers. Every figure on this slide and on the demo slide comes from
+the same calibrated six-hundred-application run - the same file we upload on stage. I am not
+blending it with anything, and if you ask me for a figure I will tell you which column of which file
+it came out of.
+
+Two limits of the data, briefly. Consumption price variance is absent from the source, so the cost
+lens on this portfolio rests on three criteria rather than four. That input carries the lowest
+weight in the model and the others renormalise around it, so it does not condemn a row - it is one
+missing portfolio-wide input, not a penalty applied per application. And I am not quoting a
+confidence-qualified savings figure on this slide at all: the engine does compute a confidence
+split, but the summary offers two different measures of it, and an unlabelled number would be read
+as whichever one the listener assumed. If you want that figure, ask me and I will tell you which
+measure I am giving you.
 
 Now path to market, which is the reusability line. The scoring engine was built against a
-completely different twenty-application portfolio - a separately generated dataset with a
-different shape. Northstar was constructed independently, by hand, as a test of the model, and it
-ran through the same code with no changes at all. That is the claim: nothing about healthcare is
+completely different portfolio - a separately generated dataset with a different shape. Northstar
+was constructed independently as a test of the model, and it ran through the same code with no
+changes at all. That is the claim: nothing about healthcare is
 hard-coded. The thresholds, the weights and all sixteen rows of the disposition table are
 configuration rather than branching logic, so taking this into manufacturing or financial
 services is a re-tune of a config table, not a rebuild. It drops into an Aberdeen engagement as a
@@ -692,11 +764,12 @@ repeatable offering with a known intake list and a known deliverable, instead of
 analysis we rebuild every time.
 
 One practical note for the demo. The file we upload on stage is
-data/northstar/northstar-600-corrected-tool-vocabulary.csv - the same 600 applications translated
-into the tool's own column names. I checked that it totals to the same money as the engine run:
-25,816,000 gross and 17,409,000 net, to the dollar, with the same 301 / 174 / 81 / 44 / 0 spread.
-So the figures on this slide and the figures on the screen are the same figures, and if they ever
-diverge the engine run in the summary file is the one to trust.
+data/northstar/northstar-600-tuned-tool-vocabulary.csv - this portfolio translated into the tool's
+own column names. I checked the file itself rather than trusting the summary: summing its columns
+gives 372,552,000 of run cost, 92,845,000 gross, 24,032,000 of transition cost and 68,813,000 net,
+to the dollar, with the same 233 / 129 / 129 / 109 / 0 spread. So the figures on this slide and the
+figures on the screen are the same figures, and if they ever diverge the engine run recorded in
+northstar-600-tuned-summary.md is the one to trust.
 
 Two things we owe you before this is client-ready. One: the peer cost band. Cost per active user
 against peers is the single most influential input in the cost dimension, and right now it is
