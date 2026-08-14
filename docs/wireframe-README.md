@@ -1,12 +1,11 @@
-# AppRat AI wireframe
+# AppRat AI wireframe — build notes
 
-## What is what
+Start with the [root README](../README.md) for what the project is, how to run it, what the
+interface shows and the scoring model behind the recommendations. This file covers one
+narrow thing: why the wireframe is split across two HTML files, and how to rebuild it.
 
-| Path | Role |
-| --- | --- |
-| `src/apprat-ai-wireframe-v2.html` | **The wireframe. This is the file the team edits.** |
-| `index.html` | Generated wrapper that makes the wireframe viewable in a browser. Do not hand-edit. |
-| `src/build-wrapper.py` | Regenerates `index.html` from the fragment. |
+In short: edit `src/apprat-ai-wireframe-v2.html`, then run `python3 src/build-wrapper.py`
+to regenerate the root `index.html`. Never hand-edit `index.html`.
 
 ## Why there are two files
 
