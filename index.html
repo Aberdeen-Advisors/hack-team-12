@@ -463,10 +463,104 @@ svg.lucide {
       background: color-mix(in srgb, var(--card) 82%, var(--ab-jade));
     }
 
+    #apprat-wireframe .status-consolidate {
+      color: color-mix(in srgb, var(--foreground) 68%, var(--ab-teal));
+      background: color-mix(in srgb, var(--card) 74%, var(--ab-teal));
+    }
+
+    #apprat-wireframe .status-replace {
+      color: color-mix(in srgb, var(--foreground) 62%, var(--ab-sky));
+      background: color-mix(in srgb, var(--card) 74%, var(--ab-sky));
+    }
+
     #apprat-wireframe .status-validate {
       color: var(--ab-blue);
       background: color-mix(in srgb, var(--card) 76%, var(--ab-gold));
     }
+
+    /* ---- provenance banner: is the reader looking at sample content or at
+           numbers computed from their own file? ---- */
+    #apprat-wireframe .data-banner {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 0.6rem;
+      align-items: start;
+      padding: 0.65rem 0.8rem;
+      margin-bottom: 0.85rem;
+      border-radius: var(--radius, 0.5rem);
+      border: 1px solid var(--border);
+      background: color-mix(in srgb, var(--card) 84%, var(--ab-gold));
+    }
+
+    #apprat-wireframe .data-banner.is-computed {
+      background: color-mix(in srgb, var(--card) 86%, var(--ab-jade));
+    }
+
+    #apprat-wireframe .data-banner.is-error {
+      background: color-mix(in srgb, var(--card) 84%, var(--ab-jasper));
+    }
+
+    #apprat-wireframe .data-banner-icon {
+      color: var(--ab-blue);
+      margin-top: 0.15rem;
+    }
+
+    #apprat-wireframe .data-banner-title {
+      font-weight: 500;
+      color: var(--ab-blue);
+    }
+
+    #apprat-wireframe .data-banner-detail {
+      margin: 0.2rem 0 0;
+    }
+
+    #apprat-wireframe .data-banner-detail:empty { display: none; }
+
+    #apprat-wireframe .sample-flag {
+      display: inline-block;
+      margin-left: 0.35rem;
+      padding: 0.05rem 0.4rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      white-space: nowrap;
+      color: var(--ab-blue);
+      background: color-mix(in srgb, var(--card) 70%, var(--ab-gold));
+    }
+
+    #apprat-wireframe .sample-flag.is-computed {
+      background: color-mix(in srgb, var(--card) 70%, var(--ab-jade));
+    }
+
+    #apprat-wireframe .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    #apprat-wireframe .dimension-list {
+      display: grid;
+      gap: 0.35rem;
+      margin: 0.65rem 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    #apprat-wireframe .dimension-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 0.5rem;
+      align-items: baseline;
+    }
+
+    #apprat-wireframe .dimension-pass { color: var(--ab-jade); font-weight: 500; }
+    #apprat-wireframe .dimension-fail { color: var(--ab-jasper); font-weight: 500; }
 
     #apprat-wireframe .cluster-list {
       display: grid;
@@ -590,11 +684,21 @@ svg.lucide {
       </div>
     </div>
     <div class="header-actions">
-      <span class="viz-badge">Global portfolio · 600 tools</span>
+      <span class="viz-badge" data-portfolio-badge>Sample portfolio · 600 tools</span>
+      <input type="file" accept=".xlsx,.csv" class="visually-hidden" id="apprat-file-input" data-file-input
+             aria-label="Choose an application inventory file, Excel workbook or CSV">
       <button type="button" class="btn" data-action="upload"><i data-lucide="upload" aria-hidden="true"></i> Upload inventory</button>
       <button type="button" class="btn btn-primary" data-action="analyze"><i data-lucide="sparkles" aria-hidden="true"></i> Analyze portfolio</button>
     </div>
   </header>
+
+  <div class="data-banner" data-data-banner role="status" aria-live="polite">
+    <i class="data-banner-icon" data-lucide="circle-alert" aria-hidden="true"></i>
+    <div>
+      <span class="data-banner-title" data-banner-title>Illustrative sample content — not computed from any file</span>
+      <p class="data-banner-detail text-small text-muted" data-banner-detail>Every figure below is placeholder copy describing a fictional 600-application portfolio. Choose <strong>Upload inventory</strong> to load your own inventory as an Excel workbook (.xlsx) or a CSV, then <strong>Analyze portfolio</strong> to replace these numbers with real ones.</p>
+    </div>
+  </div>
 
   <nav class="nav-row" aria-label="AppRat AI views">
     <button type="button" class="btn btn-ghost is-selected" data-view="overview" aria-pressed="true">Executive overview</button>
@@ -606,83 +710,83 @@ svg.lucide {
     <section class="view is-active" data-panel="overview">
       <div class="page-intro">
         <div>
-          <h2>Portfolio decision overview</h2>
+          <h2>Portfolio decision overview<span class="sample-flag" data-sample-flag>Sample</span></h2>
           <p class="text-muted">Explainable recommendations that protect critical business operations.</p>
         </div>
-        <span class="status-badge"><i data-lucide="shield-check" aria-hidden="true"></i> 74 critical apps protected</span>
+        <span class="status-badge" data-critical-badge><i data-lucide="shield-check" aria-hidden="true"></i> 74 critical apps protected</span>
       </div>
 
       <div class="kpi-grid">
         <div class="card viz-stat">
-          <div class="text-muted">Annual technology spend</div>
-          <div class="viz-stat-value numeric">$42.8M</div>
-          <div class="text-small text-muted">600 applications, SaaS and AI tools</div>
+          <div class="text-muted">Annual technology spend<span class="sample-flag" data-sample-flag>Sample</span></div>
+          <div class="viz-stat-value numeric" data-kpi="spend">$42.8M</div>
+          <div class="text-small text-muted" data-kpi-sub="spend">600 applications, SaaS and AI tools</div>
         </div>
         <div class="card viz-stat">
-          <div class="text-muted">CIO savings target</div>
-          <div class="viz-stat-value numeric">$6.42M</div>
-          <div class="text-small text-muted">15.0% of annual spend</div>
+          <div class="text-muted">CIO savings target<span class="sample-flag" data-sample-flag>Sample</span></div>
+          <div class="viz-stat-value numeric" data-kpi="target">$6.42M</div>
+          <div class="text-small text-muted" data-kpi-sub="target">15.0% of annual spend</div>
         </div>
         <div class="card viz-stat">
-          <div class="text-muted">Safe savings identified</div>
-          <div class="viz-stat-value target-value numeric">$7.10M</div>
-          <div class="text-small text-muted">16.6% · high-confidence actions</div>
+          <div class="text-muted" data-kpi-label="saving">Safe savings identified<span class="sample-flag" data-sample-flag>Sample</span></div>
+          <div class="viz-stat-value target-value numeric" data-kpi="saving">$7.10M</div>
+          <div class="text-small text-muted" data-kpi-sub="saving">16.6% · high-confidence actions</div>
         </div>
       </div>
 
       <section class="card section-card" aria-label="Savings progress">
         <div class="progress-labels">
-          <strong>Safe savings progress</strong>
+          <strong data-progress-heading>Safe savings progress</strong>
           <span class="text-small">Common scale: 20% of annual spend</span>
         </div>
-        <div class="savings-comparison" role="img" aria-label="CIO target is 6.42 million dollars or 15 percent of spend. Safe savings identified are 7.10 million dollars or 16.6 percent of spend.">
+        <div class="savings-comparison" role="img" data-savings-comparison aria-label="CIO target is 6.42 million dollars or 15 percent of spend. Safe savings identified are 7.10 million dollars or 16.6 percent of spend.">
           <div class="savings-row">
-            <div class="savings-label"><span>CIO target</span><strong class="numeric">$6.42M · 15.0%</strong></div>
-            <div class="progress-track"><div class="progress-target"></div></div>
+            <div class="savings-label"><span>CIO target</span><strong class="numeric" data-savings-label="target">$6.42M · 15.0%</strong></div>
+            <div class="progress-track"><div class="progress-target" data-progress="target"></div></div>
           </div>
           <div class="savings-row">
-            <div class="savings-label"><span>Safe savings identified</span><strong class="numeric">$7.10M · 16.6%</strong></div>
-            <div class="progress-track"><div class="progress-identified"></div></div>
+            <div class="savings-label"><span data-savings-row-label="identified">Safe savings identified</span><strong class="numeric" data-savings-label="identified">$7.10M · 16.6%</strong></div>
+            <div class="progress-track"><div class="progress-identified" data-progress="identified"></div></div>
           </div>
         </div>
-        <p class="savings-note text-small text-muted"><strong>Safe savings</strong> are avoidable annual savings from high-confidence actions that pass critical-operation and dependency guardrails. One-time transition costs are tracked separately.</p>
+        <p class="savings-note text-small text-muted" data-savings-note><strong>Safe savings</strong> are avoidable annual savings from high-confidence actions that pass critical-operation and dependency guardrails. One-time transition costs are tracked separately.</p>
       </section>
 
       <div class="overview-grid">
         <section class="card section-card">
           <h3 class="section-title">Recommended decision mix</h3>
-          <div class="mix-bar" role="img" aria-label="88 invest, 160 retain, 118 consolidate, 42 replace, 96 retire, and 96 need validation">
-            <div class="mix-invest"></div>
-            <div class="mix-retain"></div>
-            <div class="mix-consolidate"></div>
-            <div class="mix-replace"></div>
-            <div class="mix-retire"></div>
-            <div class="mix-validate"></div>
+          <div class="mix-bar" role="img" data-mix-bar aria-label="88 invest, 160 retain, 118 consolidate, 42 replace, 96 retire, and 96 need validation">
+            <div class="mix-invest" data-mix="invest"></div>
+            <div class="mix-retain" data-mix="retain"></div>
+            <div class="mix-consolidate" data-mix="consolidate"></div>
+            <div class="mix-replace" data-mix="replace"></div>
+            <div class="mix-retire" data-mix="retire"></div>
+            <div class="mix-validate" data-mix="validate"></div>
           </div>
           <div class="legend-grid text-small">
-            <div class="legend-item"><span class="legend-dot mix-invest"></span><span>Invest · 88</span></div>
-            <div class="legend-item"><span class="legend-dot mix-retain"></span><span>Retain · 160</span></div>
-            <div class="legend-item"><span class="legend-dot mix-consolidate"></span><span>Consolidate · 118</span></div>
-            <div class="legend-item"><span class="legend-dot mix-replace"></span><span>Replace · 42</span></div>
-            <div class="legend-item"><span class="legend-dot mix-retire"></span><span>Retire · 96</span></div>
-            <div class="legend-item"><span class="legend-dot mix-validate"></span><span>Needs validation · 96</span></div>
+            <div class="legend-item"><span class="legend-dot mix-invest"></span><span data-legend="invest">Invest · 88</span></div>
+            <div class="legend-item"><span class="legend-dot mix-retain"></span><span data-legend="retain">Retain · 160</span></div>
+            <div class="legend-item"><span class="legend-dot mix-consolidate"></span><span data-legend="consolidate">Consolidate · 118</span></div>
+            <div class="legend-item"><span class="legend-dot mix-replace"></span><span data-legend="replace">Replace · 42</span></div>
+            <div class="legend-item"><span class="legend-dot mix-retire"></span><span data-legend="retire">Retire · 96</span></div>
+            <div class="legend-item" data-legend-item="validate"><span class="legend-dot mix-validate"></span><span data-legend="validate">Needs validation · 96</span></div>
           </div>
-          <p class="savings-note text-small text-muted"><strong>Retain</strong> means keep as-is; <strong>Invest</strong> means keep and strengthen because it is strategic or needs improvement.</p>
+          <p class="savings-note text-small text-muted" data-mix-note><strong>Retain</strong> means keep as-is; <strong>Invest</strong> means keep and strengthen because it is strategic or needs improvement.</p>
         </section>
 
         <section class="card section-card">
           <h3 class="section-title">Critical-operation guardrails</h3>
           <ul class="guardrail-list text-small">
-            <li class="guardrail-item"><i class="guardrail-icon" data-lucide="shield-check" aria-hidden="true"></i><span><strong>0 critical capabilities</strong> left without a primary application.</span></li>
-            <li class="guardrail-item"><i class="guardrail-icon" data-lucide="git-branch" aria-hidden="true"></i><span><strong>12 retirements blocked</strong> by unresolved downstream dependencies.</span></li>
-            <li class="guardrail-item"><i class="guardrail-icon" data-lucide="circle-alert" aria-hidden="true"></i><span><strong>96 tools held</strong> for missing usage, cost or risk evidence.</span></li>
+            <li class="guardrail-item"><i class="guardrail-icon" data-lucide="shield-check" aria-hidden="true"></i><span data-guardrail="capabilities"><strong>0 critical capabilities</strong> left without a primary application.</span></li>
+            <li class="guardrail-item"><i class="guardrail-icon" data-lucide="git-branch" aria-hidden="true"></i><span data-guardrail="blocked"><strong>12 retirements blocked</strong> by unresolved downstream dependencies.</span></li>
+            <li class="guardrail-item"><i class="guardrail-icon" data-lucide="circle-alert" aria-hidden="true"></i><span data-guardrail="held"><strong>96 tools held</strong> for missing usage, cost or risk evidence.</span></li>
           </ul>
         </section>
       </div>
 
       <section class="card section-card">
-        <h3 class="section-title">Highest-value redundancy clusters</h3>
-        <div class="cluster-list">
+        <h3 class="section-title" data-cluster-heading>Highest-value redundancy clusters</h3>
+        <div class="cluster-list" data-cluster-list>
           <div class="cluster-row">
             <div class="cluster-title"><span class="cluster-count">8</span><span><strong>Enterprise collaboration</strong><br><span class="text-small text-muted">Microsoft 365, Slack, Webex and niche messaging tools</span></span></div>
             <div class="cluster-metric"><div class="metric-label text-small">Spend</div><div class="cluster-value numeric">$3.8M</div></div>
@@ -711,7 +815,7 @@ svg.lucide {
     <section class="view" data-panel="workbench">
       <div class="page-intro">
         <div>
-          <h2>Rationalization workbench</h2>
+          <h2>Rationalization workbench<span class="sample-flag" data-sample-flag>Sample</span></h2>
           <p class="text-muted">Move from portfolio evidence to an auditable recommendation.</p>
         </div>
         <button type="button" class="btn"><i data-lucide="download" aria-hidden="true"></i> Export decisions</button>
@@ -734,7 +838,7 @@ svg.lucide {
           <div class="table-responsive">
             <table class="table table-sm">
               <thead><tr><th>Application</th><th>Capability</th><th>Decision</th><th class="text-end" data-tooltip="Recurring annual run-rate spend that disappears after the action is completed; excludes one-time transition costs.">Avoidable annual savings</th><th>Confidence</th></tr></thead>
-              <tbody>
+              <tbody data-app-table>
                 <tr data-app="slack"><td><button type="button" class="btn btn-ghost table-row-action" data-select-app="slack">Slack Enterprise</button></td><td>Enterprise collaboration</td><td><span class="status-badge">Consolidate</span></td><td class="text-end numeric">$820K</td><td>High</td></tr>
                 <tr data-app="notetaker"><td><button type="button" class="btn btn-ghost table-row-action" data-select-app="notetaker">AI NoteTaker Pro</button></td><td>Meeting assistance</td><td><span class="status-badge status-retire">Retire</span></td><td class="text-end numeric">$310K</td><td>High</td></tr>
                 <tr data-app="legacy-clm"><td><button type="button" class="btn btn-ghost table-row-action" data-select-app="legacy-clm">Legacy CLM</button></td><td>Contract management</td><td><span class="status-badge status-validate">Needs validation</span></td><td class="text-end numeric">—</td><td>Low</td></tr>
@@ -756,7 +860,7 @@ svg.lucide {
     <section class="view" data-panel="detail">
       <div class="page-intro">
         <div>
-          <h2>Decision detail</h2>
+          <h2>Decision detail<span class="sample-flag" data-sample-flag>Sample</span></h2>
           <p class="text-muted">A defensible recommendation with target, rationale, guardrails and savings.</p>
         </div>
         <button type="button" class="btn"><i data-lucide="file-text" aria-hidden="true"></i> Generate executive readout</button>
@@ -765,13 +869,13 @@ svg.lucide {
       <section class="card section-card">
         <div class="detail-heading">
           <div>
-            <div class="text-small text-muted">APP-0148 · Enterprise collaboration</div>
-            <h3>Slack Enterprise</h3>
+            <div class="text-small text-muted" data-detail="meta">APP-0148 · Enterprise collaboration</div>
+            <h3 data-detail="name">Slack Enterprise</h3>
           </div>
-          <span class="status-badge">Consolidate into Microsoft Teams</span>
+          <span class="status-badge" data-detail="badge">Consolidate into Microsoft Teams</span>
         </div>
 
-        <div class="detail-grid">
+        <div class="detail-grid" data-detail="grid">
           <div><div class="field-label text-small">Annual run-rate cost</div><strong class="numeric">$1.05M</strong></div>
           <div><div class="field-label text-small" data-tooltip="Recurring annual run-rate spend eliminated after consolidation; one-time migration costs are tracked separately.">Avoidable annual savings</div><strong class="numeric target-value">$820K</strong></div>
           <div><div class="field-label text-small">90-day active usage</div><strong>38% of licensed users</strong></div>
@@ -780,10 +884,10 @@ svg.lucide {
 
         <div class="rationale-box">
           <strong>Why this decision</strong>
-          <p>Slack and Microsoft Teams support the same enterprise collaboration capability for substantially the same user population. Teams has broader adoption, lower incremental cost and meets the required security controls.</p>
+          <p data-detail="rationale">Slack and Microsoft Teams support the same enterprise collaboration capability for substantially the same user population. Teams has broader adoption, lower incremental cost and meets the required security controls.</p>
         </div>
 
-        <div class="evidence-list">
+        <div class="evidence-list" data-detail="evidence">
           <div class="evidence-row"><i class="evidence-check" data-lucide="circle-check" aria-hidden="true"></i><span><strong>Capability coverage:</strong> Teams covers messaging, channels, meetings and external collaboration.</span></div>
           <div class="evidence-row"><i class="evidence-check" data-lucide="circle-check" aria-hidden="true"></i><span><strong>Critical operations:</strong> No unique critical capability depends exclusively on Slack.</span></div>
           <div class="evidence-row"><i class="evidence-warning" data-lucide="triangle-alert" aria-hidden="true"></i><span><strong>Dependency precondition:</strong> Migrate 14 workflow integrations and archive regulated channel history before contract exit.</span></div>
@@ -794,47 +898,1911 @@ svg.lucide {
   </main>
 
   <script>
+    /* ======================================================================
+     * AppRat AI — client-side rationalization analysis.
+     *
+     * Everything below runs in the browser with no dependencies, no build step
+     * and no network calls: open index.html from the filesystem and it works.
+     * The file a reader chooses is parsed here and never leaves the machine.
+     *
+     * Three parts, in order:
+     *   1. a dependency-free .xlsx and .csv reader (ZIP + DEFLATE + SpreadsheetML)
+     *   2. a port of engine/generate_dataset.py's scoring core
+     *   3. the UI wiring for Upload inventory and Analyze portfolio
+     *
+     * Part 2 is a faithful port, verified row by row against the Python
+     * engine's own output on data/synthetic-portfolio/applications-v2.csv.
+     * See docs/wireframe-README.md for the measured parity result.
+     * ====================================================================== */
     (function () {
+      "use strict";
+
+      /* =================================================================== *
+       * PART 1 of 3 — .xlsx and .csv reader
+       * =================================================================== */
+
+      /* ==========================================================================
+       * xlsx-reader.js — dependency-free, browser-only .xlsx + .csv reader
+       * --------------------------------------------------------------------------
+       * No libraries, no CDN, no build step. Drop this into a <script> tag and open
+       * index.html from the filesystem. Everything it needs is already in the
+       * browser: DataView (ZIP parsing), DecompressionStream (raw DEFLATE) and
+       * DOMParser (SpreadsheetML).
+       *
+       * Public globals:
+       *   async readXlsxSheets(arrayBuffer) -> { [sheetName]: rows[][] }
+       *   readCsv(text)                     -> rows[][]                (RFC 4180)
+       *   rowsToObjects(rows)               -> [{header: value, ...}]
+       *   xlsxSupportCheck()                -> { supported, missing[], message }
+       *
+       * Cell values are `string`, `number`, `boolean`, or `null`. `null` means the
+       * cell is genuinely empty — never 0 and never "". Empty cells that exist in
+       * the XML only to carry a style (e.g. `<c r="F3" s="11" t="inlineStr"/>`) are
+       * `null` too, and cells/rows omitted from the XML altogether are padded with
+       * `null` at their correct positions so column alignment is preserved.
+       *
+       * KNOWN LIMITATION (deliberate): number formats are NOT applied. A cell is
+       * returned as its raw stored value, so an Excel date serial comes back as the
+       * number (e.g. 45000), a percentage as 0.15 rather than "15%", and currency
+       * without its symbol. Converting serials to dates requires reading styles.xml
+       * plus the 1900/1904 epoch flag and the 1900 leap-year bug, which is out of
+       * scope here. Dates written as ISO text (as in this project's workbooks) come
+       * through unchanged as strings.
+       *
+       * Also not supported (they do not appear in this project's data): encrypted
+       * workbooks, the legacy binary .xls format, .xlsb, and ZIP entries compressed
+       * with anything other than "stored" (0) or "deflate" (8).
+       * ======================================================================== */
+
+      /* ------------------------------------------------------------------ *
+       * 0. Feature detection
+       * ------------------------------------------------------------------ */
+
+      /**
+       * Reports whether this browser can run the .xlsx path at all.
+       * `DecompressionStream` is the hard requirement: Chrome/Edge 103+,
+       * Safari 16.4+, Firefox 113+.
+       */
+      function xlsxSupportCheck() {
+        var missing = [];
+        if (typeof DecompressionStream === 'undefined') missing.push('DecompressionStream');
+        if (typeof DOMParser === 'undefined') missing.push('DOMParser');
+        if (typeof TextDecoder === 'undefined') missing.push('TextDecoder');
+        if (typeof Blob === 'undefined') missing.push('Blob');
+        return {
+          supported: missing.length === 0,
+          missing: missing,
+          message: missing.length === 0
+            ? 'Spreadsheet reading is supported in this browser.'
+            : 'This browser is missing ' + missing.join(', ') +
+              '. Reading .xlsx files needs a modern browser (Chrome or Edge 103+, ' +
+              'Safari 16.4+, Firefox 113+). CSV files will still work.'
+        };
+      }
+
+      /* ------------------------------------------------------------------ *
+       * 1. ZIP container
+       * ------------------------------------------------------------------ */
+
+      var XLSX_SIG_EOCD = 0x06054b50;   // end of central directory
+      var XLSX_SIG_EOCD64 = 0x06064b50; // zip64 end of central directory
+      var XLSX_SIG_LOC64 = 0x07064b50;  // zip64 eocd locator
+      var XLSX_SIG_CDH = 0x02014b50;    // central directory file header
+      var XLSX_SIG_LFH = 0x04034b50;    // local file header
+
+      function xlsxError(message) {
+        return new Error(message);
+      }
+
+      /**
+       * Scan backwards from the end of the buffer for the end-of-central-directory
+       * signature. The record is 22 bytes plus an optional comment of up to 65535
+       * bytes, so it always lives in the last 65557 bytes.
+       */
+      function findEocd(view) {
+        var maxBack = Math.min(view.byteLength, 65557);
+        var start = view.byteLength - maxBack;
+        for (var i = view.byteLength - 22; i >= start; i--) {
+          if (view.getUint32(i, true) === XLSX_SIG_EOCD) {
+            // Sanity-check the comment length so we do not latch onto a stray
+            // signature that happens to appear inside compressed data.
+            var commentLen = view.getUint16(i + 20, true);
+            if (i + 22 + commentLen === view.byteLength) return i;
+          }
+        }
+        return -1;
+      }
+
+      /**
+       * Walk the central directory and return a Map of entry name -> descriptor.
+       * We deliberately trust the central directory (not the local headers) for
+       * sizes, because local headers may defer them to a data descriptor.
+       */
+      function readZipDirectory(arrayBuffer) {
+        if (!arrayBuffer || typeof arrayBuffer.byteLength !== 'number') {
+          throw xlsxError('No file data was provided.');
+        }
+        if (arrayBuffer.byteLength < 22) {
+          throw xlsxError("That doesn't look like an .xlsx file — the file is too small to be a spreadsheet.");
+        }
+
+        var view = new DataView(arrayBuffer);
+        var eocd = findEocd(view);
+        if (eocd < 0) {
+          throw xlsxError(
+            "That doesn't look like an .xlsx file. An .xlsx workbook is a ZIP " +
+            'archive, and no ZIP directory was found in this file. If you saved it ' +
+            'as .xls or .csv, re-save it as "Excel Workbook (.xlsx)" and try again.'
+          );
+        }
+
+        var entryCount = view.getUint16(eocd + 10, true);
+        var cdSize = view.getUint32(eocd + 12, true);
+        var cdOffset = view.getUint32(eocd + 16, true);
+
+        // ZIP64: the 32-bit fields are saturated and the real values live in the
+        // ZIP64 end-of-central-directory record pointed at by its locator.
+        if (entryCount === 0xffff || cdSize === 0xffffffff || cdOffset === 0xffffffff) {
+          var loc = eocd - 20;
+          if (loc >= 0 && view.getUint32(loc, true) === XLSX_SIG_LOC64) {
+            var eocd64 = readU64(view, loc + 8);
+            if (eocd64 >= 0 && eocd64 + 56 <= view.byteLength &&
+                view.getUint32(eocd64, true) === XLSX_SIG_EOCD64) {
+              entryCount = readU64(view, eocd64 + 32);
+              cdSize = readU64(view, eocd64 + 40);
+              cdOffset = readU64(view, eocd64 + 48);
+            }
+          }
+        }
+
+        if (cdOffset < 0 || cdOffset + cdSize > view.byteLength) {
+          throw xlsxError(
+            'This .xlsx file appears to be truncated or corrupted (its ZIP ' +
+            'directory points outside the file). Try re-saving it from Excel.'
+          );
+        }
+
+        var utf8 = new TextDecoder('utf-8');
+        var entries = new Map();
+        var p = cdOffset;
+
+        for (var n = 0; n < entryCount; n++) {
+          if (p + 46 > view.byteLength || view.getUint32(p, true) !== XLSX_SIG_CDH) break;
+
+          var flags = view.getUint16(p + 8, true);
+          var method = view.getUint16(p + 10, true);
+          var compSize = view.getUint32(p + 20, true);
+          var uncompSize = view.getUint32(p + 24, true);
+          var nameLen = view.getUint16(p + 28, true);
+          var extraLen = view.getUint16(p + 30, true);
+          var commentLen = view.getUint16(p + 32, true);
+          var localOffset = view.getUint32(p + 42, true);
+
+          var nameBytes = new Uint8Array(arrayBuffer, p + 46, nameLen);
+          // Bit 11 of the general purpose flags marks the name as UTF-8. Older
+          // writers use a legacy code page; UTF-8 decoding is a safe approximation
+          // for the ASCII paths inside an OOXML package either way.
+          var name = utf8.decode(nameBytes);
+
+          // ZIP64 extended information extra field overrides the saturated sizes.
+          if (uncompSize === 0xffffffff || compSize === 0xffffffff || localOffset === 0xffffffff) {
+            var ex = p + 46 + nameLen;
+            var exEnd = ex + extraLen;
+            while (ex + 4 <= exEnd) {
+              var hid = view.getUint16(ex, true);
+              var hsize = view.getUint16(ex + 2, true);
+              if (hid === 0x0001) {
+                var q = ex + 4;
+                if (uncompSize === 0xffffffff && q + 8 <= exEnd) { uncompSize = readU64(view, q); q += 8; }
+                if (compSize === 0xffffffff && q + 8 <= exEnd) { compSize = readU64(view, q); q += 8; }
+                if (localOffset === 0xffffffff && q + 8 <= exEnd) { localOffset = readU64(view, q); q += 8; }
+                break;
+              }
+              ex += 4 + hsize;
+            }
+          }
+
+          entries.set(name, {
+            name: name,
+            method: method,
+            flags: flags,
+            compressedSize: compSize,
+            uncompressedSize: uncompSize,
+            localOffset: localOffset
+          });
+
+          p += 46 + nameLen + extraLen + commentLen;
+        }
+
+        if (entries.size === 0) {
+          throw xlsxError("That doesn't look like an .xlsx file — the ZIP archive is empty.");
+        }
+        return entries;
+      }
+
+      /** Read a little-endian 64-bit value as a JS number (safe below 2^53). */
+      function readU64(view, offset) {
+        var lo = view.getUint32(offset, true);
+        var hi = view.getUint32(offset + 4, true);
+        return hi * 4294967296 + lo;
+      }
+
+      /**
+       * Locate an entry's compressed bytes by skipping its local file header,
+       * whose filename and extra-field lengths differ from the central directory's.
+       */
+      function entryBytes(arrayBuffer, entry) {
+        var view = new DataView(arrayBuffer);
+        var off = entry.localOffset;
+        if (off + 30 > view.byteLength || view.getUint32(off, true) !== XLSX_SIG_LFH) {
+          throw xlsxError(
+            'This .xlsx file is corrupted: the entry "' + entry.name +
+            '" has no valid local header.'
+          );
+        }
+        var nameLen = view.getUint16(off + 26, true);
+        var extraLen = view.getUint16(off + 28, true);
+        var start = off + 30 + nameLen + extraLen;
+        var end = start + entry.compressedSize;
+        if (end > arrayBuffer.byteLength) {
+          throw xlsxError(
+            'This .xlsx file is truncated: the entry "' + entry.name +
+            '" runs past the end of the file.'
+          );
+        }
+        return new Uint8Array(arrayBuffer, start, entry.compressedSize);
+      }
+
+      /** Inflate (or copy) one entry and return its bytes. */
+      async function inflateEntry(arrayBuffer, entry) {
+        var raw = entryBytes(arrayBuffer, entry);
+
+        if (entry.method === 0) {
+          // Stored: the bytes are already the content. Copy so callers cannot
+          // accidentally mutate the source buffer.
+          return raw.slice();
+        }
+        if (entry.method !== 8) {
+          throw xlsxError(
+            'This .xlsx file uses an unsupported compression method (' + entry.method +
+            ') for "' + entry.name + '". Re-saving it from Excel usually fixes this.'
+          );
+        }
+        if (typeof DecompressionStream === 'undefined') {
+          throw xlsxError(xlsxSupportCheck().message);
+        }
+
+        var stream = new Blob([raw]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+        var buf;
+        try {
+          buf = await new Response(stream).arrayBuffer();
+        } catch (e) {
+          throw xlsxError(
+            'This .xlsx file could not be decompressed — it may be corrupted or ' +
+            'password-protected (entry "' + entry.name + '").'
+          );
+        }
+        return new Uint8Array(buf);
+      }
+
+      /** Inflate an entry and decode it as UTF-8 text. Returns null if absent. */
+      async function readEntryText(arrayBuffer, entries, name) {
+        var entry = entries.get(name);
+        if (!entry) return null;
+        var bytes = await inflateEntry(arrayBuffer, entry);
+        return new TextDecoder('utf-8').decode(bytes);
+      }
+
+      /* ------------------------------------------------------------------ *
+       * 2. XML helpers
+       * ------------------------------------------------------------------ */
+
+      /** Parse XML text, turning parser failures into a readable Error. */
+      function parseXml(text, label) {
+        var doc = new DOMParser().parseFromString(text, 'application/xml');
+        var err = doc.getElementsByTagName('parsererror')[0];
+        if (err || !doc.documentElement) {
+          throw xlsxError(
+            'This .xlsx file contains malformed XML (' + label + '), so it cannot be read.'
+          );
+        }
+        return doc;
+      }
+
+      /**
+       * Namespace-agnostic element lookup. OOXML files may or may not use a prefix
+       * (`<sheet>` vs `<x:sheet>`), so match on local name in any namespace.
+       */
+      function els(node, localName) {
+        return node.getElementsByTagNameNS('*', localName);
+      }
+
+      /** First child element with this local name, or null. Direct children only. */
+      function childEl(node, localName) {
+        for (var c = node.firstElementChild; c; c = c.nextElementSibling) {
+          if (localName === (c.localName || c.nodeName)) return c;
+        }
+        return null;
+      }
+
+      /**
+       * Attribute lookup by local name, ignoring the prefix — `r:id` in
+       * workbook.xml is the relationship namespace, but some writers vary.
+       */
+      function attrLocal(el, localName) {
+        var direct = el.getAttribute(localName);
+        if (direct !== null) return direct;
+        var attrs = el.attributes;
+        for (var i = 0; i < attrs.length; i++) {
+          if ((attrs[i].localName || attrs[i].name) === localName) return attrs[i].value;
+        }
+        return null;
+      }
+
+      /* ------------------------------------------------------------------ *
+       * 3. Cell references
+       * ------------------------------------------------------------------ */
+
+      /**
+       * "BC" -> 54 (0-based). Returns -1 when the reference has no letters.
+       * Base-26 bijective numbering: A=1 ... Z=26, AA=27.
+       */
+      function colToIndex(ref) {
+        var n = 0, seen = 0;
+        for (var i = 0; i < ref.length; i++) {
+          var c = ref.charCodeAt(i);
+          if (c >= 65 && c <= 90) { n = n * 26 + (c - 64); seen++; }
+          else if (c >= 97 && c <= 122) { n = n * 26 + (c - 96); seen++; }
+          else break;
+        }
+        return seen ? n - 1 : -1;
+      }
+
+      /** "BC7" -> 7 (1-based row). Returns -1 when there are no digits. */
+      function rowFromRef(ref) {
+        var i = 0;
+        while (i < ref.length && !(ref.charCodeAt(i) >= 48 && ref.charCodeAt(i) <= 57)) i++;
+        if (i >= ref.length) return -1;
+        var n = parseInt(ref.slice(i), 10);
+        return isNaN(n) ? -1 : n;
+      }
+
+      /* ------------------------------------------------------------------ *
+       * 4. Shared strings
+       * ------------------------------------------------------------------ */
+
+      /**
+       * Build the shared-string table. Each <si> may be plain (`<t>`) or rich text
+       * (several `<r><t>` runs) — concatenate every run so styled text arrives in
+       * one piece. `<rPh>` (furigana / phonetic hints) is metadata, not content, so
+       * its `<t>` elements are skipped.
+       */
+      function parseSharedStrings(xmlText) {
+        if (!xmlText) return [];
+        var doc = parseXml(xmlText, 'xl/sharedStrings.xml');
+        var sis = els(doc.documentElement, 'si');
+        var out = new Array(sis.length);
+        for (var i = 0; i < sis.length; i++) out[i] = collectText(sis[i]);
+        return out;
+      }
+
+      /** Concatenate all <t> text under a node, ignoring phonetic <rPh> blocks. */
+      function collectText(node) {
+        var ts = els(node, 't');
+        var s = '';
+        for (var i = 0; i < ts.length; i++) {
+          if (!hasAncestorNamed(ts[i], node, 'rPh')) s += ts[i].textContent;
+        }
+        return s;
+      }
+
+      function hasAncestorNamed(el, stopAt, localName) {
+        for (var p = el.parentNode; p && p !== stopAt; p = p.parentNode) {
+          if ((p.localName || p.nodeName) === localName) return true;
+        }
+        return false;
+      }
+
+      /* ------------------------------------------------------------------ *
+       * 5. Worksheet
+       * ------------------------------------------------------------------ */
+
+      /**
+       * Turn one worksheet's XML into a dense rectangular array of rows.
+       *
+       * Alignment is the whole point here: cells and rows are both sparse in
+       * SpreadsheetML, so we place every cell at the column its `r` reference
+       * decodes to, then pad. A blank cell in the middle of a row and a row that
+       * was skipped entirely both come out as `null`, at the right index.
+       */
+      function parseSheet(xmlText, sharedStrings, label) {
+        var doc = parseXml(xmlText, label);
+        var rowEls = els(doc.documentElement, 'row');
+
+        var sparse = new Map(); // 1-based row number -> array of values
+        var maxRow = 0;
+        var maxCol = -1;
+        var fallbackRow = 0;
+
+        for (var i = 0; i < rowEls.length; i++) {
+          var rowEl = rowEls[i];
+          var rAttr = attrLocal(rowEl, 'r');
+          var rowNum = rAttr === null ? fallbackRow + 1 : parseInt(rAttr, 10);
+          if (!(rowNum > 0)) rowNum = fallbackRow + 1;
+          fallbackRow = rowNum;
+          if (rowNum > maxRow) maxRow = rowNum;
+
+          var cells = sparse.get(rowNum);
+          if (!cells) { cells = []; sparse.set(rowNum, cells); }
+
+          var cellEls = els(rowEl, 'c');
+          var nextCol = 0;
+          for (var j = 0; j < cellEls.length; j++) {
+            var cellEl = cellEls[j];
+            var ref = attrLocal(cellEl, 'r');
+            var col = ref ? colToIndex(ref) : -1;
+            if (col < 0) col = nextCol; // no usable reference: assume next column
+            nextCol = col + 1;
+            if (col > maxCol) maxCol = col;
+            while (cells.length <= col) cells.push(null);
+            cells[col] = cellValue(cellEl, sharedStrings);
+          }
+        }
+
+        var width = maxCol + 1;
+        var rows = new Array(maxRow);
+        for (var r = 1; r <= maxRow; r++) {
+          var src = sparse.get(r);
+          var row = new Array(width);
+          for (var c = 0; c < width; c++) {
+            row[c] = (src && c < src.length && src[c] !== undefined) ? src[c] : null;
+          }
+          rows[r - 1] = row;
+        }
+        return rows;
+      }
+
+      /**
+       * Decode one <c> element.
+       *
+       * Types: "s" shared-string index, "inlineStr" literal <is><t>, "str" cached
+       * formula result, "b" boolean, "e" error text, "d" ISO-8601 date text, and
+       * no `t` (or "n") for numbers. We always read <v>, never <f> — a formula's
+       * cached result is the value; the formula source is not.
+       */
+      function cellValue(cellEl, sharedStrings) {
+        var t = attrLocal(cellEl, 't') || 'n';
+
+        if (t === 'inlineStr') {
+          var is = childEl(cellEl, 'is');
+          if (!is) {
+            // `<c r="F3" s="11" t="inlineStr"/>` — typed and styled, but no content.
+            // This is a genuinely blank cell.
+            var vEmpty = childEl(cellEl, 'v');
+            if (!vEmpty) return null;
+            var raw = vEmpty.textContent;
+            return raw === '' ? null : raw;
+          }
+          var text = collectText(is);
+          return text === '' ? null : text;
+        }
+
+        var v = childEl(cellEl, 'v');
+        if (!v) return null;
+        var s = v.textContent;
+        if (s === '') return null;
+
+        if (t === 's') {
+          var idx = parseInt(s, 10);
+          if (isNaN(idx) || idx < 0 || idx >= sharedStrings.length) return null;
+          var shared = sharedStrings[idx];
+          return shared === '' ? null : shared;
+        }
+        if (t === 'str' || t === 'e' || t === 'd') return s;
+        if (t === 'b') return s !== '0' && s.toLowerCase() !== 'false';
+
+        // Numeric (t="n" or absent). Fall back to the raw text if it will not
+        // parse, rather than silently producing NaN.
+        var num = Number(s);
+        return isNaN(num) ? s : num;
+      }
+
+      /* ------------------------------------------------------------------ *
+       * 6. Package wiring
+       * ------------------------------------------------------------------ */
+
+      /** Resolve an OOXML relationship target against the part that declared it. */
+      function resolvePath(baseDir, target) {
+        if (!target) return null;
+        if (target.charAt(0) === '/') return target.slice(1);
+        var parts = (baseDir ? baseDir.split('/') : []).filter(Boolean);
+        var segs = target.split('/');
+        for (var i = 0; i < segs.length; i++) {
+          var seg = segs[i];
+          if (seg === '' || seg === '.') continue;
+          if (seg === '..') parts.pop();
+          else parts.push(seg);
+        }
+        return parts.join('/');
+      }
+
+      /**
+       * Read every worksheet from an .xlsx ArrayBuffer.
+       *
+       * @param {ArrayBuffer} arrayBuffer raw bytes of the .xlsx file
+       * @returns {Promise<Object>} sheet name -> rows (array of arrays)
+       * @throws {Error} with a message suitable for showing to a user
+       */
+      async function readXlsxSheets(arrayBuffer) {
+        if (arrayBuffer && arrayBuffer.buffer instanceof ArrayBuffer && !(arrayBuffer instanceof ArrayBuffer)) {
+          // Accept a typed array as a convenience.
+          arrayBuffer = arrayBuffer.buffer.slice(
+            arrayBuffer.byteOffset, arrayBuffer.byteOffset + arrayBuffer.byteLength
+          );
+        }
+
+        var entries = readZipDirectory(arrayBuffer);
+
+        // Find the workbook part. Normally xl/workbook.xml; follow _rels/.rels when
+        // a writer puts it somewhere else.
+        var workbookPath = 'xl/workbook.xml';
+        if (!entries.has(workbookPath)) {
+          var rootRels = await readEntryText(arrayBuffer, entries, '_rels/.rels');
+          if (rootRels) {
+            var rootDoc = parseXml(rootRels, '_rels/.rels');
+            var rels = els(rootDoc.documentElement, 'Relationship');
+            for (var i = 0; i < rels.length; i++) {
+              var type = attrLocal(rels[i], 'Type') || '';
+              if (type.indexOf('/officeDocument') !== -1) {
+                var candidate = resolvePath('', attrLocal(rels[i], 'Target'));
+                if (candidate && entries.has(candidate)) { workbookPath = candidate; break; }
+              }
+            }
+          }
+        }
+        if (!entries.has(workbookPath)) {
+          throw xlsxError(
+            "That doesn't look like an .xlsx file — it is a ZIP archive but " +
+            'contains no Excel workbook part (xl/workbook.xml).'
+          );
+        }
+
+        var baseDir = workbookPath.indexOf('/') === -1
+          ? '' : workbookPath.slice(0, workbookPath.lastIndexOf('/'));
+
+        var workbookXml = await readEntryText(arrayBuffer, entries, workbookPath);
+        var wbDoc = parseXml(workbookXml, workbookPath);
+
+        // r:id -> target path, from the workbook's own .rels part.
+        var relsPath = resolvePath(baseDir, '_rels/' + workbookPath.split('/').pop() + '.rels');
+        var relMap = new Map();
+        var relsXml = await readEntryText(arrayBuffer, entries, relsPath);
+        if (relsXml) {
+          var relsDoc = parseXml(relsXml, relsPath);
+          var relEls = els(relsDoc.documentElement, 'Relationship');
+          for (var k = 0; k < relEls.length; k++) {
+            var id = attrLocal(relEls[k], 'Id');
+            var target = attrLocal(relEls[k], 'Target');
+            var mode = attrLocal(relEls[k], 'TargetMode');
+            if (id && target && mode !== 'External') {
+              relMap.set(id, resolvePath(baseDir, target));
+            }
+          }
+        }
+
+        var sheetEls = els(wbDoc.documentElement, 'sheet');
+        if (sheetEls.length === 0) {
+          throw xlsxError('This workbook contains no worksheets, so there is nothing to read.');
+        }
+
+        // Shared strings are optional — workbooks written with inline strings have
+        // no such part at all.
+        var sharedStrings = parseSharedStrings(
+          await readEntryText(arrayBuffer, entries, resolvePath(baseDir, 'sharedStrings.xml'))
+        );
+
+        var result = {};
+        var readCount = 0;
+        var positional = 0;
+
+        for (var s = 0; s < sheetEls.length; s++) {
+          var sheetEl = sheetEls[s];
+          var name = attrLocal(sheetEl, 'name') || ('Sheet' + (s + 1));
+          var rid = attrLocal(sheetEl, 'id'); // r:id
+          var path = rid ? relMap.get(rid) : null;
+
+          // Fallback for workbooks with missing or unusable rels: worksheets are
+          // conventionally xl/worksheets/sheetN.xml in declaration order.
+          if (!path || !entries.has(path)) {
+            positional++;
+            var guess = resolvePath(baseDir, 'worksheets/sheet' + positional + '.xml');
+            path = entries.has(guess) ? guess : null;
+          } else {
+            positional++;
+          }
+          if (!path) continue;
+
+          var sheetXml = await readEntryText(arrayBuffer, entries, path);
+          if (sheetXml === null) continue;
+
+          // Later sheets with a duplicate name would otherwise be lost.
+          var key = name;
+          for (var dup = 2; Object.prototype.hasOwnProperty.call(result, key); dup++) {
+            key = name + ' (' + dup + ')';
+          }
+          result[key] = parseSheet(sheetXml, sharedStrings, path);
+          readCount++;
+        }
+
+        if (readCount === 0) {
+          throw xlsxError(
+            'This workbook lists worksheets but none of their data could be found ' +
+            'inside the file. It may be corrupted.'
+          );
+        }
+        return result;
+      }
+
+      /* ------------------------------------------------------------------ *
+       * 7. CSV
+       * ------------------------------------------------------------------ */
+
+      /**
+       * Parse CSV text per RFC 4180: double-quoted fields, embedded commas and
+       * newlines inside quotes, `""` for a literal quote, CRLF / LF / CR line
+       * endings. A leading UTF-8 BOM is stripped.
+       *
+       * Blank fields come back as `''`, not `null` — unlike a spreadsheet cell, a
+       * CSV field cannot distinguish "empty" from "absent", so there is nothing to
+       * signal. A completely blank line yields an empty row (`[]`). Both behaviours
+       * match Python's csv module, which the parser is diff-tested against.
+       *
+       * @param {string} text
+       * @returns {Array<Array<string>>}
+       */
+      function readCsv(text) {
+        if (text == null) return [];
+        text = String(text);
+        if (text.charCodeAt(0) === 0xfeff) text = text.slice(1); // BOM
+        if (text === '') return [];
+
+        var rows = [];
+        var row = [];
+        var field = '';
+        var quoted = false;   // this field was written in quotes
+        var inQuotes = false; // currently inside a quoted section
+        var i = 0;
+        var len = text.length;
+        var endedWithNewline = false;
+
+        // A line containing nothing at all is an empty row, not a row holding one
+        // empty field — the same distinction Python's csv module makes.
+        function endRow() {
+          if (row.length === 0 && field === '' && !quoted) rows.push([]);
+          else { row.push(field); rows.push(row); }
+          row = []; field = ''; quoted = false;
+        }
+
+        while (i < len) {
+          var ch = text.charAt(i);
+
+          if (inQuotes) {
+            if (ch === '"') {
+              if (text.charAt(i + 1) === '"') { field += '"'; i += 2; continue; }
+              inQuotes = false; i++; continue;
+            }
+            field += ch; i++; continue;
+          }
+
+          if (ch === '"') {
+            // A quote only opens a quoted section at the start of a field; a stray
+            // quote mid-field is kept literally, which is what spreadsheets do.
+            if (field === '' && !quoted) { inQuotes = true; quoted = true; i++; continue; }
+            field += ch; i++; continue;
+          }
+          if (ch === ',') { row.push(field); field = ''; quoted = false; i++; continue; }
+          if (ch === '\r' || ch === '\n') {
+            if (ch === '\r' && text.charAt(i + 1) === '\n') i += 2; else i++;
+            endRow();
+            endedWithNewline = (i >= len);
+            continue;
+          }
+          field += ch; i++;
+        }
+
+        // Flush a final line that had no trailing newline.
+        if (!endedWithNewline) endRow();
+        return rows;
+      }
+
+      /* ------------------------------------------------------------------ *
+       * 8. Rows -> objects
+       * ------------------------------------------------------------------ */
+
+      /**
+       * Use row 0 as headers and map each later row to an object.
+       * Blank or duplicate headers get stable synthetic names so no column is
+       * silently dropped. Short rows are filled with `null`.
+       *
+       * @param {Array<Array<*>>} rows
+       * @returns {Array<Object>}
+       */
+      function rowsToObjects(rows) {
+        if (!rows || rows.length === 0) return [];
+        var headerRow = rows[0] || [];
+        var headers = [];
+        var used = Object.create(null);
+
+        for (var c = 0; c < headerRow.length; c++) {
+          var raw = headerRow[c];
+          var name = (raw === null || raw === undefined) ? '' : String(raw).trim();
+          if (name === '') name = 'column' + (c + 1);
+          if (used[name]) {
+            var n = used[name] + 1;
+            used[name] = n;
+            name = name + '_' + n;
+          }
+          used[name] = used[name] || 1;
+          headers.push(name);
+        }
+
+        var out = [];
+        for (var r = 1; r < rows.length; r++) {
+          var row = rows[r] || [];
+          var obj = {};
+          for (var j = 0; j < headers.length; j++) {
+            var v = j < row.length ? row[j] : null;
+            obj[headers[j]] = v === undefined ? null : v;
+          }
+          out.push(obj);
+        }
+        return out;
+      }
+
+      /* =================================================================== *
+       * PART 2 of 3 — the scoring engine, ported from engine/generate_dataset.py
+       * =================================================================== */
+
+      /* ==========================================================================
+       * apprat-engine.js — browser port of engine/generate_dataset.py
+       * --------------------------------------------------------------------------
+       * A faithful JavaScript port of the scoring core in engine/generate_dataset.py:
+       * the 18 weighted criteria, the four dimension scores, the 3.0 gate, the
+       * 16-row pattern lookup, the lifecycle / sourcing / redundancy guards, the
+       * retention gate, the successor bump, the savings netting, the completeness
+       * and confidence tiers, and the portfolio roll-up.
+       *
+       * No dependencies, no build step. Constants are lifted verbatim from the
+       * Python so the two stay comparable line by line.
+       *
+       * Public entry point:
+       *   arAnalyse(records) -> { rows, summary, mapping }
+       * where `records` is an array of plain objects keyed by the uploaded file's
+       * own header strings (the output of rowsToObjects()).
+       * ======================================================================== */
+
+      /* ------------------------------------------------------------------ *
+       * 1. Constants — verbatim from engine/generate_dataset.py
+       * ------------------------------------------------------------------ */
+
+      /* generate_dataset.py:88-94 */
+      var AR_DIMENSIONS = [
+        ['V', 'Business value', 'business_value_score', 'v_pass'],
+        ['T', 'Technical health', 'technical_health_score', 't_pass'],
+        ['C', 'Cost efficiency', 'cost_efficiency_score', 'c_pass'],
+        ['R', 'Risk posture', 'risk_posture_score', 'r_pass']
+      ];
+
+      /* generate_dataset.py:97-139 — [criterion, dimension, integer weight] */
+      var AR_CRITERIA = [
+        ['ov_increase_value', 'V', 1],
+        ['ov_reach_consumers', 'V', 1],
+        ['ov_reduce_costs_efficiency', 'V', 1],
+        ['ov_patient_care_criticality', 'V', 2],
+        ['ov_governance_compliance', 'V', 1],
+        ['th_supportability', 'T', 2],
+        ['th_architecture_fit', 'T', 2],
+        ['th_operational_stability', 'T', 1],
+        ['th_vendor_viability', 'T', 1],
+        ['th_customization_debt', 'T', 1],
+        ['c_cost_per_active_user_vs_peers', 'C', 2],
+        ['c_unused_licence_waste', 'C', 1],
+        ['c_consumption_price_variance', 'C', 1],
+        ['c_absolute_cost_band', 'C', 0],
+        ['r_technical_risk', 'R', 1],
+        ['r_business_compliance_risk', 'R', 1],
+        ['r_clinical_safety_risk', 'R', 1],
+        ['r_end_user_perceived_quality', 'R', 0]
+      ];
+
+      /* Plain-English label for each scored input, for the evidence panel. Our own
+       * wording, describing our own criterion columns. */
+      var AR_CRITERION_LABELS = {
+        ov_increase_value: 'Criticality to revenue',
+        ov_reach_consumers: 'Breadth of use',
+        ov_reduce_costs_efficiency: 'Process centrality',
+        ov_patient_care_criticality: 'Criticality to patient care',
+        ov_governance_compliance: 'Governance and compliance alignment',
+        th_supportability: 'Supportability',
+        th_architecture_fit: 'Architecture fit',
+        th_operational_stability: 'Operational stability',
+        th_vendor_viability: 'Vendor viability',
+        th_customization_debt: 'Customization debt',
+        c_cost_per_active_user_vs_peers: 'Cost per active user against peers',
+        c_unused_licence_waste: 'Unused licence waste',
+        c_consumption_price_variance: 'Consumption price variance',
+        c_absolute_cost_band: 'Absolute cost band',
+        r_technical_risk: 'Technical risk',
+        r_business_compliance_risk: 'Business and compliance risk',
+        r_clinical_safety_risk: 'Clinical safety risk',
+        r_end_user_perceived_quality: 'End-user perceived quality'
+      };
+
+      var AR_PASS_THRESHOLD = 3.0;                 /* >= passes, so exactly 3.0 passes */
+
+      /* generate_dataset.py:166-184 — the 16-row lookup. Our five terms, our ladder. */
+      var AR_DISPOSITION_TABLE = {
+        PPPP: ['retain', 'Very Low'],
+        PPPF: ['invest', 'High'],
+        PPFP: ['invest', 'Moderate'],
+        PPFF: ['invest', 'High'],
+        PFPP: ['invest', 'Moderate'],
+        PFPF: ['invest', 'High'],
+        PFFP: ['replace', 'High'],
+        PFFF: ['replace', 'Very High'],
+        FPPP: ['consolidate', 'Low'],
+        FPPF: ['consolidate', 'Moderate'],
+        FPFP: ['retire', 'High'],
+        FPFF: ['retire', 'Very High'],
+        FFPP: ['consolidate', 'Moderate'],
+        FFPF: ['retire', 'High'],
+        FFFP: ['retire', 'Very High'],
+        FFFF: ['retire', 'Very High']
+      };
+
+      var AR_DISPOSITIONS = ['retain', 'invest', 'consolidate', 'replace', 'retire'];
+      var AR_PRIORITY_LADDER = ['Very Low', 'Low', 'Moderate', 'High', 'Very High'];
+      var AR_HML = { High: 1.0, Medium: 0.75, Low: 0.25, None: 0.0 };
+
+      /* generate_dataset.py:199-213 — the completeness_score denominator (44 fields).
+       * vendor_eos_date is deliberately absent: a SaaS product legitimately has none. */
+      var AR_COMPLETENESS_FIELDS = [
+        'vendor_name', 'deployment_model', 'sourcing_type', 'lifecycle_stage', 'implementation_date',
+        'version_installed', 'business_owner', 'technical_owner', 'business_unit',
+        'cost_centre', 'primary_capability', 'licences_purchased', 'active_users', 'last_signin_date',
+        'process_centrality', 'owner_stated_strategic_importance', 'cost_licence_subscription',
+        'cost_maintenance_dev_labour', 'cost_indirect_and_training', 'contract_id',
+        'annual_contract_value', 'term_end', 'auto_renewal_flag', 'licence_metric',
+        'has_downstream_dependents', 'integration_pattern', 'retention_obligation_flag',
+        'information_classification', 'ov_increase_value', 'ov_reach_consumers',
+        'ov_reduce_costs_efficiency', 'ov_patient_care_criticality', 'ov_governance_compliance',
+        'th_supportability', 'th_architecture_fit', 'th_operational_stability', 'th_vendor_viability',
+        'th_customization_debt', 'c_cost_per_active_user_vs_peers', 'c_unused_licence_waste',
+        'c_consumption_price_variance', 'r_technical_risk', 'r_business_compliance_risk',
+        'r_clinical_safety_risk'
+      ];
+
+      var AR_TARGET_REDUCTION_PCT = 0.15;          /* the CIO's 15% spend-reduction target */
+      var AR_TCO_HORIZON_YEARS = 5;                /* undiscounted */
+      var AR_MATERIALITY_LINE = 700000;            /* the $700k line in override_priority */
+      var AR_NOTICE_WINDOW_DAYS = 180;
+
+      /* The five cost categories summed into tco_five_category_subtotal. */
+      var AR_COST_CATEGORIES = [
+        'cost_licence_subscription', 'cost_upgrade_and_modules', 'cost_maintenance_dev_labour',
+        'cost_infrastructure_peripherals', 'cost_indirect_and_training'
+      ];
+
+      /* Every column the port reads. Anything not on this list is carried through
+       * untouched and never scored. */
+      var AR_TEXT_FIELDS = [
+        'app_id', 'app_name', 'vendor_name', 'description', 'deployment_model', 'sourcing_type',
+        'lifecycle_stage', 'implementation_date', 'version_installed', 'vendor_eos_date',
+        'business_owner', 'technical_owner', 'business_unit', 'department', 'cost_centre',
+        'primary_capability', 'secondary_capabilities', 'last_signin_date', 'process_centrality',
+        'owner_stated_strategic_importance', 'contract_id', 'term_start', 'term_end', 'licence_metric',
+        'integration_pattern', 'information_classification', 'overlap_cluster_id', 'cluster_role',
+        'replacement_app_id', 'retention_expiry_date', 'saving_type', 'urg_timeline_sensitivity',
+        'urg_risk_pain_severity', 'data_source', 'action', 'gross_saving_basis'
+      ];
+
+      var AR_NUMBER_FIELDS = [
+        'licences_purchased', 'active_users', 'cost_licence_subscription', 'cost_upgrade_and_modules',
+        'cost_maintenance_dev_labour', 'cost_infrastructure_peripherals', 'cost_indirect_and_training',
+        'consumption_based_cost', 'one_time_implementation_cost', 'annual_contract_value',
+        'renewal_notice_days', 'early_termination_penalty', 'dependency_count',
+        'replacement_ongoing_tco', 'amortised_one_time_migration_cost', 'residual_archival_cost',
+        'realization_lag_months', 'gross_saving_annual', 'reharvest_share', 'reharvest_reserve'
+      ];
+
+      var AR_BOOLEAN_FIELDS = [
+        'auto_renewal_flag', 'has_downstream_dependents', 'retention_obligation_flag',
+        'replacement_cost_already_in_baseline', 'technical_obsolescence_flag', 'is_orphaned',
+        'is_shadow_it', 'is_ai_tool'
+      ];
+
+      /* Extra header spellings we accept for a canonical column. Our own column
+       * names on the left of each pair; only spelling variants, never vendor terms. */
+      var AR_HEADER_ALIASES = {
+        application_id: 'app_id',
+        id: 'app_id',
+        application: 'app_name',
+        application_name: 'app_name',
+        name: 'app_name',
+        vendor: 'vendor_name',
+        supplier: 'vendor_name',
+        capability: 'primary_capability',
+        business_capability: 'primary_capability',
+        lifecycle: 'lifecycle_stage',
+        sourcing: 'sourcing_type',
+        licences: 'licences_purchased',
+        licenses_purchased: 'licences_purchased',
+        licenses: 'licences_purchased',
+        seats_purchased: 'licences_purchased',
+        users_active: 'active_users',
+        active_user_count: 'active_users',
+        consumption_cost: 'consumption_based_cost',
+        avoidable_annual_cost: 'gross_saving_annual',
+        avoidable_annual_saving: 'gross_saving_annual',
+        gross_annual_saving: 'gross_saving_annual',
+        gross_saving: 'gross_saving_annual',
+        migration_cost_amortised: 'amortised_one_time_migration_cost',
+        one_time_migration_cost: 'amortised_one_time_migration_cost',
+        successor_app_id: 'replacement_app_id',
+        successor_ongoing_tco: 'replacement_ongoing_tco',
+        archival_cost: 'residual_archival_cost',
+        retention_expiry: 'retention_expiry_date',
+        cluster_id: 'overlap_cluster_id',
+        role_in_cluster: 'cluster_role'
+      };
+
+      /* ------------------------------------------------------------------ *
+       * 2. Value handling — a blank cell is a blank cell, never a zero
+       * ------------------------------------------------------------------ */
+
+      /* Python treats None as absent and the literal string "unknown" as absent
+       * (compute_provenance). An empty cell reaches us as null or "". */
+      function arIsBlank(v) {
+        if (v === null || v === undefined) return true;
+        if (typeof v === 'string') {
+          var t = v.trim();
+          return t === '' || t.toLowerCase() === 'unknown';
+        }
+        return false;
+      }
+
+      function arText(v) {
+        if (arIsBlank(v)) return null;
+        return typeof v === 'string' ? v.trim() : String(v);
+      }
+
+      function arNumber(v) {
+        if (arIsBlank(v)) return null;
+        if (typeof v === 'number') return isFinite(v) ? v : null;
+        var s = String(v).trim().replace(/[$£€,\s]/g, '');
+        if (s === '') return null;
+        var pct = false;
+        if (s.charAt(s.length - 1) === '%') { pct = true; s = s.slice(0, -1); }
+        if (/^\((.*)\)$/.test(s)) s = '-' + s.slice(1, -1);      /* (1,200) -> -1200 */
+        var n = Number(s);
+        if (!isFinite(n)) return null;
+        return pct ? n / 100 : n;
+      }
+
+      function arBoolean(v) {
+        if (arIsBlank(v)) return null;
+        if (typeof v === 'boolean') return v;
+        if (typeof v === 'number') return v !== 0;
+        var s = String(v).trim().toLowerCase();
+        if (s === 'true' || s === 'yes' || s === 'y' || s === '1') return true;
+        if (s === 'false' || s === 'no' || s === 'n' || s === '0') return false;
+        return null;
+      }
+
+      /* money() in the Python: None becomes 0 for arithmetic only. */
+      function arMoney(x) {
+        return (x === null || x === undefined || !isFinite(x)) ? 0 : x;
+      }
+
+      /* Python's round(x, 3). Both languages round the same IEEE-754 double, and
+       * they differ only on an exact binary tie, which cannot arise here: every
+       * dimension score is n/(2*den) with den in 1..7, so it is either
+       * non-terminating in binary or has at most three decimal places. Verified
+       * against all 20 committed rows. */
+      function arRound3(x) {
+        if (x === null || x === undefined || !isFinite(x)) return null;
+        return Number(x.toFixed(3));
+      }
+
+      /* Python's round(x) to a whole number: half-to-even on the exact double. */
+      function arRound0(x) {
+        if (x === null || x === undefined || !isFinite(x)) return null;
+        var f = Math.floor(x);
+        var diff = x - f;
+        if (diff > 0.5) return f + 1;
+        if (diff < 0.5) return f;
+        return (f % 2 === 0) ? f : f + 1;
+      }
+
+      /* Date -> epoch ms (UTC midnight), or null. Accepts an ISO string (what this
+       * project's own files hold) and an Excel serial number, because the xlsx reader
+       * deliberately does not apply number formats and hands back the raw serial. */
+      var AR_EXCEL_EPOCH = Date.UTC(1899, 11, 30);   /* the 1900 system, leap-year bug included */
+
+      function arDate(v) {
+        if (arIsBlank(v)) return null;
+        if (typeof v === 'number' && isFinite(v)) return arSerialToDate(v);
+        var s = arText(v);
+        if (!s) return null;
+        var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s);
+        if (m) return Date.UTC(+m[1], +m[2] - 1, +m[3]);
+        if (/^\d+(\.\d+)?$/.test(s)) return arSerialToDate(Number(s));
+        var t = Date.parse(s);
+        return isFinite(t) ? t : null;
+      }
+
+      /* An Excel serial only makes sense in a plausible range; outside it, the cell is
+       * some other number and is not treated as a date. 20000 is 1954, 80000 is 2119. */
+      function arSerialToDate(n) {
+        if (!(n >= 20000 && n <= 80000)) return null;
+        return AR_EXCEL_EPOCH + Math.floor(n) * AR_DAY_MS;
+      }
+
+      var AR_DAY_MS = 86400000;
+
+      /* ------------------------------------------------------------------ *
+       * 3. Column mapping — tolerant of case, spaces, hyphens, underscores
+       * ------------------------------------------------------------------ */
+
+      function arNormaliseHeader(h) {
+        return String(h === null || h === undefined ? '' : h)
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '_')
+          .replace(/^_+|_+$/g, '');
+      }
+
+      var AR_ALL_CANONICAL = (function () {
+        var seen = {};
+        var out = [];
+        function add(n) { if (!seen[n]) { seen[n] = true; out.push(n); } }
+        AR_TEXT_FIELDS.forEach(add);
+        AR_NUMBER_FIELDS.forEach(add);
+        AR_BOOLEAN_FIELDS.forEach(add);
+        AR_CRITERIA.forEach(function (c) { add(c[0]); });
+        return out;
+      })();
+
+      var AR_CANONICAL_SET = (function () {
+        var s = {};
+        AR_ALL_CANONICAL.forEach(function (n) { s[n] = true; });
+        return s;
+      })();
+
+      /**
+       * Build a header -> canonical-column map for one uploaded file.
+       * Returns { map, matched, unmatched, scoredFound, scoredMissing }.
+       */
+      function arMapColumns(headers) {
+        var map = {};
+        var matched = [];
+        var unmatched = [];
+        headers.forEach(function (h) {
+          var n = arNormaliseHeader(h);
+          var canonical = null;
+          if (AR_CANONICAL_SET[n]) canonical = n;
+          else if (AR_HEADER_ALIASES[n] && AR_CANONICAL_SET[AR_HEADER_ALIASES[n]]) canonical = AR_HEADER_ALIASES[n];
+          /* A trailing/leading qualifier is tolerated: "App Inventory: Active Users". */
+          if (!canonical) {
+            for (var i = 0; i < AR_ALL_CANONICAL.length; i++) {
+              var c = AR_ALL_CANONICAL[i];
+              if (n === c || n.slice(-(c.length + 1)) === '_' + c || n.slice(0, c.length + 1) === c + '_') {
+                canonical = c;
+                break;
+              }
+            }
+          }
+          if (canonical && !map[canonical]) {
+            map[canonical] = h;
+            matched.push(canonical);
+          } else {
+            unmatched.push(h);
+          }
+        });
+
+        var scoredFound = [];
+        var scoredMissing = [];
+        AR_CRITERIA.forEach(function (c) {
+          (map[c[0]] ? scoredFound : scoredMissing).push(c[0]);
+        });
+
+        return {
+          map: map,
+          matched: matched,
+          unmatched: unmatched,
+          scoredFound: scoredFound,
+          scoredMissing: scoredMissing
+        };
+      }
+
+      /**
+       * Find the header row in a raw grid and turn the grid into records.
+       *
+       * A spreadsheet often carries a banner row of merged category labels above the
+       * real header — the Applications sheet in this project's own workbook does, with
+       * the header on row 2 and data from row 3 — so the header row is detected by
+       * which candidate row recognises the most of our own column names, rather than
+       * assumed to be row 1.
+       *
+       * @param {Array<Array>} grid rows of cells
+       * @param {number} [maxScan] how many leading rows to consider
+       * @returns {{headerIndex: number, headers: Array, records: Array, recognised: number}}
+       */
+      function arRecordsFromGrid(grid, maxScan) {
+        var scan = Math.min(grid.length, maxScan || 8);
+        var best = { headerIndex: 0, recognised: -1 };
+        for (var i = 0; i < scan; i++) {
+          var candidate = (grid[i] || []).map(function (c) {
+            return (c === null || c === undefined) ? '' : String(c);
+          });
+          var named = candidate.filter(function (h) { return h.trim() !== ''; }).length;
+          if (named < 2) continue;
+          var m = arMapColumns(candidate);
+          /* Prefer the row that recognises most of our columns; on a tie the earlier row wins. */
+          if (m.matched.length > best.recognised) {
+            best = { headerIndex: i, recognised: m.matched.length };
+          }
+        }
+
+        var headerIndex = best.recognised > 0 ? best.headerIndex : 0;
+        var headers = (grid[headerIndex] || []).map(function (c, j) {
+          var s = (c === null || c === undefined) ? '' : String(c).trim();
+          return s === '' ? '__col' + (j + 1) : s;
+        });
+
+        var records = [];
+        for (var r = headerIndex + 1; r < grid.length; r++) {
+          var cells = grid[r] || [];
+          var allBlank = true;
+          for (var k = 0; k < cells.length; k++) {
+            if (!arIsBlank(cells[k])) { allBlank = false; break; }
+          }
+          if (allBlank) continue;                       /* skip spacer rows */
+          var rec = {};
+          for (var c2 = 0; c2 < headers.length; c2++) {
+            rec[headers[c2]] = c2 < cells.length ? cells[c2] : null;
+          }
+          records.push(rec);
+        }
+
+        return {
+          headerIndex: headerIndex,
+          headers: headers,
+          records: records,
+          recognised: Math.max(0, best.recognised)
+        };
+      }
+
+      /** Turn one raw record into the typed row the engine expects. */
+      function arNormaliseRow(record, mapping, index) {
+        var raw = {};                          /* canonical -> raw cell, for completeness */
+        var row = { _index: index };
+        Object.keys(mapping.map).forEach(function (canonical) {
+          raw[canonical] = record[mapping.map[canonical]];
+        });
+        row._raw = raw;
+
+        AR_TEXT_FIELDS.forEach(function (f) { row[f] = arText(raw[f]); });
+        AR_NUMBER_FIELDS.forEach(function (f) { row[f] = arNumber(raw[f]); });
+        AR_BOOLEAN_FIELDS.forEach(function (f) { row[f] = arBoolean(raw[f]); });
+        AR_CRITERIA.forEach(function (c) { row[c[0]] = arNumber(raw[c[0]]); });
+
+        if (!row.app_id) row.app_id = 'ROW-' + String(index + 1);
+        if (!row.app_name) row.app_name = row.app_id;
+        return row;
+      }
+
+      /* ------------------------------------------------------------------ *
+       * 4. The scoring core — a direct port
+       * ------------------------------------------------------------------ */
+
+      /* generate_dataset.py:1491-1506. Weighted arithmetic mean on the 1-5 scale,
+       * renormalised over the criteria that actually carry a value: a blank is
+       * skipped in numerator AND denominator, so a sparse row is reported as
+       * incomplete rather than silently scored downward. */
+      function arDimensionScore(row, dimKey) {
+        var num = 0.0;
+        var den = 0.0;
+        var used = [];
+        for (var i = 0; i < AR_CRITERIA.length; i++) {
+          var name = AR_CRITERIA[i][0], dim = AR_CRITERIA[i][1], weight = AR_CRITERIA[i][2];
+          if (dim !== dimKey || weight === 0) continue;
+          var val = row[name];
+          if (val === null || val === undefined) continue;
+          num += val * weight;
+          den += weight;
+          used.push(name);
+        }
+        if (den === 0) return { score: null, denominator: 0, used: used };
+        return { score: arRound3(num / den), denominator: den, used: used };
+      }
+
+      /* generate_dataset.py:1509-1513. The comparison is >=, so exactly 3.0 passes,
+       * and an unscoreable dimension is a FAIL, not a skip. */
+      function arGate(score) {
+        if (score === null || score === undefined) return 'F';
+        return score >= AR_PASS_THRESHOLD ? 'P' : 'F';
+      }
+
+      /* generate_dataset.py:1516-1541. All four gates pass -> retain; any gate fails
+       * -> invest, and the failing dimension is what the money buys. Cost is not
+       * special-cased: a cost-only failure resolves to invest, never to retire. */
+      function arRetainOrInvest(row) {
+        var failed = [];
+        AR_DIMENSIONS.forEach(function (d) {
+          if (row[d[3]] === 'F') failed.push(d[1].toLowerCase());
+        });
+        if (failed.length) {
+          return ['invest', 'invest in ' + failed.join(' and in ') + ': that is the dimension failing the '
+            + AR_PASS_THRESHOLD.toFixed(1) + ' gate, so that is what the money buys'];
+        }
+        return ['retain', 'all four dimensions clear the 3.0 gate, so there is no failing dimension to fund '
+          + 'and nothing to buy: keep it, spend nothing'];
+      }
+
+      /* generate_dataset.py:1544. Clamps to the ends of the ladder. */
+      function arStepPriority(priority, steps) {
+        var i = AR_PRIORITY_LADDER.indexOf(priority);
+        if (i < 0) return priority;
+        var j = Math.min(Math.max(i + steps, 0), AR_PRIORITY_LADDER.length - 1);
+        return AR_PRIORITY_LADDER[j];
+      }
+
+      /* generate_dataset.py:1549-1553. Mean of the two urgency signals through HML. */
+      function arUrgency(row) {
+        var vals = [];
+        [row.urg_timeline_sensitivity, row.urg_risk_pain_severity].forEach(function (v) {
+          if (v === null || v === undefined) return;
+          var key = String(v).trim();
+          var mapped = AR_HML[key.charAt(0).toUpperCase() + key.slice(1).toLowerCase()];
+          if (mapped === undefined) mapped = AR_HML[key];
+          if (mapped !== undefined) vals.push(mapped);
+        });
+        if (!vals.length) return null;
+        var sum = 0;
+        vals.forEach(function (v) { sum += v; });
+        return arRound3(sum / vals.length);
+      }
+
+      /* generate_dataset.py:1556-1571. Priority for a row whose disposition came
+       * from the redundancy override rather than the gate lookup. In order:
+       *   1. Birth/Growth        -> Moderate (do not rush an app still ramping)
+       *   2. urgency >= 0.75     -> High     (a deadline forces the decision)
+       *   3. net saving >= $700k -> High
+       *   4. otherwise           -> Moderate */
+      function arOverridePriority(row) {
+        if (row.lifecycle_stage === 'Birth' || row.lifecycle_stage === 'Growth') {
+          return ['Moderate', 'lifecycle is ' + row.lifecycle_stage + ', so the consolidation is not rushed'];
+        }
+        var u = row.urgency_score || 0;
+        if (u >= 0.75) {
+          return ['High', 'urgency ' + u.toFixed(2) + ' - a contract or support deadline forces the decision'];
+        }
+        if ((row.net_saving_annual || 0) >= AR_MATERIALITY_LINE) {
+          return ['High', 'net saving above the $700k materiality line'];
+        }
+        return ['Moderate', 'material saving but no forcing deadline'];
+      }
+
+      /* generate_dataset.py:1578-1677 — compute(), in the order the engine runs. */
+      function arCompute(row, analysisDate) {
+        /* ---- usage and cost arithmetic ---- */
+        var lic = row.licences_purchased, act = row.active_users;
+        row.licence_utilisation_rate = (lic && act !== null && act !== undefined) ? arRound3(act / lic) : null;
+        row.unused_licence_count = (lic && act !== null && act !== undefined) ? lic - act : null;
+
+        var subtotal = 0;
+        AR_COST_CATEGORIES.forEach(function (c) { subtotal += arMoney(row[c]); });
+        row.tco_five_category_subtotal = subtotal;
+        row.annual_tco_recurring = subtotal + arMoney(row.consumption_based_cost);
+        row.five_year_cumulative_tco = row.annual_tco_recurring * AR_TCO_HORIZON_YEARS;
+        row.cost_per_active_user = act ? arRound0(row.annual_tco_recurring / act) : null;
+        row.unused_licence_spend = (row.licence_utilisation_rate !== null)
+          ? arRound0(arMoney(row.cost_licence_subscription) * (1 - row.licence_utilisation_rate))
+          : null;
+
+        /* ---- contract arithmetic ---- */
+        var end = arDate(row.term_end), notice = row.renewal_notice_days;
+        if (end !== null && notice) {
+          var deadline = end - notice * AR_DAY_MS;
+          row.notice_deadline_date = new Date(deadline).toISOString().slice(0, 10);
+          var delta = Math.round((deadline - analysisDate) / AR_DAY_MS);
+          row.in_notice_window_now = delta >= 0 && delta <= AR_NOTICE_WINDOW_DAYS;
+        } else {
+          row.notice_deadline_date = null;
+          row.in_notice_window_now = null;
+        }
+        row.contract_runway_months = (end !== null)
+          ? Math.max(0, arRound0((end - analysisDate) / AR_DAY_MS / 30.44))
+          : null;
+
+        /* ---- the four dimension scores, the gates and the key ---- */
+        row.dimension_detail = {};
+        AR_DIMENSIONS.forEach(function (d) {
+          var res = arDimensionScore(row, d[0]);
+          row[d[2]] = res.score;
+          row[d[3]] = arGate(res.score);
+          row.dimension_detail[d[0]] = {
+            key: d[0], name: d[1], score: res.score, pass: row[d[3]],
+            denominator: res.denominator, used: res.used
+          };
+        });
+        row.vtcr_key = row.v_pass + row.t_pass + row.c_pass + row.r_pass;
+        row.unscoreable_dimensions = AR_DIMENSIONS
+          .filter(function (d) { return row[d[2]] === null; })
+          .map(function (d) { return d[1]; });
+
+        var entry = AR_DISPOSITION_TABLE[row.vtcr_key];
+        var disposition = entry[0];
+        var priority = entry[1];
+        var priorityReason = 'straight from the ' + row.vtcr_key + ' row of the lookup table';
+
+        /* ---- the retain / invest split: a check, not a decision ---- */
+        row._split_conflict = null;
+        if (disposition === 'retain' || disposition === 'invest') {
+          var res2 = arRetainOrInvest(row);
+          row.retain_or_invest_basis = res2[1];
+          if (res2[0] !== disposition) {
+            row._split_conflict = 'the lookup table maps ' + row.vtcr_key + ' to ' + disposition
+              + ' but the retain/invest rule returns ' + res2[0];
+          }
+        } else {
+          row.retain_or_invest_basis = null;
+        }
+
+        row._gate_disposition = disposition;
+        row._gate_priority = priority;
+
+        /* ---- guard 1: lifecycle. Bars retire and replace only, never silently. ---- */
+        row.lifecycle_exclusion_applied = (row.lifecycle_stage === 'Birth' || row.lifecycle_stage === 'Growth');
+        row.lifecycle_suppressed_term = null;
+        var suppressed = null;
+        var reasons = [];
+        if (row.lifecycle_exclusion_applied) {
+          if (disposition === 'retire' || disposition === 'replace') {
+            suppressed = disposition;
+            row.lifecycle_suppressed_term = disposition;
+            disposition = 'invest';
+            priority = 'High';
+            priorityReason = 'lifecycle guard replaced a retire/replace with a funded invest';
+            reasons.push('lifecycle stage ' + row.lifecycle_stage + ': retire and replace are barred outright, '
+              + 'so the ' + suppressed + ' the gates returned is suppressed');
+          } else {
+            suppressed = 'none - guard armed, gates returned ' + disposition;
+            reasons.push('lifecycle stage ' + row.lifecycle_stage + ': the retire/replace bar is armed but the '
+              + 'gates did not reach either, so nothing was suppressed. Consolidate is NOT barred by lifecycle');
+          }
+        }
+
+        /* ---- guard 2: sourcing. Annotation only: it never changes the term. ---- */
+        row.sourcing_exclusion_applied = (row.sourcing_type === 'SaaS' && disposition === 'replace');
+        if (row.sourcing_exclusion_applied) {
+          reasons.push('sourcing type SaaS: rebuilding or re-platforming the product in place is not a legal '
+            + 'option, so the action is substitution by another product, not a re-platform of this one');
+        }
+
+        /* ---- override: redundancy. Not a gate - an override. ---- */
+        row.redundancy_override_applied = (row.cluster_role === 'absorbed');
+        if (row.redundancy_override_applied) {
+          if (disposition !== 'consolidate') {
+            suppressed = disposition + ' (gate result, overridden by cluster membership)';
+            reasons.push('cluster ' + (row.overlap_cluster_id || 'membership') + ' membership overrides the gate '
+              + 'result and forces consolidate into ' + (row.replacement_app_id || 'the surviving application')
+              + '; the capability persists');
+          }
+          disposition = 'consolidate';
+        }
+
+        row.disposition = disposition;
+        row.priority = priority;
+        row._priority_reason = priorityReason;
+        row._suppressed = suppressed;
+        row._reasons = reasons;
+        return row;
+      }
+
+      /* generate_dataset.py:1680-1698 — compute_savings(). Never assume a retire
+       * returns 100% of an application's cost.
+       *
+       * The Python takes its gross-saving basis from a per-row working key that is
+       * not a column in any file, so the port resolves it in this order:
+       *   1. the file supplies a gross saving (or avoidable annual cost) column
+       *   2. the file supplies a gross_saving_basis column
+       *   3. default to the run-rate rule
+       * The netting itself is unchanged. */
+      function arComputeSavings(row) {
+        var removesRunRate = (row.disposition === 'retire' || row.disposition === 'consolidate'
+          || row.disposition === 'replace');
+        var gross;
+        var basis;
+
+        if (row.gross_saving_annual !== null && row.gross_saving_annual !== undefined) {
+          gross = row.gross_saving_annual;
+          basis = 'supplied';
+        } else if (row.gross_saving_basis === 'licence_reharvest') {
+          var share = (row.reharvest_share === null || row.reharvest_share === undefined) ? 1 : row.reharvest_share;
+          var reserve = arMoney(row.reharvest_reserve);
+          gross = arRound0(arMoney(row.unused_licence_spend) * share) - reserve;
+          basis = 'licence_reharvest';
+        } else if (row.gross_saving_basis === 'none') {
+          gross = 0;
+          basis = 'none';
+        } else {
+          gross = removesRunRate ? row.annual_tco_recurring : 0;
+          basis = 'run_rate';
+        }
+
+        var successor = row.replacement_cost_already_in_baseline ? 0 : arMoney(row.replacement_ongoing_tco);
+        var net = gross - successor - arMoney(row.amortised_one_time_migration_cost)
+          - arMoney(row.residual_archival_cost);
+
+        row.gross_saving_basis_used = basis;
+        row.gross_saving_annual = gross;
+        row.net_saving_annual = net;
+        row.net_saving_five_year = net * AR_TCO_HORIZON_YEARS;
+        row.saving_type = gross ? (row.saving_type || 'recurring') : 'none';
+        row.consolidation_saving = (row.cluster_role === 'absorbed') ? net : null;
+        return row;
+      }
+
+      /* generate_dataset.py:1701-1741 — apply_constraints_and_priority(). Runs after
+       * savings (the override rule reads the net saving) and after every row has a
+       * disposition (the successor bump reads another row's). */
+      function arApplyConstraintsAndPriority(rows, analysisDate) {
+        rows.forEach(function (row) {
+          if (row.redundancy_override_applied) {
+            var res = arOverridePriority(row);
+            row.priority = res[0];
+            row._priority_reason = 'redundancy override: ' + res[1];
+          }
+
+          /* retention gate: a retire with a live obligation is constrained, not cancelled */
+          var expiry = arDate(row.retention_expiry_date);
+          row.retention_override_applied = !!(row.disposition === 'retire' && row.retention_obligation_flag
+            && expiry !== null && expiry > analysisDate);
+          if (row.retention_override_applied) {
+            var was = row.priority;
+            row.priority = arStepPriority(was, -1);
+            row._priority_reason = 'retention constraint stepped priority down from ' + was
+              + ': the archive has to exist before anything can be switched off';
+            row._reasons.push('retention obligation runs to ' + row.retention_expiry_date + ' and the '
+              + 'application cannot purge its own data, so the retirement is CONSTRAINED, not cancelled');
+          }
+        });
+
+        /* successor bump: a platform on the critical path of a replace goes up one step */
+        rows.forEach(function (row) {
+          var blockers = rows.filter(function (r) {
+            return r.replacement_app_id === row.app_id && r.disposition === 'replace';
+          }).map(function (r) { return r.app_id; });
+          if (blockers.length) {
+            var was = row.priority;
+            row.priority = arStepPriority(was, 1);
+            row._priority_reason = 'stepped up from ' + was + ': ' + blockers.join(', ')
+              + ' cannot complete its replacement until this rollout finishes';
+            row._reasons.push('named successor for ' + blockers.join(', ') + ', so its rollout is on the '
+              + 'critical path of another initiative');
+            row.successor_bump_for = blockers;
+          }
+        });
+
+        rows.forEach(function (row) {
+          row.suppressed_recommendation = row._suppressed;
+          row.suppression_reason = row._reasons.length ? row._reasons.join('; ') : null;
+        });
+        return rows;
+      }
+
+      /* generate_dataset.py:1744-1758 — compute_provenance(). "unknown" counts as
+       * missing, not as a value. A column absent from the file is missing on every
+       * row, exactly as a None would be in the Python. */
+      function arComputeProvenance(row) {
+        var missing = [];
+        AR_COMPLETENESS_FIELDS.forEach(function (f) {
+          if (arIsBlank(row._raw[f])) missing.push(f);
+        });
+        row.completeness_score = arRound3(1 - missing.length / AR_COMPLETENESS_FIELDS.length);
+        row.missing_fields = missing.length ? missing.join('; ') : null;
+
+        var allScoresPresent = true;
+        AR_CRITERIA.forEach(function (c) {
+          if (c[2] > 0 && (row[c[0]] === null || row[c[0]] === undefined)) allScoresPresent = false;
+        });
+        row.all_scores_present = allScoresPresent;
+
+        if (row.completeness_score >= 0.90 && allScoresPresent) row.confidence = 'high';
+        else if (row.completeness_score >= 0.40) row.confidence = 'medium';
+        else row.confidence = 'low';
+        return row;
+      }
+
+      /* ------------------------------------------------------------------ *
+       * 5. Plain-English rationale
+       * ------------------------------------------------------------------ */
+
+      function arPhrase(name, score, flag) {
+        if (score === null || score === undefined) {
+          return name + ' could not be scored (no populated inputs) and is treated as a fail';
+        }
+        return name + ' ' + score.toFixed(2) + ' ' + (flag === 'P' ? 'passes' : 'FAILS');
+      }
+
+      var AR_DISPOSITION_SENTENCE = {
+        retain: 'Keep it as it is and spend nothing: every dimension clears the gate, so there is no failing '
+          + 'dimension to fund.',
+        invest: 'Keep it and put money or effort into the dimension that fails the gate.',
+        consolidate: 'Fold it into another application that keeps the capability alive.',
+        replace: 'Substitute a different product for the same capability.',
+        retire: 'Switch it off: the capability goes away or is already covered elsewhere.'
+      };
+
+      function arComposeRationale(row) {
+        var head = row.vtcr_key + ': ' + [
+          arPhrase('business value', row.business_value_score, row.v_pass),
+          arPhrase('technical health', row.technical_health_score, row.t_pass),
+          arPhrase('cost efficiency', row.cost_efficiency_score, row.c_pass),
+          arPhrase('risk posture', row.risk_posture_score, row.r_pass)
+        ].join('; ') + ' against a 3.0 gate on every dimension.';
+
+        var parts = [head, AR_DISPOSITION_SENTENCE[row.disposition] || ''];
+
+        if (row.retain_or_invest_basis) parts.push(arUpperFirst(row.retain_or_invest_basis) + '.');
+        if (row.suppression_reason) parts.push('Guardrails: ' + row.suppression_reason + '.');
+
+        if (row.gross_saving_annual) {
+          var s = 'Gross avoidable annual cost ' + arMoneyText(row.gross_saving_annual);
+          var deductions = [];
+          if (!row.replacement_cost_already_in_baseline && arMoney(row.replacement_ongoing_tco)) {
+            deductions.push('a successor running at ' + arMoneyText(row.replacement_ongoing_tco) + ' a year');
+          }
+          if (arMoney(row.amortised_one_time_migration_cost)) {
+            deductions.push('amortised transition cost of ' + arMoneyText(row.amortised_one_time_migration_cost));
+          }
+          if (arMoney(row.residual_archival_cost)) {
+            deductions.push('a residual archival cost of ' + arMoneyText(row.residual_archival_cost));
+          }
+          s += deductions.length ? ', less ' + deductions.join(' and ') + ', nets ' : ' nets ';
+          s += arMoneyText(row.net_saving_annual) + ' a year.';
+          parts.push(s);
+        } else {
+          parts.push('No run-rate cost is removed by this decision, so no annual saving is claimed.');
+        }
+
+        if (row.unscoreable_dimensions.length) {
+          parts.push('Caution: ' + arJoinList(row.unscoreable_dimensions) + ' had no populated inputs in the '
+            + 'uploaded file, so ' + (row.unscoreable_dimensions.length > 1 ? 'they were' : 'it was')
+            + ' treated as a fail. Supply those inputs before acting on this row.');
+        }
+        parts.push('Confidence ' + row.confidence + ' on a completeness score of '
+          + (row.completeness_score * 100).toFixed(0) + '%.');
+
+        row.rationale = parts.filter(function (p) { return p; }).join(' ');
+        return row;
+      }
+
+      function arUpperFirst(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+      function arJoinList(items) {
+        if (items.length <= 1) return items.join('');
+        return items.slice(0, -1).join(', ') + ' and ' + items[items.length - 1];
+      }
+
+      function arMoneyText(n) {
+        var v = Math.round(arMoney(n));
+        return '$' + Math.abs(v).toLocaleString('en-US') .replace(/^/, v < 0 ? '-' : '');
+      }
+
+      /* ------------------------------------------------------------------ *
+       * 6. Portfolio roll-up
+       * ------------------------------------------------------------------ */
+
+      /* generate_dataset.py:1939-1955 — rollup(). */
+      function arRollup(rows) {
+        var total = 0, netAll = 0, constrainedNet = 0;
+        var constrained = [];
+        var spread = {};
+        var prioritySpread = {};
+        var keys = {};
+
+        AR_DISPOSITIONS.forEach(function (d) { spread[d] = 0; });
+        AR_PRIORITY_LADDER.forEach(function (p) { prioritySpread[p] = 0; });
+
+        rows.forEach(function (r) {
+          total += r.annual_tco_recurring;
+          netAll += r.net_saving_annual;
+          spread[r.disposition] = (spread[r.disposition] || 0) + 1;
+          prioritySpread[r.priority] = (prioritySpread[r.priority] || 0) + 1;
+          keys[r.vtcr_key] = (keys[r.vtcr_key] || 0) + 1;
+          if (r.retention_override_applied || (r.realization_lag_months || 0) >= 12) {
+            constrained.push(r.app_id);
+            constrainedNet += r.net_saving_annual;
+          }
+        });
+
+        return {
+          rowCount: rows.length,
+          total_annual_tco: total,
+          target: arRound0(total * AR_TARGET_REDUCTION_PCT),
+          net_saving_all: netAll,
+          net_saving_excluding_constrained_and_deferred: netAll - constrainedNet,
+          gross_saving_all: rows.reduce(function (a, r) { return a + r.gross_saving_annual; }, 0),
+          constrained_or_deferred: constrained,
+          spread: spread,
+          priority_spread: prioritySpread,
+          keys: keys
+        };
+      }
+
+      /* Consolidation clusters, from the declared cluster columns. */
+      function arBuildClusters(rows) {
+        var byId = {};
+        rows.forEach(function (r) {
+          if (!r.overlap_cluster_id) return;
+          var c = byId[r.overlap_cluster_id];
+          if (!c) {
+            c = byId[r.overlap_cluster_id] = {
+              id: r.overlap_cluster_id, members: [], survivors: [], absorbed: [],
+              spend: 0, saving: 0, capability: r.primary_capability || null
+            };
+          }
+          c.members.push(r);
+          c.spend += r.annual_tco_recurring;
+          if (r.cluster_role === 'absorbed') { c.absorbed.push(r); c.saving += r.net_saving_annual; }
+          else { c.survivors.push(r); if (!c.capability && r.primary_capability) c.capability = r.primary_capability; }
+        });
+        var list = Object.keys(byId).map(function (k) { return byId[k]; });
+        list.forEach(function (c) {
+          c.count = c.members.length;
+          c.survivorName = c.survivors.length ? c.survivors[0].app_name : null;
+          c.label = c.capability || c.id;
+          /* Cluster risk read off the members' own confidence and guardrails. */
+          var lowConfidence = c.members.some(function (r) { return r.confidence !== 'high'; });
+          var constrainedMember = c.members.some(function (r) { return r.retention_override_applied; });
+          c.risk = lowConfidence ? 'Validate' : (constrainedMember ? 'Guarded' : 'Complete');
+        });
+        list.sort(function (a, b) { return b.saving - a.saving || b.spend - a.spend; });
+        return list;
+      }
+
+      /* Guardrail counts, all read off the engine's own guards. */
+      function arBuildGuardrails(rows) {
+        var idsInFile = {};
+        rows.forEach(function (r) { idsInFile[r.app_id] = r; });
+
+        /* A capability is left without a primary application when every application
+         * mapped to it is retired and no surviving application is named as a successor. */
+        var byCapability = {};
+        rows.forEach(function (r) {
+          var cap = r.primary_capability;
+          if (!cap) return;
+          (byCapability[cap] = byCapability[cap] || []).push(r);
+        });
+        var orphaned = [];
+        Object.keys(byCapability).forEach(function (cap) {
+          var members = byCapability[cap];
+          var keepsCapability = members.some(function (r) {
+            return r.disposition === 'retain' || r.disposition === 'invest';
+          });
+          if (keepsCapability) return;
+          var namedSuccessorSurvives = members.some(function (r) {
+            var s = r.replacement_app_id ? idsInFile[r.replacement_app_id] : null;
+            return s && s.disposition !== 'retire';
+          });
+          if (!namedSuccessorSurvives) orphaned.push(cap);
+        });
+
+        var lifecycleSuppressed = rows.filter(function (r) { return r.lifecycle_suppressed_term; });
+        var retentionConstrained = rows.filter(function (r) { return r.retention_override_applied; });
+        var heldForEvidence = rows.filter(function (r) {
+          return r.confidence !== 'high' || r.unscoreable_dimensions.length > 0;
+        });
+
+        return {
+          orphanedCapabilities: orphaned,
+          lifecycleSuppressed: lifecycleSuppressed.map(function (r) { return r.app_id; }),
+          retentionConstrained: retentionConstrained.map(function (r) { return r.app_id; }),
+          constrainedCount: lifecycleSuppressed.length + retentionConstrained.length,
+          heldForEvidence: heldForEvidence.map(function (r) { return r.app_id; })
+        };
+      }
+
+      /* ------------------------------------------------------------------ *
+       * 7. Public entry point
+       * ------------------------------------------------------------------ */
+
+      /**
+       * Score a whole uploaded portfolio.
+       * @param {Array<Object>} records rows keyed by the file's own headers
+       * @param {Object} [options] { analysisDate: Date }
+       * @returns {{rows: Array, summary: Object, mapping: Object, clusters: Array, guardrails: Object}}
+       */
+      function arAnalyse(records, options) {
+        options = options || {};
+        var d = options.analysisDate || new Date();
+        var analysisDate = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+
+        var headers = [];
+        var seenHeader = {};
+        records.forEach(function (rec) {
+          Object.keys(rec).forEach(function (h) {
+            if (!seenHeader[h]) { seenHeader[h] = true; headers.push(h); }
+          });
+        });
+
+        var mapping = arMapColumns(headers);
+
+        /* With none of the scored inputs present there is nothing to score, and
+         * scoring anyway would report a portfolio of retires read off four empty
+         * dimensions. Refuse instead of fabricating. */
+        if (!mapping.scoredFound.length) {
+          return {
+            rows: [], clusters: [], guardrails: null, mapping: mapping,
+            summary: {
+              usable: false, rowCount: records.length,
+              scoredInputsFound: 0, scoredInputsTotal: AR_CRITERIA.length,
+              scoredInputsMissing: mapping.scoredMissing,
+              recognisedColumns: mapping.matched.length,
+              unrecognisedColumns: mapping.unmatched.length
+            }
+          };
+        }
+
+        var rows = records.map(function (rec, i) { return arNormaliseRow(rec, mapping, i); });
+
+        rows.forEach(function (r) { arCompute(r, analysisDate); });
+        rows.forEach(function (r) { r.urgency_score = arUrgency(r); });
+        rows.forEach(function (r) { arComputeSavings(r); });
+        arApplyConstraintsAndPriority(rows, analysisDate);
+        rows.forEach(function (r) { arComputeProvenance(r); });
+        rows.forEach(function (r) { arComposeRationale(r); });
+
+        var summary = arRollup(rows);
+        summary.usable = true;
+        summary.analysisDate = new Date(analysisDate).toISOString().slice(0, 10);
+        summary.scoredInputsFound = mapping.scoredFound.length;
+        summary.scoredInputsTotal = AR_CRITERIA.length;
+        summary.scoredInputsMissing = mapping.scoredMissing;
+        summary.recognisedColumns = mapping.matched.length;
+        summary.unrecognisedColumns = mapping.unmatched.length;
+        summary.unscoreableDimensions = (function () {
+          var set = {};
+          rows.forEach(function (r) { r.unscoreable_dimensions.forEach(function (n) { set[n] = (set[n] || 0) + 1; }); });
+          return set;
+        })();
+        summary.confidenceSpread = (function () {
+          var c = { high: 0, medium: 0, low: 0 };
+          rows.forEach(function (r) { c[r.confidence] = (c[r.confidence] || 0) + 1; });
+          return c;
+        })();
+        summary.splitConflicts = rows.filter(function (r) { return r._split_conflict; })
+          .map(function (r) { return r.app_id + ': ' + r._split_conflict; });
+
+        return {
+          rows: rows,
+          summary: summary,
+          mapping: mapping,
+          clusters: arBuildClusters(rows),
+          guardrails: arBuildGuardrails(rows)
+        };
+      }
+
+      /* =================================================================== *
+       * PART 3 of 3 — UI wiring
+       * =================================================================== */
+
+      /* ==========================================================================
+       * UI wiring: Upload inventory -> Analyze portfolio -> real numbers on the page
+       * ========================================================================== */
+
       var root = document.getElementById("apprat-wireframe");
       if (!root) return;
 
-      var detailData = {
-        slack: {
-          title: "Slack Enterprise",
-          decision: "Consolidate",
-          target: "Microsoft Teams",
-          savings: "$820K",
-          reason: "Same capability and user population; Teams has broader adoption and lower incremental cost."
-        },
-        notetaker: {
-          title: "AI NoteTaker Pro",
-          decision: "Retire",
-          target: "Microsoft Teams transcription",
-          savings: "$310K",
-          reason: "Low usage and fully replaceable meeting-transcription capability with no critical dependency."
-        },
-        "legacy-clm": {
-          title: "Legacy CLM",
-          decision: "Needs validation",
-          target: "Pending evidence",
-          savings: "Not committed",
-          reason: "Contract exit date and two legal-system dependencies are unresolved."
-        },
-        "patient-flow": {
-          title: "Patient Flow Hub",
-          decision: "Invest",
-          target: "Retain and modernize",
-          savings: "$0",
-          reason: "Primary support for a critical clinical operation with high usage and no viable replacement."
-        },
-        workday: {
-          title: "Workday HCM",
-          decision: "Retain",
-          target: "Keep as-is",
-          savings: "$0",
-          reason: "Healthy cost, usage and risk profile with no stronger consolidation target."
-        }
+      var fileInput = root.querySelector("[data-file-input]");
+      var banner = root.querySelector("[data-data-banner]");
+      var bannerTitle = root.querySelector("[data-banner-title]");
+      var bannerDetail = root.querySelector("[data-banner-detail]");
+
+      /* Everything the page knows. `mode` is the honesty switch: until an analysis
+       * has run the figures on the page are the shipped sample copy and are labelled
+       * as such. */
+      var state = {
+        mode: "sample",          /* "sample" | "computed" */
+        file: null,              /* { name, records, columnCount, mapping } */
+        analysis: null,
+        detailData: {},
+        selected: null
       };
+
+      var support = xlsxSupportCheck();
+
+      /* ------------------------------------------------------------------ *
+       * Formatting
+       * ------------------------------------------------------------------ */
+
+      function esc(s) {
+        return String(s === null || s === undefined ? "" : s)
+          .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function moneyShort(n) {
+        var v = Math.round(n || 0);
+        var sign = v < 0 ? "-" : "";
+        var a = Math.abs(v);
+        if (a >= 1000000) return sign + "$" + (a / 1000000).toFixed(2) + "M";
+        if (a >= 1000) return sign + "$" + Math.round(a / 1000) + "K";
+        return sign + "$" + a;
+      }
+
+      function moneyFull(n) {
+        var v = Math.round(n || 0);
+        return (v < 0 ? "-$" : "$") + Math.abs(v).toLocaleString("en-US");
+      }
+
+      function pct(part, whole) {
+        if (!whole) return 0;
+        return (part / whole) * 100;
+      }
+
+      function pct1(part, whole) { return pct(part, whole).toFixed(1) + "%"; }
+
+      function plural(n, one, many) { return n === 1 ? one : (many || one + "s"); }
+
+      function joinList(items) {
+        if (!items.length) return "";
+        if (items.length === 1) return items[0];
+        return items.slice(0, -1).join(", ") + " and " + items[items.length - 1];
+      }
+
+      function titleCase(s) { return String(s).charAt(0).toUpperCase() + String(s).slice(1); }
+
+      /* Set a value plus a machine-readable exact figure and a full-precision title,
+       * so a rounded headline never hides the number it came from. */
+      function setFigure(el, shortText, exact) {
+        if (!el) return;
+        el.textContent = shortText;
+        if (exact === null || exact === undefined) {
+          el.removeAttribute("data-exact");
+          el.removeAttribute("title");
+        } else {
+          el.setAttribute("data-exact", String(Math.round(exact)));
+          el.setAttribute("title", moneyFull(exact));
+        }
+      }
+
+      function setBanner(kind, title, detailHtml) {
+        if (!banner) return;
+        banner.classList.toggle("is-computed", kind === "computed");
+        banner.classList.toggle("is-error", kind === "error");
+        if (bannerTitle) bannerTitle.textContent = title;
+        if (bannerDetail) bannerDetail.innerHTML = detailHtml || "";
+      }
+
+      /* The little "Sample" pills next to every figure. */
+      function setSampleFlags(mode) {
+        root.querySelectorAll("[data-sample-flag]").forEach(function (el) {
+          if (mode === "computed") {
+            el.textContent = "Computed";
+            el.classList.add("is-computed");
+          } else {
+            el.textContent = "Sample";
+            el.classList.remove("is-computed");
+          }
+        });
+      }
+
+      /* ------------------------------------------------------------------ *
+       * View switching (unchanged behaviour)
+       * ------------------------------------------------------------------ */
 
       function activateView(name) {
         root.querySelectorAll("[data-panel]").forEach(function (panel) {
@@ -847,42 +2815,723 @@ svg.lucide {
         });
       }
 
+      function refreshIcons() {
+        if (window.lucide) window.lucide.createIcons({ attrs: { width: 16, height: 16 } });
+      }
+
+      /* ------------------------------------------------------------------ *
+       * Reading a chosen file
+       * ------------------------------------------------------------------ */
+
+      function readFileAsArrayBuffer(file) {
+        return new Promise(function (resolve, reject) {
+          var fr = new FileReader();
+          fr.onload = function () { resolve(fr.result); };
+          fr.onerror = function () { reject(new Error("The browser could not read that file.")); };
+          fr.readAsArrayBuffer(file);
+        });
+      }
+
+      function readFileAsText(file) {
+        return new Promise(function (resolve, reject) {
+          var fr = new FileReader();
+          fr.onload = function () { resolve(fr.result); };
+          fr.onerror = function () { reject(new Error("The browser could not read that file.")); };
+          fr.readAsText(file);
+        });
+      }
+
+      /* Pick the sheet that looks most like an application inventory: the one whose
+       * detected header row recognises the most of our own column names. */
+      function pickSheet(sheets) {
+        var best = null;
+        Object.keys(sheets).forEach(function (name) {
+          var grid = sheets[name];
+          if (!grid || grid.length < 2) return;
+          var built = arRecordsFromGrid(grid);
+          if (!built.records.length) return;
+          if (!best || built.recognised > best.built.recognised) {
+            best = { name: name, built: built };
+          }
+        });
+        return best;
+      }
+
+      function loadFile(file) {
+        var lower = file.name.toLowerCase();
+        var isXlsx = /\.xlsx$/.test(lower);
+        var isCsv = /\.(csv|txt)$/.test(lower);
+
+        if (!isXlsx && !isCsv) {
+          return Promise.reject(new Error(
+            "That file type is not supported. Choose an Excel workbook (.xlsx) or a CSV file."));
+        }
+
+        if (isXlsx) {
+          if (!support.supported) return Promise.reject(new Error(support.message));
+          return readFileAsArrayBuffer(file).then(function (ab) {
+            return readXlsxSheets(ab);
+          }).then(function (sheets) {
+            var picked = pickSheet(sheets);
+            if (!picked) throw new Error("That workbook has no sheet with a readable table of applications.");
+            return {
+              name: file.name,
+              sheetName: picked.name,
+              sheetCount: Object.keys(sheets).length,
+              records: picked.built.records,
+              headers: picked.built.headers,
+              headerRow: picked.built.headerIndex + 1
+            };
+          });
+        }
+
+        return readFileAsText(file).then(function (text) {
+          var grid = readCsv(text);
+          var built = arRecordsFromGrid(grid);
+          if (!built.records.length) throw new Error("That CSV file has a header but no data rows.");
+          return {
+            name: file.name,
+            sheetName: null,
+            sheetCount: 1,
+            records: built.records,
+            headers: built.headers,
+            headerRow: built.headerIndex + 1
+          };
+        });
+      }
+
+      /* ------------------------------------------------------------------ *
+       * Renderers — write the computed figures into the shipped layout
+       * ------------------------------------------------------------------ */
+
+      function renderKpis(a) {
+        var s = a.summary;
+        var rowCount = s.rowCount;
+
+        setFigure(root.querySelector('[data-kpi="spend"]'), moneyShort(s.total_annual_tco), s.total_annual_tco);
+        var spendSub = root.querySelector('[data-kpi-sub="spend"]');
+        if (spendSub) {
+          spendSub.textContent = moneyFull(s.total_annual_tco) + " across " + rowCount + " "
+            + plural(rowCount, "application") + " scored";
+        }
+
+        setFigure(root.querySelector('[data-kpi="target"]'), moneyShort(s.target), s.target);
+        var targetSub = root.querySelector('[data-kpi-sub="target"]');
+        if (targetSub) targetSub.textContent = moneyFull(s.target) + " · 15.0% of annual spend";
+
+        var label = root.querySelector('[data-kpi-label="saving"]');
+        if (label) {
+          label.innerHTML = "Net annual saving identified"
+            + '<span class="sample-flag is-computed" data-sample-flag>Computed</span>';
+        }
+        setFigure(root.querySelector('[data-kpi="saving"]'), moneyShort(s.net_saving_all), s.net_saving_all);
+        var savingSub = root.querySelector('[data-kpi-sub="saving"]');
+        if (savingSub) {
+          savingSub.textContent = moneyFull(s.net_saving_all) + " · " + pct1(s.net_saving_all, s.total_annual_tco)
+            + " of annual spend · " + moneyFull(s.net_saving_excluding_constrained_and_deferred)
+            + " available now";
+          savingSub.setAttribute("data-exact-available",
+            String(Math.round(s.net_saving_excluding_constrained_and_deferred)));
+        }
+
+        var critical = root.querySelector("[data-critical-badge]");
+        if (critical) {
+          var protectedCount = a.rows.filter(function (r) {
+            return r.disposition === "retain" || r.disposition === "invest";
+          }).length;
+          critical.innerHTML = '<i data-lucide="shield-check" aria-hidden="true"></i> ' + protectedCount + " of "
+            + rowCount + " " + plural(rowCount, "application") + " kept";
+        }
+
+        var badge = root.querySelector("[data-portfolio-badge]");
+        if (badge) badge.textContent = "Uploaded portfolio · " + rowCount + " " + plural(rowCount, "application");
+      }
+
+      function renderSavings(a) {
+        var s = a.summary;
+        var targetPct = pct(s.target, s.total_annual_tco);
+        var identifiedPct = pct(s.net_saving_all, s.total_annual_tco);
+
+        /* The two bars share one scale so they can be compared by eye. The shipped
+         * page fixed that scale at 20%; a real portfolio can exceed it, so round the
+         * larger of the two figures up to the next 5% instead. */
+        var scale = Math.max(20, Math.ceil(Math.max(targetPct, identifiedPct) / 5) * 5);
+
+        var scaleLabel = root.querySelector(".progress-labels .text-small");
+        if (scaleLabel) scaleLabel.textContent = "Common scale: " + scale + "% of annual spend";
+        var progressHeading = root.querySelector("[data-progress-heading]");
+        if (progressHeading) progressHeading.textContent = "Savings against the 15% target";
+
+        var targetBar = root.querySelector('[data-progress="target"]');
+        var identifiedBar = root.querySelector('[data-progress="identified"]');
+        if (targetBar) targetBar.style.width = Math.min(100, (targetPct / scale) * 100).toFixed(2) + "%";
+        if (identifiedBar) identifiedBar.style.width = Math.min(100, (identifiedPct / scale) * 100).toFixed(2) + "%";
+
+        var targetLabel = root.querySelector('[data-savings-label="target"]');
+        if (targetLabel) {
+          targetLabel.textContent = moneyShort(s.target) + " · " + targetPct.toFixed(1) + "%";
+          targetLabel.setAttribute("data-exact", String(Math.round(s.target)));
+        }
+        var rowLabel = root.querySelector('[data-savings-row-label="identified"]');
+        if (rowLabel) rowLabel.textContent = "Net saving identified";
+        var identifiedLabel = root.querySelector('[data-savings-label="identified"]');
+        if (identifiedLabel) {
+          identifiedLabel.textContent = moneyShort(s.net_saving_all) + " · " + identifiedPct.toFixed(1) + "%";
+          identifiedLabel.setAttribute("data-exact", String(Math.round(s.net_saving_all)));
+        }
+
+        var comparison = root.querySelector("[data-savings-comparison]");
+        if (comparison) {
+          comparison.setAttribute("aria-label",
+            "On a common scale of " + scale + " percent of annual spend: the 15 percent target is "
+            + moneyFull(s.target) + ", and the net annual saving identified is " + moneyFull(s.net_saving_all)
+            + ", which is " + identifiedPct.toFixed(1) + " percent of spend.");
+        }
+
+        var note = root.querySelector("[data-savings-note]");
+        if (note) {
+          var constrained = s.constrained_or_deferred;
+          note.innerHTML = "<strong>Net annual saving</strong> is the gross avoidable annual cost of every "
+            + "retire, consolidate and replace decision, less any successor's running cost, amortised "
+            + "transition cost and residual archival cost. One-time costs are amortised, never ignored. "
+            + "<strong>" + esc(moneyFull(s.net_saving_excluding_constrained_and_deferred)) + " is available now</strong>"
+            + (constrained.length
+              ? "; the remainder sits behind " + constrained.length + " constrained or deferred "
+                + plural(constrained.length, "decision") + " (" + esc(constrained.join(", ")) + ")."
+              : ".");
+        }
+      }
+
+      function renderMix(a) {
+        var s = a.summary;
+        var total = s.rowCount || 1;
+        var order = ["invest", "retain", "consolidate", "replace", "retire"];
+
+        order.forEach(function (term) {
+          var seg = root.querySelector('[data-mix="' + term + '"]');
+          var count = s.spread[term] || 0;
+          /* The segment widths live in the stylesheet, so they have to be overridden
+           * inline to reflect real counts. */
+          if (seg) seg.style.width = (pct(count, total)).toFixed(3) + "%";
+          var legend = root.querySelector('[data-legend="' + term + '"]');
+          if (legend) {
+            legend.textContent = titleCase(term) + " · " + count;
+            legend.setAttribute("data-count", String(count));
+          }
+        });
+
+        /* The engine emits five terms and no sixth. The gold segment is a separate
+         * evidence signal, not a disposition, so it carries no width in the bar. */
+        var validateSeg = root.querySelector('[data-mix="validate"]');
+        if (validateSeg) validateSeg.style.width = "0%";
+        var flagged = a.rows.filter(function (r) {
+          return r.confidence !== "high" || r.unscoreable_dimensions.length > 0;
+        });
+        var validateLegend = root.querySelector('[data-legend="validate"]');
+        if (validateLegend) {
+          validateLegend.textContent = "Flagged for validation · " + flagged.length;
+          validateLegend.setAttribute("data-count", String(flagged.length));
+        }
+
+        var bar = root.querySelector("[data-mix-bar]");
+        if (bar) {
+          bar.setAttribute("aria-label", order.map(function (t) {
+            return (s.spread[t] || 0) + " " + t;
+          }).join(", ") + " out of " + total + " " + plural(total, "application") + " scored.");
+        }
+
+        var note = root.querySelector("[data-mix-note]");
+        if (note) {
+          note.innerHTML = "<strong>Retain</strong> means every dimension clears the 3.0 gate, so there is "
+            + "nothing to fund. <strong>Invest</strong> funds the dimension that fails. "
+            + "<strong>Consolidate</strong> folds the application into one that keeps the capability, "
+            + "<strong>Replace</strong> substitutes a different product, and <strong>Retire</strong> "
+            + "switches it off. Every application gets exactly one of the five. "
+            + "<em>Flagged for validation</em> is not a sixth decision: those " + flagged.length + " "
+            + plural(flagged.length, "row") + " keep the decision shown above and are counted in it, "
+            + "but the evidence behind them is incomplete.";
+        }
+      }
+
+      function renderGuardrails(a) {
+        var g = a.guardrails;
+        var s = a.summary;
+
+        var cap = root.querySelector('[data-guardrail="capabilities"]');
+        if (cap) {
+          var n = g.orphanedCapabilities.length;
+          cap.innerHTML = "<strong>" + n + " " + plural(n, "capability", "capabilities") + "</strong> left "
+            + "without an application that keeps it"
+            + (n ? " (" + esc(joinList(g.orphanedCapabilities)) + ")." : ".");
+        }
+
+        var blocked = root.querySelector('[data-guardrail="blocked"]');
+        if (blocked) {
+          var parts = [];
+          if (g.lifecycleSuppressed.length) {
+            parts.push(g.lifecycleSuppressed.length + " barred by the lifecycle guard and funded instead");
+          }
+          if (g.retentionConstrained.length) {
+            parts.push(g.retentionConstrained.length + " constrained by a live retention obligation");
+          }
+          blocked.innerHTML = "<strong>" + g.constrainedCount + " retire or replace "
+            + plural(g.constrainedCount, "decision") + "</strong> constrained by a guardrail"
+            + (parts.length ? ": " + esc(joinList(parts)) + "." : ".");
+        }
+
+        var held = root.querySelector('[data-guardrail="held"]');
+        if (held) {
+          var h = g.heldForEvidence.length;
+          var unscoreable = Object.keys(s.unscoreableDimensions);
+          held.innerHTML = "<strong>" + h + " " + plural(h, "application") + " held</strong> for incomplete "
+            + "evidence — confidence below high"
+            + (unscoreable.length
+              ? ", and " + esc(joinList(unscoreable.map(function (d) {
+                  return d.toLowerCase() + " could not be scored on " + s.unscoreableDimensions[d] + " "
+                    + plural(s.unscoreableDimensions[d], "row");
+                }))) + "."
+              : ".");
+        }
+      }
+
+      function renderClusters(a) {
+        var list = root.querySelector("[data-cluster-list]");
+        var heading = root.querySelector("[data-cluster-heading]");
+        if (!list) return;
+
+        var clusters = a.clusters.slice(0, 3);
+        if (heading) {
+          heading.textContent = a.clusters.length
+            ? "Highest-value redundancy clusters (" + a.clusters.length + " found)"
+            : "Redundancy clusters";
+        }
+
+        if (!clusters.length) {
+          list.innerHTML = '<p class="text-small text-muted">No redundancy clusters in this file. Clusters are '
+            + 'read from the cluster columns (<code>overlap_cluster_id</code> and <code>cluster_role</code>); '
+            + 'without them no application is marked as absorbed into another.</p>';
+          return;
+        }
+
+        list.innerHTML = clusters.map(function (c) {
+          var riskClass = c.risk === "Validate" ? "status-badge status-validate"
+            : (c.risk === "Guarded" ? "status-badge status-consolidate" : "status-badge status-invest");
+          var absorbedNames = c.absorbed.map(function (r) { return r.app_name; });
+          var sub = c.survivorName
+            ? "Keep " + esc(c.survivorName) + (absorbedNames.length
+                ? "; fold in " + esc(joinList(absorbedNames)) : "")
+            : esc(joinList(c.members.map(function (r) { return r.app_name; })));
+          return '<div class="cluster-row">'
+            + '<div class="cluster-title"><span class="cluster-count">' + c.count + '</span>'
+            + '<span><strong>' + esc(titleCase(c.label)) + '</strong><br>'
+            + '<span class="text-small text-muted">' + sub + '</span></span></div>'
+            + '<div class="cluster-metric"><div class="metric-label text-small">Spend</div>'
+            + '<div class="cluster-value numeric" data-exact="' + Math.round(c.spend) + '" title="'
+            + esc(moneyFull(c.spend)) + '">' + moneyShort(c.spend) + '</div></div>'
+            + '<div class="cluster-metric"><div class="metric-label text-small">Savings</div>'
+            + '<div class="cluster-value numeric" data-exact="' + Math.round(c.saving) + '" title="'
+            + esc(moneyFull(c.saving)) + '">' + moneyShort(c.saving) + '</div></div>'
+            + '<div class="cluster-metric"><div class="metric-label text-small">Evidence</div>'
+            + '<div><span class="' + riskClass + '">' + esc(c.risk) + '</span></div></div>'
+            + '<button type="button" class="btn btn-ghost table-row-action" data-cluster="' + esc(c.id) + '">'
+            + 'Review</button></div>';
+        }).join("");
+
+        wireClusterButtons();
+        refreshIcons();
+      }
+
+      var AR_BADGE_CLASS = {
+        retain: "status-badge status-retain",
+        invest: "status-badge status-invest",
+        consolidate: "status-badge status-consolidate",
+        replace: "status-badge status-replace",
+        retire: "status-badge status-retire"
+      };
+
+      function renderTable(a) {
+        var tbody = root.querySelector("[data-app-table]");
+        if (!tbody) return;
+
+        var sorted = a.rows.slice().sort(function (x, y) {
+          return y.net_saving_annual - x.net_saving_annual
+            || AR_PRIORITY_LADDER.indexOf(y.priority) - AR_PRIORITY_LADDER.indexOf(x.priority);
+        });
+
+        tbody.innerHTML = sorted.map(function (r) {
+          var saving = r.net_saving_annual
+            ? moneyShort(r.net_saving_annual)
+            : (r.disposition === "retain" || r.disposition === "invest" ? "$0" : moneyShort(0));
+          return '<tr data-app="' + esc(r.app_id) + '">'
+            + '<td><button type="button" class="btn btn-ghost table-row-action" data-select-app="'
+            + esc(r.app_id) + '">' + esc(r.app_name) + '</button></td>'
+            + '<td>' + esc(r.primary_capability || "—") + '</td>'
+            + '<td><span class="' + AR_BADGE_CLASS[r.disposition] + '">' + esc(titleCase(r.disposition))
+            + '</span></td>'
+            + '<td class="text-end numeric" data-exact="' + Math.round(r.net_saving_annual) + '" title="'
+            + esc(moneyFull(r.net_saving_annual)) + '">' + saving + '</td>'
+            + '<td data-confidence="' + esc(r.confidence) + '">' + esc(titleCase(r.confidence)) + '</td>'
+            + '</tr>';
+        }).join("");
+
+        wireRowButtons();
+      }
+
+      /* The evidence panel and the full decision view, rebuilt from the computed row. */
+      function dimensionListHtml(r) {
+        return '<ul class="dimension-list text-small">' + AR_DIMENSIONS.map(function (d) {
+          var det = r.dimension_detail[d[0]];
+          var scoreText = det.score === null ? "not scored" : det.score.toFixed(3);
+          var verdict = det.score === null
+            ? '<span class="dimension-fail">no inputs · fails</span>'
+            : (det.pass === "P" ? '<span class="dimension-pass">passes</span>'
+                                : '<span class="dimension-fail">fails</span>');
+          return '<li class="dimension-row" data-dimension="' + d[0] + '">'
+            + '<span>' + esc(d[1]) + '</span>'
+            + '<span class="numeric" data-score="' + (det.score === null ? "" : det.score) + '">'
+            + scoreText + '</span>' + verdict + '</li>';
+        }).join("") + "</ul>";
+      }
+
+      function renderInlineDetail(r) {
+        var panel = root.querySelector("#inline-detail");
+        if (!panel) return;
+        panel.className = "";
+        panel.innerHTML =
+          '<div class="detail-heading"><div><div class="text-small text-muted">'
+            + esc(r.app_id) + (r.primary_capability ? " · " + esc(r.primary_capability) : "")
+            + '</div><h3>' + esc(r.app_name) + '</h3></div>'
+            + '<span class="' + AR_BADGE_CLASS[r.disposition] + '">' + esc(titleCase(r.disposition))
+            + '</span></div>'
+          + '<div class="detail-grid">'
+            + '<div><div class="field-label text-small">Decision</div><strong data-detail-decision>'
+              + esc(titleCase(r.disposition)) + '</strong></div>'
+            + '<div><div class="field-label text-small">Priority</div><strong data-detail-priority>'
+              + esc(r.priority) + '</strong></div>'
+            + '<div><div class="field-label text-small">Net annual saving</div>'
+              + '<strong class="numeric target-value" data-detail-saving="' + Math.round(r.net_saving_annual)
+              + '">' + moneyFull(r.net_saving_annual) + '</strong></div>'
+            + '<div><div class="field-label text-small">Confidence</div><strong data-detail-confidence>'
+              + esc(titleCase(r.confidence)) + ' · ' + (r.completeness_score * 100).toFixed(0)
+              + '% complete</strong></div>'
+          + '</div>'
+          + '<div class="text-small text-muted" style="margin-top:0.65rem">Pattern key <strong>'
+            + esc(r.vtcr_key) + '</strong> against a 3.0 gate on every dimension</div>'
+          + dimensionListHtml(r)
+          + '<div class="rationale-box" style="margin-top:0.75rem"><strong>Rationale</strong><p>'
+            + esc(r.rationale) + '</p></div>'
+          + '<button type="button" class="btn btn-primary btn-block" data-open-detail>Open full decision</button>';
+
+        var openButton = panel.querySelector("[data-open-detail]");
+        if (openButton) {
+          openButton.addEventListener("click", function () {
+            renderFullDetail(r);
+            activateView("detail");
+          });
+        }
+        refreshIcons();
+      }
+
+      function renderFullDetail(r) {
+        var meta = root.querySelector('[data-detail="meta"]');
+        var name = root.querySelector('[data-detail="name"]');
+        var badge = root.querySelector('[data-detail="badge"]');
+        var grid = root.querySelector('[data-detail="grid"]');
+        var rationale = root.querySelector('[data-detail="rationale"]');
+        var evidence = root.querySelector('[data-detail="evidence"]');
+
+        if (meta) {
+          meta.textContent = r.app_id + (r.primary_capability ? " · " + r.primary_capability : "")
+            + (r.vendor_name ? " · " + r.vendor_name : "");
+        }
+        if (name) name.textContent = r.app_name;
+        if (badge) {
+          badge.className = AR_BADGE_CLASS[r.disposition];
+          badge.textContent = titleCase(r.disposition) + " · " + r.priority + " priority"
+            + (r.disposition === "consolidate" && r.replacement_app_id ? " · into " + r.replacement_app_id : "");
+        }
+        if (grid) {
+          var util = r.licence_utilisation_rate === null ? null : (r.licence_utilisation_rate * 100).toFixed(0);
+          grid.innerHTML =
+            '<div><div class="field-label text-small">Annual run-rate cost</div>'
+              + '<strong class="numeric">' + moneyFull(r.annual_tco_recurring) + '</strong></div>'
+            + '<div><div class="field-label text-small" data-tooltip="Recurring annual run-rate spend that '
+              + 'disappears after the action, less the successor\'s running cost, amortised transition cost '
+              + 'and residual archival cost.">Net avoidable annual saving</div>'
+              + '<strong class="numeric target-value">' + moneyFull(r.net_saving_annual) + '</strong></div>'
+            + '<div><div class="field-label text-small">Licence utilisation</div><strong>'
+              + (util === null ? "not supplied" : util + "% of " + r.licences_purchased + " licences")
+              + '</strong></div>'
+            + '<div><div class="field-label text-small">Recommendation confidence</div><strong>'
+              + titleCase(r.confidence) + " · " + (r.completeness_score * 100).toFixed(0)
+              + '% of the fields the model reads</strong></div>';
+        }
+        if (rationale) rationale.textContent = r.rationale;
+
+        if (evidence) {
+          var items = [];
+          AR_DIMENSIONS.forEach(function (d) {
+            var det = r.dimension_detail[d[0]];
+            var ok = det.pass === "P";
+            items.push({
+              ok: ok,
+              html: "<strong>" + esc(d[1]) + ":</strong> "
+                + (det.score === null
+                  ? "no populated inputs in the uploaded file, so it is treated as a fail."
+                  : det.score.toFixed(3) + " against the 3.0 gate — " + (ok ? "passes" : "fails")
+                    + ", weighted over " + det.used.length + " of the "
+                    + AR_CRITERIA.filter(function (c) { return c[1] === d[0] && c[2] > 0; }).length
+                    + " scored inputs in this dimension.")
+            });
+          });
+          if (r.suppression_reason) {
+            items.push({ ok: false, html: "<strong>Guardrails:</strong> " + esc(r.suppression_reason) + "." });
+          }
+          if (r.gross_saving_annual) {
+            items.push({
+              ok: true,
+              html: "<strong>Savings basis:</strong> gross avoidable annual cost "
+                + moneyFull(r.gross_saving_annual) + " nets " + moneyFull(r.net_saving_annual)
+                + " a year after successor, transition and archival costs."
+            });
+          }
+          evidence.innerHTML = items.map(function (it) {
+            return '<div class="evidence-row"><i class="' + (it.ok ? "evidence-check" : "evidence-warning")
+              + '" data-lucide="' + (it.ok ? "circle-check" : "triangle-alert") + '" aria-hidden="true"></i>'
+              + '<span>' + it.html + '</span></div>';
+          }).join("");
+        }
+        refreshIcons();
+      }
+
+      /* ------------------------------------------------------------------ *
+       * Event wiring
+       * ------------------------------------------------------------------ */
+
+      function wireRowButtons() {
+        root.querySelectorAll("[data-select-app]").forEach(function (button) {
+          if (button.getAttribute("data-wired") === "1") return;
+          button.setAttribute("data-wired", "1");
+          button.addEventListener("click", function () {
+            var key = button.getAttribute("data-select-app");
+            var app = state.detailData[key];
+            if (!app) return;
+            state.selected = key;
+            if (state.mode === "computed") renderInlineDetail(app);
+            else renderSampleInlineDetail(app);
+          });
+        });
+      }
+
+      function wireClusterButtons() {
+        root.querySelectorAll("[data-cluster]").forEach(function (button) {
+          if (button.getAttribute("data-wired") === "1") return;
+          button.setAttribute("data-wired", "1");
+          button.addEventListener("click", function () {
+            activateView("workbench");
+            if (state.mode !== "computed" || !state.analysis) return;
+            var id = button.getAttribute("data-cluster");
+            var cluster = null;
+            state.analysis.clusters.forEach(function (c) { if (c.id === id) cluster = c; });
+            var pick = cluster && (cluster.absorbed[0] || cluster.members[0]);
+            if (pick) {
+              state.selected = pick.app_id;
+              renderInlineDetail(pick);
+            }
+          });
+        });
+      }
+
+      /* The shipped sample rows keep their original behaviour before an upload. */
+      var SAMPLE_DETAIL = {
+        slack: { title: "Slack Enterprise", decision: "Consolidate", target: "Microsoft Teams", savings: "$820K", reason: "Same capability and user population; Teams has broader adoption and lower incremental cost." },
+        notetaker: { title: "AI NoteTaker Pro", decision: "Retire", target: "Microsoft Teams transcription", savings: "$310K", reason: "Low usage and fully replaceable meeting-transcription capability with no critical dependency." },
+        "legacy-clm": { title: "Legacy CLM", decision: "Needs validation", target: "Pending evidence", savings: "Not committed", reason: "Contract exit date and two legal-system dependencies are unresolved." },
+        "patient-flow": { title: "Patient Flow Hub", decision: "Invest", target: "Retain and modernize", savings: "$0", reason: "Primary support for a critical clinical operation with high usage and no viable replacement." },
+        workday: { title: "Workday HCM", decision: "Retain", target: "Keep as-is", savings: "$0", reason: "Healthy cost, usage and risk profile with no stronger consolidation target." }
+      };
+
+      function renderSampleInlineDetail(app) {
+        var panel = root.querySelector("#inline-detail");
+        if (!panel) return;
+        panel.className = "";
+        panel.innerHTML =
+          '<div class="detail-heading"><div><div class="text-small text-muted">Sample application — not from a file</div><h3>' + esc(app.title) + '</h3></div></div>'
+          + '<div class="detail-grid"><div><div class="field-label text-small">Decision</div><strong>' + esc(app.decision) + '</strong></div>'
+          + '<div><div class="field-label text-small">Target</div><strong>' + esc(app.target) + '</strong></div>'
+          + '<div><div class="field-label text-small">Savings</div><strong class="numeric">' + esc(app.savings) + '</strong></div>'
+          + '<div><div class="field-label text-small">Confidence</div><strong>' + (app.decision === "Needs validation" ? "Low" : "High") + '</strong></div></div>'
+          + '<div class="rationale-box"><strong>Rationale</strong><p>' + esc(app.reason) + '</p></div>'
+          + '<button type="button" class="btn btn-primary btn-block" data-open-detail>Open full decision</button>';
+        var openButton = panel.querySelector("[data-open-detail]");
+        if (openButton) openButton.addEventListener("click", function () { activateView("detail"); });
+        refreshIcons();
+      }
+
       root.querySelectorAll("[data-view]").forEach(function (button) {
         button.addEventListener("click", function () {
           activateView(button.getAttribute("data-view"));
         });
       });
 
-      root.querySelectorAll("[data-cluster]").forEach(function (button) {
-        button.addEventListener("click", function () {
-          activateView("workbench");
-        });
-      });
+      state.detailData = SAMPLE_DETAIL;
+      wireRowButtons();
+      wireClusterButtons();
 
-      root.querySelectorAll("[data-select-app]").forEach(function (button) {
-        button.addEventListener("click", function () {
-          var app = detailData[button.getAttribute("data-select-app")];
-          var panel = root.querySelector("#inline-detail");
-          if (!app || !panel) return;
-          panel.className = "";
-          panel.innerHTML =
-            '<div class="detail-heading"><div><div class="text-small text-muted">Selected application</div><h3>' + app.title + '</h3></div></div>' +
-            '<div class="detail-grid"><div><div class="field-label text-small">Decision</div><strong>' + app.decision + '</strong></div><div><div class="field-label text-small">Target</div><strong>' + app.target + '</strong></div><div><div class="field-label text-small">Savings</div><strong class="numeric">' + app.savings + '</strong></div><div><div class="field-label text-small">Confidence</div><strong>' + (app.decision === "Needs validation" ? "Low" : "High") + '</strong></div></div>' +
-            '<div class="rationale-box"><strong>Rationale</strong><p>' + app.reason + '</p></div>' +
-            '<button type="button" class="btn btn-primary btn-block" data-open-detail>Open full decision</button>';
-          var openButton = panel.querySelector("[data-open-detail]");
-          if (openButton) {
-            openButton.addEventListener("click", function () { activateView("detail"); });
+      /* ------------------------------------------------------------------ *
+       * The two header buttons
+       * ------------------------------------------------------------------ */
+
+      function describeFile(f) {
+        var mapping = arMapColumns(f.headers);
+        var found = mapping.scoredFound.length;
+        return {
+          mapping: mapping,
+          text: esc(f.name) + (f.sheetName ? ' — sheet "' + esc(f.sheetName) + '"' : "")
+            + ": <strong>" + f.records.length + " " + plural(f.records.length, "row") + "</strong>, "
+            + "<strong>" + mapping.matched.length + " recognised "
+            + plural(mapping.matched.length, "column") + "</strong> of " + f.headers.length
+            + ", including <strong>" + found + " of " + AR_CRITERIA.length + " scored inputs</strong>."
+        };
+      }
+
+      function onUploadClick() {
+        if (!fileInput) return;
+        fileInput.value = "";                /* so choosing the same file again still fires change */
+        fileInput.click();
+      }
+
+      function onFileChosen() {
+        var file = fileInput && fileInput.files && fileInput.files[0];
+        if (!file) return;
+
+        setBanner("sample", "Reading " + file.name + "…", "");
+
+        loadFile(file).then(function (loaded) {
+          var described = describeFile(loaded);
+          if (!described.mapping.scoredFound.length) {
+            state.file = null;
+            setBanner("error", "That file has none of the columns the model scores",
+              "Read " + esc(loaded.name) + " (" + loaded.records.length + " "
+              + plural(loaded.records.length, "row") + ", " + loaded.headers.length + " columns) but none of "
+              + "its headers match a scored input, so there is nothing to analyse and no results are shown. "
+              + "The model reads column names such as <code>app_id</code>, <code>app_name</code>, "
+              + "<code>ov_patient_care_criticality</code>, <code>th_supportability</code>, "
+              + "<code>c_cost_per_active_user_vs_peers</code> and <code>r_technical_risk</code>. "
+              + "Case, spaces, hyphens and underscores do not matter.");
+            return;
           }
-          if (window.lucide) window.lucide.createIcons({ attrs: { width: 16, height: 16 } });
+          state.file = loaded;
+          setBanner("sample", "File ready — press Analyze portfolio",
+            described.text + " The figures below are still illustrative sample content until you press "
+            + "<strong>Analyze portfolio</strong>.");
+        }).catch(function (err) {
+          state.file = null;
+          setBanner("error", "That file could not be read", esc(err && err.message ? err.message : String(err)));
         });
-      });
+      }
+
+      function onAnalyzeClick() {
+        activateView("overview");
+
+        if (!state.file) {
+          setBanner("error", "Choose an inventory file first",
+            "<strong>Analyze portfolio</strong> scores the applications in a file you upload. Press "
+            + "<strong>Upload inventory</strong> and choose an Excel workbook (.xlsx) or a CSV, then press "
+            + "Analyze. The figures below remain illustrative sample content."
+            + (support.supported ? "" : " " + esc(support.message)));
+          return;
+        }
+
+        var a;
+        try {
+          a = arAnalyse(state.file.records);
+        } catch (err) {
+          setBanner("error", "The analysis could not be completed",
+            esc(err && err.message ? err.message : String(err))
+            + " The figures below are unchanged illustrative sample content.");
+          return;
+        }
+
+        if (!a.summary.usable) {
+          setBanner("error", "Nothing in that file could be scored",
+            "None of the 18 scored inputs were found, so no decisions were produced.");
+          return;
+        }
+
+        state.analysis = a;
+        state.mode = "computed";
+        state.detailData = {};
+        a.rows.forEach(function (r) { state.detailData[r.app_id] = r; });
+
+        renderKpis(a);
+        renderSavings(a);
+        renderMix(a);
+        renderGuardrails(a);
+        renderClusters(a);
+        renderTable(a);
+        setSampleFlags("computed");
+
+        /* Reset the evidence panel and the full decision view: whatever was selected
+         * before belonged to a different portfolio. */
+        var panel = root.querySelector("#inline-detail");
+        if (panel) {
+          panel.className = "detail-empty";
+          panel.innerHTML = '<div><i data-lucide="mouse-pointer-click" aria-hidden="true"></i><br>'
+            + 'Select an application to see the decision evidence.</div>';
+        }
+        state.selected = null;
+        if (a.rows.length) renderFullDetail(a.rows[0]);
+
+        var s = a.summary;
+        var notes = [];
+        notes.push("Scored <strong>" + s.rowCount + " " + plural(s.rowCount, "row") + "</strong> from "
+          + esc(state.file.name) + (state.file.sheetName ? ' (sheet "' + esc(state.file.sheetName) + '")' : "")
+          + " entirely in this browser — nothing was uploaded anywhere.");
+        notes.push("Found <strong>" + s.scoredInputsFound + " of " + s.scoredInputsTotal
+          + " scored inputs</strong> across " + s.recognisedColumns + " recognised "
+          + plural(s.recognisedColumns, "column") + ".");
+        var unscoreable = Object.keys(s.unscoreableDimensions);
+        if (unscoreable.length) {
+          notes.push("<strong>" + esc(joinList(unscoreable)) + "</strong> could not be scored on some rows "
+            + "(no populated inputs) and " + (unscoreable.length > 1 ? "are" : "is")
+            + " treated as a fail, which pushes those rows toward consolidate, replace or retire — supply "
+            + esc(joinList(s.scoredInputsMissing.slice(0, 4))) + " to score "
+            + (unscoreable.length > 1 ? "them" : "it") + ".");
+        }
+        if (s.confidenceSpread.high < s.rowCount) {
+          notes.push("Confidence is <strong>high on " + s.confidenceSpread.high + " "
+            + plural(s.confidenceSpread.high, "row") + "</strong>, medium on "
+            + s.confidenceSpread.medium + " and low on " + s.confidenceSpread.low
+            + ", capped by how complete each row is.");
+        }
+
+        setBanner("computed", "Computed from " + state.file.name + " · " + s.rowCount + " "
+          + plural(s.rowCount, "application") + " scored on " + s.analysisDate, notes.join(" "));
+        refreshIcons();
+      }
+
+      if (fileInput) fileInput.addEventListener("change", onFileChosen);
 
       root.querySelectorAll("[data-action]").forEach(function (button) {
         button.addEventListener("click", function () {
-          if (button.getAttribute("data-action") === "analyze") activateView("overview");
+          var action = button.getAttribute("data-action");
+          if (action === "upload") onUploadClick();
+          else if (action === "analyze") onAnalyzeClick();
         });
       });
+
+      /* Tell the reader up front if this browser cannot do .xlsx, rather than
+       * failing at the moment they choose a workbook. */
+      if (!support.supported) {
+        var uploadButton = root.querySelector('[data-action="upload"]');
+        if (uploadButton) uploadButton.setAttribute("title", support.message);
+        setBanner("sample", "Illustrative sample content — not computed from any file",
+          "Every figure below is placeholder copy describing a fictional 600-application portfolio. "
+          + "<strong>" + esc(support.message) + "</strong> Choose <strong>Upload inventory</strong> to load a "
+          + "CSV, then <strong>Analyze portfolio</strong>.");
+      }
+
     })();
   </script>
 </div>

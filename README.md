@@ -62,12 +62,21 @@ Three views, switched from the tabs at the top:
   usage, confidence, the written rationale, and the evidence rows behind it, including
   any precondition that has to be cleared first.
 
-**This is a wireframe with illustrative data.** The numbers are there to show the shape of
-the output, not to report a real portfolio. Several controls are intentionally not wired
-up: the three filter selects, **Upload inventory**, **Export decisions**, and **Generate
-executive readout**. What does work is the navigation, the cluster **Review** buttons,
-selecting an application to load its evidence, **Open full decision**, and **Analyze
-portfolio**. `docs/wireframe-README.md` has the full list.
+**Upload inventory** and **Analyze portfolio** are real. **Upload inventory** opens a file
+dialogue that accepts an Excel workbook (`.xlsx`) or a CSV; **Analyze portfolio** then runs
+the scoring model over that file entirely in the browser — no server, no upload, nothing
+leaves the machine — and rewrites every figure on the page with the computed result. The
+page ships with illustrative numbers describing a fictional 600-application portfolio, and
+until an analysis has run it says so: a banner and a `Sample` pill on each figure. After an
+analysis both change to name the file the numbers came from.
+
+The scoring is a JavaScript port of `engine/generate_dataset.py`, verified against the
+Python engine's own output: **329 of 329 fields matched with zero mismatches** across all
+20 applications of `data/synthetic-portfolio/applications-v2.csv`, and identically via the
+`.xlsx`. `docs/wireframe-README.md` has the measurement and the column-name expectations.
+
+Still intentionally not wired up: the three filter selects, **Export decisions**, and
+**Generate executive readout**. `docs/wireframe-README.md` has the full list.
 
 ## How to make changes
 
