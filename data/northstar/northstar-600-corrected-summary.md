@@ -64,6 +64,18 @@ Support Role after normalisation: Secondary 1424, Duplicative 254, Primary 119.
 - Needs Validation: 29
 - medium: 2
 
+### What that confidence figure does and does not say
+
+**$13,650,000 of the $17,409,000 net first-year saving sits on the 569 of 600 applications whose `confidence` column reads `high`.** That is the portion of the saving where the risk evidence is complete. It is not a verified figure, not a validated one, and not a statement that the underlying numbers are trustworthy to that degree — only that the inputs the confidence rule inspects were present.
+
+What the rule actually grades is **availability**: the three risk inputs, plus the source's own evidence-quality columns. It does **not** mean every input on the row is present. **54 rows are missing a weighted technical input** — architecture fit, unscored where the hosting label is the ambiguous bare `Private cloud` — **and still read `high`**, because a missing non-risk input does not cap confidence.
+
+This is a **different measure** from the **safe figure of $15,850,000** in `Money` above. Safe is gated on cost notes and the guardrails, not on the per-application `confidence` value; the parenthetical "high-confidence only" on that line is what caused the two to be conflated earlier. To be unambiguous: **$13,650,000 / 569 rows is the confidence-column figure; $15,850,000 is the safe figure.** They are computed from different gates, neither is a subset of the other by construction, and neither should be cited as the other.
+
+**Disclosure that must travel with the figure:** the cost lens on this portfolio rests on **three criteria, not four**. `c_consumption_price_variance` is unscorable on all 600 rows because the source workbook has no metered, plan or consumption-price column.
+
+**Correction worth recording, so nobody chases it:** adding that missing consumption column would **not** restore full confidence in the web page. The page holds rows at medium for two independent reasons, and **10 of its 44 completeness fields are blank on 599 rows** — implementation date, cost centre, last sign-in, process centrality, owner-stated importance, contract id, licence metric, retention flag, lifecycle stage, and the consumption input. Supplying that one input moves completeness from **0.773 to 0.795 against a 0.90 gate**, so it lifts nothing.
+
 ## Data gaps
 
 - `c_consumption_price_variance`: unscored on 600 of 600 rows
