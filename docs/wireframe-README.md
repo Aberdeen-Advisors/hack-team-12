@@ -173,6 +173,49 @@ Both `aria-live="polite"` regions are kept, the banner is one of them, the mix b
 savings comparison update their `aria-label` alongside their geometry, and every control stays
 keyboard-reachable (the file input is visually hidden but focusable, with an `aria-label`).
 
+### A confidence grade supplied by the file
+
+The page derives confidence itself from how complete each row is, and its top band requires
+*every* non-zero-weight scored input to be present. On a file where one such input is blank
+throughout, that pins the whole portfolio to the middle band no matter how good the rest of the
+evidence is. So where an uploaded file already carries a confidence grade, the page now **uses
+the supplied value, per row**, and falls back to its own assessment wherever the column is absent
+or a cell is blank or unreadable.
+
+- The column is recognised tolerantly for case, spaces, hyphens and underscores, but matched
+  against an **exact** normalised whitelist — `confidence`, `confidence_level`,
+  `confidence_grade`, `recommendation_confidence` — rather than the leading/trailing-qualifier
+  rule the canonical columns use. A suffix rule would let `capability_tag_confidence`, a
+  different column that sits in these same files, capture the slot.
+- `high`, `medium` and `low` map to themselves, and the literal **`Needs Validation` in any
+  casing or punctuation** maps to the **lowest** band. It is not a fourth bucket: those rows keep
+  the disposition they were scored into and are counted in it.
+- Anything unrecognised in the cell falls back rather than guessing.
+
+**How the resulting figure is described matters more than the figure.** The grade a scoring engine
+writes into that column measures how complete the **risk** evidence is — a narrower test than the
+page's own count across all 44 completeness fields. So the page never calls the derived figure
+"high-confidence savings" or implies it covers every input. It says which test was applied, and
+whether the value was read from the file or worked out here, and it keys that wording off
+*observed disagreement* rather than assuming: a supplied grade that matches the page's own count
+on every row is described as agreeing with it, not relabelled as a risk test the page cannot see.
+Where only some rows carried a readable grade, the note, the column heading and the banner all
+name the split.
+
+On the tuned demo dataset the supplied column reads high on 569 rows, `Needs Validation` on 29 and
+medium on 2, and the page reports **$59,471,000 of the $68,813,000 net annual saving as sitting on
+the 569 of 600 applications whose risk evidence is complete** — explicitly not the saving where
+every input is in place. It also discloses what is thin: cost efficiency rests on 2 of the 3
+measures that carry weight, because no consumption price variance is supplied on any row. (The
+absolute cost band carries weight 0 and is skipped, so it is 3 weighted measures, not 4; all three
+weighted risk inputs are present, so risk posture is not narrowed.)
+
+For the record, the page's own assessment lands in the middle band on that file for **two
+independent reasons**, so no single added column would move it: a weight-1 scored input
+(consumption price variance) is blank on every row, which fails the "every weighted input present"
+test on its own; and row completeness comes to **0.773** on 599 of the 600 rows — ten of the 44
+counted fields empty — against a **0.90** gate.
+
 ### The three workbench filters
 
 The Business capability, Recommendation and Critical operation selects narrow the decision table

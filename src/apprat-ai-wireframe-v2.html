@@ -624,6 +624,7 @@
           </div>
         </div>
         <p class="savings-note text-small text-muted" data-savings-note><strong>Net annual saving</strong> is the gross avoidable annual cost of every retire, consolidate and replace decision, less any successor's running cost, amortised transition cost and residual archival cost. One-time costs are amortised, never ignored.</p>
+        <p class="savings-note text-small text-muted" data-evidence-note hidden></p>
         <p class="provenance-note text-small text-muted" data-provenance-note hidden></p>
       </section>
 
@@ -721,7 +722,7 @@
           </div>
           <div class="table-responsive">
             <table class="table table-sm">
-              <thead><tr><th>Application</th><th>Capability</th><th>Decision</th><th class="text-end" data-tooltip="Recurring annual run-rate spend that disappears after the action is completed; excludes one-time transition costs.">Avoidable annual savings</th><th>Confidence</th></tr></thead>
+              <thead><tr><th>Application</th><th>Capability</th><th>Decision</th><th class="text-end" data-tooltip="Recurring annual run-rate spend that disappears after the action is completed; excludes one-time transition costs.">Avoidable annual savings</th><th data-confidence-header>Confidence</th></tr></thead>
               <tbody data-app-table>
                 <tr data-table-empty><td colspan="5" class="table-empty"><p data-table-empty-text>There are no applications to show yet. Upload an inventory and press Analyze portfolio.</p><button type="button" class="btn btn-ghost" data-filter-clear>Clear filters</button></td></tr>
               </tbody>
@@ -1737,6 +1738,41 @@
         role_in_cluster: 'cluster_role'
       };
 
+      /* Header spellings that carry a confidence grade already worked out by whoever
+       * produced the file. Matched on the exact normalised header, never by the
+       * leading/trailing-qualifier rule that the canonical columns use, because
+       * "capability_tag_confidence" is a different column and must not be mistaken
+       * for this one. */
+      var AR_SUPPLIED_CONFIDENCE_HEADERS = {
+        confidence: true,
+        confidence_level: true,
+        confidence_grade: true,
+        recommendation_confidence: true
+      };
+
+      /* The four grades we accept in a supplied confidence cell. "Needs Validation"
+       * is the lowest of them, not a fourth bucket: punctuation and case are ignored,
+       * so "Needs Validation", "needs-validation" and "NEEDSVALIDATION" all read as
+       * low. Anything unrecognised returns null so the row falls back to the page's
+       * own assessment. */
+      function arNormaliseConfidence(value) {
+        if (arIsBlank(value)) return null;
+        var n = String(value).toLowerCase().replace(/[^a-z]+/g, '');
+        if (n === 'high') return 'high';
+        if (n === 'medium') return 'medium';
+        if (n === 'low') return 'low';
+        if (n === 'needsvalidation') return 'low';
+        return null;
+      }
+
+      /** The uploaded file's own confidence header, or null when it has none. */
+      function arFindSuppliedConfidenceHeader(headers) {
+        for (var i = 0; i < headers.length; i++) {
+          if (AR_SUPPLIED_CONFIDENCE_HEADERS[arNormaliseHeader(headers[i])]) return headers[i];
+        }
+        return null;
+      }
+
       /* ------------------------------------------------------------------ *
        * 2. Value handling — a blank cell is a blank cell, never a zero
        * ------------------------------------------------------------------ */
@@ -1901,7 +1937,8 @@
           matched: matched,
           unmatched: unmatched,
           scoredFound: scoredFound,
-          scoredMissing: scoredMissing
+          scoredMissing: scoredMissing,
+          confidenceHeader: arFindSuppliedConfidenceHeader(headers)
         };
       }
 
@@ -1971,6 +2008,11 @@
           raw[canonical] = record[mapping.map[canonical]];
         });
         row._raw = raw;
+        /* Read straight off the record: the confidence column is a supplied result,
+         * not one of the canonical inputs the scoring reads. */
+        row._supplied_confidence = mapping.confidenceHeader
+          ? record[mapping.confidenceHeader]
+          : null;
 
         AR_TEXT_FIELDS.forEach(function (f) { row[f] = arText(raw[f]); });
         AR_NUMBER_FIELDS.forEach(function (f) { row[f] = arNumber(raw[f]); });
@@ -2303,7 +2345,49 @@
         if (row.completeness_score >= 0.90 && allScoresPresent) row.confidence = 'high';
         else if (row.completeness_score >= 0.40) row.confidence = 'medium';
         else row.confidence = 'low';
+        row.confidence_derived = row.confidence;
+
+        /* A file that already carries a confidence grade wins, per row, wherever the
+         * cell holds one of the grades we recognise. This is reading a supplied value,
+         * not a second way of computing one: a blank or unreadable cell falls back to
+         * the assessment just made above. Note that the grade a scoring engine puts in
+         * this column measures how complete the RISK evidence is, which is a narrower
+         * test than the completeness count above — so the two disagree legitimately,
+         * and anything shown to a reader has to say which one it is. */
+        var supplied = arNormaliseConfidence(row._supplied_confidence);
+        row.confidence_from_file = supplied !== null;
+        if (supplied !== null) row.confidence = supplied;
         return row;
+      }
+
+      /**
+       * Decide, for the portfolio as a whole, what the confidence grades actually rest
+       * on, and stamp it on every row so each place that shows a grade can name it.
+       *
+       *   'own'    nothing supplied — the page's own count of how complete each row is
+       *   'risk'   supplied, and it says something the page's own count does not, which
+       *            is the signal that it grades a narrower thing: how complete the RISK
+       *            evidence is
+       *   'agreed' supplied, but identical to the page's own count on every row, so the
+       *            page describes it as that rather than claiming a test it cannot see
+       *   'mixed'  supplied on some rows only
+       *
+       * Naming it from observed disagreement rather than assuming is the point: a file
+       * whose grade happens to be a completeness grade must not be relabelled as a risk
+       * one just because it arrived in a column.
+       */
+      function arApplyConfidenceBasis(rows) {
+        var fromFile = 0, disagreements = 0;
+        rows.forEach(function (r) {
+          if (!r.confidence_from_file) return;
+          fromFile++;
+          if (r.confidence !== r.confidence_derived) disagreements++;
+        });
+        var basis = fromFile === 0
+          ? 'own'
+          : (disagreements > 0 ? 'risk' : (fromFile === rows.length ? 'agreed' : 'mixed'));
+        rows.forEach(function (r) { r.confidence_basis = basis; });
+        return { basis: basis, fromFile: fromFile, disagreements: disagreements };
       }
 
       /* ------------------------------------------------------------------ *
@@ -2363,8 +2447,17 @@
             + 'uploaded file, so ' + (row.unscoreable_dimensions.length > 1 ? 'they were' : 'it was')
             + ' treated as a fail. Supply those inputs before acting on this row.');
         }
-        parts.push('Confidence ' + row.confidence + ' on a completeness score of '
-          + (row.completeness_score * 100).toFixed(0) + '%.');
+        if (row.confidence_basis === 'risk' && row.confidence_from_file) {
+          parts.push('Confidence ' + row.confidence + ', read from the uploaded file, where it grades how '
+            + 'complete the risk evidence is rather than the evidence as a whole; '
+            + (row.completeness_score * 100).toFixed(0) + '% of the fields this page counts are filled in.');
+        } else if (row.confidence_from_file) {
+          parts.push('Confidence ' + row.confidence + ', supplied by the uploaded file and matching a '
+            + 'completeness score of ' + (row.completeness_score * 100).toFixed(0) + '%.');
+        } else {
+          parts.push('Confidence ' + row.confidence + ' on a completeness score of '
+            + (row.completeness_score * 100).toFixed(0) + '%.');
+        }
 
         row.rationale = parts.filter(function (p) { return p; }).join(' ');
         return row;
@@ -2544,6 +2637,7 @@
         rows.forEach(function (r) { arComputeSavings(r); });
         arApplyConstraintsAndPriority(rows, analysisDate);
         rows.forEach(function (r) { arComputeProvenance(r); });
+        var confidenceBasis = arApplyConfidenceBasis(rows);
         rows.forEach(function (r) { arComposeRationale(r); });
 
         var summary = arRollup(rows);
@@ -2563,6 +2657,53 @@
           var c = { high: 0, medium: 0, low: 0 };
           rows.forEach(function (r) { c[r.confidence] = (c[r.confidence] || 0) + 1; });
           return c;
+        })();
+
+        /* Where each row's confidence came from. The page has to be able to say so. */
+        summary.confidenceColumn = mapping.confidenceHeader;
+        summary.confidenceFromFile = rows.filter(function (r) { return r.confidence_from_file; }).length;
+
+        /* Rows where the supplied grade says something this page's own completeness
+         * count does not. That is the honest signal that the supplied grade is measuring
+         * a different thing — for the portfolios this tool scores, how complete the RISK
+         * evidence is — and it is the only basis on which the page may describe the
+         * grade that way. Where a supplied grade agrees with the page's own assessment
+         * everywhere, the page says exactly that instead of claiming a narrower test it
+         * cannot see. */
+        summary.confidenceDisagreements = confidenceBasis.disagreements;
+        summary.confidenceBasis = confidenceBasis.basis;
+
+        /* The savings carried by the rows graded highest. When the grade came from the
+         * file this is savings where the RISK evidence is complete, which is not the
+         * same as savings where all the evidence is complete — every place this figure
+         * is shown has to say which it is. Summed from the rows on the page, so it is
+         * always what the page actually holds. */
+        summary.topConfidenceRows = rows.filter(function (r) { return r.confidence === 'high'; });
+        summary.net_saving_top_confidence = summary.topConfidenceRows
+          .reduce(function (a, r) { return a + r.net_saving_annual; }, 0);
+        summary.topConfidenceCount = summary.topConfidenceRows.length;
+
+        /* Scored inputs whose column was read but which carried no value on any row.
+         * They narrow a dimension's view without making it unscoreable, so the page
+         * cannot report the dimension as fully evidenced. Only the weighted criteria
+         * count: a zero-weight input never moves a score, so its absence narrows
+         * nothing and claiming otherwise would overstate the gap. */
+        summary.narrowedDimensions = (function () {
+          var out = [];
+          AR_DIMENSIONS.forEach(function (d) {
+            var inDim = AR_CRITERIA.filter(function (c) { return c[1] === d[0] && c[2] > 0; });
+            var empty = inDim.filter(function (c) {
+              return rows.every(function (r) { return r[c[0]] === null || r[c[0]] === undefined; });
+            });
+            if (!empty.length || empty.length === inDim.length) return;   /* none, or wholly unscoreable */
+            out.push({
+              dimension: d[1],
+              total: inDim.length,
+              present: inDim.length - empty.length,
+              missing: empty.map(function (c) { return (AR_CRITERION_LABELS[c[0]] || c[0]).toLowerCase(); })
+            });
+          });
+          return out;
         })();
         summary.splitConflicts = rows.filter(function (r) { return r._split_conflict; })
           .map(function (r) { return r.app_id + ': ' + r._split_conflict; });
@@ -2884,6 +3025,81 @@
                 + plural(constrained.length, "decision") + " (" + esc(constrained.join(", ")) + ")."
               : ".");
         }
+
+        renderEvidenceNote(a);
+      }
+
+      /**
+       * The slice of the net saving carried by the best-evidenced rows, summed from the
+       * rows the page is showing.
+       *
+       * The wording is the point of this function. When the grade comes from the
+       * uploaded file it grades how complete the RISK evidence is — three risk inputs
+       * and the evidence-quality columns — and not the whole evidence set, so calling
+       * the result "high confidence" would move a wrong claim rather than remove one.
+       * It therefore says what was measured, says the value was read from the file, and
+       * discloses any dimension left resting on fewer inputs than it reads.
+       */
+      function renderEvidenceNote(a) {
+        var el = root.querySelector("[data-evidence-note]");
+        if (!el) return;
+
+        var s = a.summary;
+        var n = s.topConfidenceCount;
+        var total = s.rowCount;
+        var fromFile = s.confidenceFromFile;
+
+        if (!n) {
+          el.hidden = true;
+          el.innerHTML = "";
+          return;
+        }
+
+        var of = " of " + total + " " + plural(total, "application");
+        var subject, provenance;
+        /* Only claim the whole figure is risk-evidence-complete when every row's grade
+         * actually came from the file. Where some rows fell back, part of the figure
+         * rests on this page's own count and the copy has to stay neutral. */
+        if (s.confidenceBasis === 'risk' && fromFile === total) {
+          subject = "<strong>" + n + of + " whose risk evidence is complete</strong>";
+          provenance = "That grade was read from the uploaded file, not worked out here, and it grades how "
+            + "complete each application's <strong>risk</strong> evidence is — not how complete its evidence "
+            + "is overall. Read this as the saving where the risk evidence is complete; it is not the saving "
+            + "where every input is in place.";
+        } else if (s.confidenceBasis === 'risk') {
+          subject = "<strong>" + n + of + " graded highest on evidence</strong>";
+          provenance = "On " + fromFile + " " + plural(fromFile, "row") + " that grade was read from the "
+            + "uploaded file, where it grades how complete the <strong>risk</strong> evidence is rather than "
+            + "the evidence as a whole; the remaining " + (total - fromFile) + " carried no grade and fell "
+            + "back to this page's own count of how complete the row is. So this figure does not rest on one "
+            + "test throughout, and none of it is a check that every input is in place.";
+        } else if (s.confidenceBasis === 'own') {
+          subject = "<strong>" + n + of + " this page grades highest on evidence</strong>";
+          provenance = "This page judged that itself, from how much of each row is filled in, because the "
+            + "file supplied no grade of its own. It is a count of filled-in fields, not a judgement about "
+            + "any one kind of evidence.";
+        } else if (s.confidenceBasis === 'agreed') {
+          subject = "<strong>" + n + of + " graded highest on evidence</strong>";
+          provenance = "The uploaded file supplies that grade and it agrees with this page's own count of how "
+            + "complete each row is on every application, so nothing here rests on a grade this page cannot "
+            + "account for.";
+        } else {
+          subject = "<strong>" + n + of + " graded highest on evidence</strong>";
+          provenance = "The grade was read from the uploaded file on " + fromFile + " " + plural(fromFile, "row")
+            + " and judged by this page from row completeness on the rest, so it does not rest on the same "
+            + "test throughout.";
+        }
+
+        var narrowed = (s.narrowedDimensions || []).map(function (d) {
+          return "the " + esc(d.dimension.toLowerCase()) + " view rests on " + d.present + " of the "
+            + d.total + " measures that carry weight, because no " + esc(joinList(d.missing))
+            + " is supplied on any row of this file";
+        });
+
+        el.innerHTML = "<strong>" + esc(moneyFull(s.net_saving_top_confidence)) + "</strong> of that net "
+          + "saving sits on the " + subject + ". " + provenance
+          + (narrowed.length ? " On this portfolio " + narrowed.join("; ") + "." : "");
+        el.hidden = false;
       }
 
       /* ------------------------------------------------------------------ *
@@ -3017,7 +3233,9 @@
           var h = g.heldForEvidence.length;
           var unscoreable = Object.keys(s.unscoreableDimensions);
           held.innerHTML = "<strong>" + h + " " + plural(h, "application") + " held</strong> for incomplete "
-            + "evidence — confidence below high"
+            + "evidence — " + (s.confidenceBasis === 'risk' && s.confidenceFromFile === s.rowCount
+              ? "the file grades their risk evidence as less than complete"
+              : "evidence confidence below high")
             + (unscoreable.length
               ? ", and " + esc(joinList(unscoreable.map(function (d) {
                   return d.toLowerCase() + " could not be scored on " + s.unscoreableDimensions[d] + " "
@@ -3110,10 +3328,41 @@
             + '</tr>';
         }).join("") + emptyRowHtml();
 
+        renderConfidenceHeader(a);
         wireRowButtons();
         wireFilterClears();
         rebuildFilterOptions();
         applyFilters();
+      }
+
+      /* Name the confidence column for what it actually grades in this run, so the
+       * column heading cannot be read as an overall evidence score. */
+      function renderConfidenceHeader(a) {
+        var th = root.querySelector("[data-confidence-header]");
+        if (!th) return;
+        var s = a.summary;
+        if (s.confidenceBasis === 'risk' && s.confidenceFromFile === s.rowCount) {
+          th.textContent = "Risk-evidence confidence";
+          th.setAttribute("data-tooltip", "Read from the uploaded file. It grades how complete each "
+            + "application's risk evidence is, not how complete its evidence is overall.");
+        } else if (s.confidenceBasis === 'risk') {
+          th.textContent = "Evidence confidence";
+          th.setAttribute("data-tooltip", "Read from the uploaded file on " + s.confidenceFromFile + " of "
+            + s.rowCount + " rows, where it grades risk evidence rather than the evidence as a whole; judged "
+            + "by this page from row completeness on the rest.");
+        } else if (s.confidenceBasis === 'own') {
+          th.textContent = "Evidence confidence";
+          th.setAttribute("data-tooltip", "Judged by this page from how much of each row is filled in. "
+            + "The uploaded file supplied no confidence grade.");
+        } else if (s.confidenceBasis === 'agreed') {
+          th.textContent = "Evidence confidence";
+          th.setAttribute("data-tooltip", "Supplied by the uploaded file, and the same on every row as this "
+            + "page's own count of how complete the row is.");
+        } else {
+          th.textContent = "Evidence confidence";
+          th.setAttribute("data-tooltip", "Read from the uploaded file on " + s.confidenceFromFile
+            + " of " + s.rowCount + " rows and judged by this page from row completeness on the rest.");
+        }
       }
 
       /* ------------------------------------------------------------------ *
@@ -3323,9 +3572,14 @@
             + '<div><div class="field-label text-small">Net annual saving</div>'
               + '<strong class="numeric target-value" data-detail-saving="' + Math.round(r.net_saving_annual)
               + '">' + moneyFull(r.net_saving_annual) + '</strong></div>'
-            + '<div><div class="field-label text-small">Confidence</div><strong data-detail-confidence>'
-              + esc(titleCase(r.confidence)) + ' · ' + (r.completeness_score * 100).toFixed(0)
-              + '% complete</strong></div>'
+            + '<div><div class="field-label text-small">'
+              + (r.confidence_basis === 'risk' && r.confidence_from_file
+                ? 'Risk-evidence confidence' : 'Evidence confidence')
+              + '</div><strong data-detail-confidence>'
+              + esc(titleCase(r.confidence)) + ' · ' + (r.confidence_from_file
+                ? 'from the file'
+                : (r.completeness_score * 100).toFixed(0) + '% complete')
+              + '</strong></div>'
           + '</div>'
           + '<div class="text-small text-muted" style="margin-top:0.65rem">Pattern key <strong>'
             + esc(r.vtcr_key) + '</strong> against a 3.0 gate on every dimension</div>'
@@ -3374,9 +3628,16 @@
             + '<div><div class="field-label text-small">Licence utilisation</div><strong>'
               + (util === null ? "not supplied" : util + "% of " + r.licences_purchased + " licences")
               + '</strong></div>'
-            + '<div><div class="field-label text-small">Recommendation confidence</div><strong>'
-              + titleCase(r.confidence) + " · " + (r.completeness_score * 100).toFixed(0)
-              + '% of the fields the model reads</strong></div>';
+            + '<div><div class="field-label text-small"' + (r.confidence_basis === 'risk' && r.confidence_from_file
+                ? ' data-tooltip="Read from the uploaded file. It grades how complete this application\'s '
+                  + 'risk evidence is, not how complete its evidence is overall."'
+                : '')
+              + '>' + (r.confidence_basis === 'risk' && r.confidence_from_file
+                ? 'Risk-evidence confidence' : 'Evidence confidence')
+              + '</div><strong>' + titleCase(r.confidence) + " · " + (r.confidence_from_file
+                ? 'read from the file'
+                : (r.completeness_score * 100).toFixed(0) + '% of the fields the model reads')
+              + '</strong></div>';
         }
         if (rationale) rationale.textContent = r.rationale;
 
@@ -3614,7 +3875,26 @@
           notes.push("Confidence is <strong>high on " + s.confidenceSpread.high + " "
             + plural(s.confidenceSpread.high, "row") + "</strong>, medium on "
             + s.confidenceSpread.medium + " and low on " + s.confidenceSpread.low
-            + ", capped by how complete each row is.");
+            + (s.confidenceBasis === 'own'
+              ? ", capped by how complete each row is. The file supplied no confidence column."
+              : s.confidenceBasis === 'risk'
+                ? ", read from the <strong>" + esc(String(s.confidenceColumn)) + "</strong> column of the "
+                  + "file, where it grades how complete the risk evidence is rather than the evidence as a "
+                  + "whole (any Needs Validation grade is counted as low)"
+                  /* Only claim the whole portfolio was read from the file when it was.
+                   * Where a cell was blank or unreadable that row fell back to this
+                   * page's own count, and the banner has to say so. */
+                  + (s.confidenceFromFile === s.rowCount
+                    ? "."
+                    : " — on " + s.confidenceFromFile + " of " + s.rowCount + " rows; the remaining "
+                      + (s.rowCount - s.confidenceFromFile) + " carried no readable grade and fell back to "
+                      + "this page's own count of how complete the row is.")
+                : s.confidenceBasis === 'agreed'
+                  ? ", supplied in the <strong>" + esc(String(s.confidenceColumn)) + "</strong> column of the "
+                    + "file and matching this page's own count of how complete each row is."
+                  : ", read from the <strong>" + esc(String(s.confidenceColumn)) + "</strong> column of the "
+                    + "file on " + s.confidenceFromFile + " " + plural(s.confidenceFromFile, "row")
+                    + " and capped by how complete each of the remaining rows is."));
         }
 
         setBanner("computed", "Computed from " + state.file.name + " · " + s.rowCount + " "
