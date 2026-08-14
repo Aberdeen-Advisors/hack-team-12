@@ -354,6 +354,46 @@
       background: color-mix(in srgb, var(--card) 70%, var(--ab-jade));
     }
 
+    /* ---- source line: sits immediately above the figures in every view and names
+           the file they came from, so a figure can never be read without its
+           source. In the failed state it carries the error instead, right where
+           the figures would be, for a reader who never saw the banner. ---- */
+    #apprat-wireframe .source-line {
+      display: block;
+      padding: 0.5rem 0.7rem;
+      margin-bottom: 0.85rem;
+      border-radius: var(--radius, 0.5rem);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--ab-gold);
+      background: color-mix(in srgb, var(--card) 86%, var(--ab-gold));
+    }
+
+    #apprat-wireframe .source-line[hidden] { display: none; }
+
+    #apprat-wireframe .source-line.is-computed {
+      border-left-color: var(--ab-jade);
+      background: color-mix(in srgb, var(--card) 88%, var(--ab-jade));
+    }
+
+    #apprat-wireframe .source-line.is-error {
+      border-left-color: var(--ab-jasper);
+      background: color-mix(in srgb, var(--card) 82%, var(--ab-jasper));
+    }
+
+    #apprat-wireframe .source-line-title {
+      display: block;
+      font-weight: 500;
+      color: var(--ab-blue);
+    }
+
+    #apprat-wireframe .source-line-detail {
+      display: block;
+      margin-top: 0.15rem;
+      color: var(--muted-foreground);
+    }
+
+    #apprat-wireframe .source-line-detail:empty { display: none; }
+
     /* Marks a figure as a whole-portfolio total, so a filtered table beside it can
      * never be mistaken for the number the figure describes. */
     #apprat-wireframe .scope-flag {
@@ -580,7 +620,7 @@
     <button type="button" class="btn btn-ghost" data-view="detail" aria-pressed="false">Decision detail</button>
   </nav>
 
-  <main>
+  <main data-results-region>
     <section class="view is-active" data-panel="overview">
       <div class="page-intro">
         <div>
@@ -589,6 +629,8 @@
         </div>
         <span class="status-badge" data-critical-badge><i data-lucide="shield-check" aria-hidden="true"></i> No applications scored</span>
       </div>
+
+      <p class="source-line text-small" data-source-line role="status" aria-live="polite" hidden></p>
 
       <div class="kpi-grid">
         <div class="card viz-stat">
@@ -677,6 +719,8 @@
         <button type="button" class="btn"><i data-lucide="download" aria-hidden="true"></i> Export decisions</button>
       </div>
 
+      <p class="source-line text-small" data-source-line role="status" aria-live="polite" hidden></p>
+
       <div class="filter-row">
         <div class="filter-field">
           <label class="form-label text-small">Business capability
@@ -746,6 +790,8 @@
         </div>
         <button type="button" class="btn"><i data-lucide="file-text" aria-hidden="true"></i> Generate executive readout</button>
       </div>
+
+      <p class="source-line text-small" data-source-line role="status" aria-live="polite" hidden></p>
 
       <section class="card section-card">
         <div class="detail-heading">
@@ -2733,6 +2779,14 @@
       var bannerTitle = root.querySelector("[data-banner-title]");
       var bannerDetail = root.querySelector("[data-banner-detail]");
 
+      /* Every figure on the page lives inside this region. Its markup as shipped is
+       * the no-figures state — every headline "—", every pill "Not analyzed", every
+       * table and panel empty — so keeping a copy of it gives us an exact way back
+       * to that state. Taken before anything is wired or rendered, so the copy is
+       * pristine. */
+      var resultsRegion = root.querySelector("[data-results-region]");
+      var pristineResults = resultsRegion ? resultsRegion.innerHTML : null;
+
       /* Everything the page knows. `mode` is the honesty switch: until an analysis
        * has run there are no figures on the page at all — every headline reads "—"
        * and carries a "Not analyzed" pill — so nothing here can be read as a result. */
@@ -2824,6 +2878,55 @@
         });
       }
 
+      /* The line that sits immediately above the figures in all three views. It
+       * always names the file the figures on that view belong to, so a reader who
+       * never saw the banner at the top of the page still cannot read a figure
+       * without its source. On a failed upload it carries the error in the same
+       * place, where the figures would otherwise be. */
+      function setSourceLine(kind, titleText, detailHtml) {
+        root.querySelectorAll("[data-source-line]").forEach(function (line) {
+          line.hidden = false;
+          line.classList.toggle("is-computed", kind === "computed");
+          line.classList.toggle("is-error", kind === "error");
+          line.innerHTML = '<strong class="source-line-title">' + esc(titleText) + "</strong>"
+            + '<span class="source-line-detail">' + (detailHtml || "") + "</span>";
+        });
+      }
+
+      /* Put the page back to the no-figures state it shipped in: no headline
+       * figures, no table rows, no evidence, no decision detail, every pill reading
+       * "Not analyzed". Restoring the pristine markup is what makes this exact —
+       * there is no list of figures to keep in step with, so a figure added to the
+       * page later cannot be left behind here holding a stale number.
+       *
+       * Called the moment a new file is chosen and on every path that fails, so no
+       * figure from an earlier portfolio can survive on screen next to a different
+       * file's name. */
+      function clearResults() {
+        state.mode = "sample";
+        state.analysis = null;
+        state.detailData = {};
+        state.selected = null;
+
+        if (!resultsRegion || pristineResults === null) return;
+
+        /* Keep the reader on the view they were looking at. */
+        var activePanel = resultsRegion.querySelector("[data-panel].is-active");
+        var activeName = activePanel ? activePanel.getAttribute("data-panel") : "overview";
+
+        resultsRegion.innerHTML = pristineResults;
+        activateView(activeName);
+
+        var badge = root.querySelector("[data-portfolio-badge]");
+        if (badge) badge.textContent = "No portfolio analyzed yet";
+
+        /* The restored markup carries fresh controls, so re-attach their handlers
+         * and let the filters re-describe an empty table. */
+        wireFilters();
+        setSampleFlags("sample");
+        refreshIcons();
+      }
+
       /* ------------------------------------------------------------------ *
        * View switching (unchanged behaviour)
        * ------------------------------------------------------------------ */
@@ -2891,6 +2994,14 @@
             "That file type is not supported. Choose an Excel workbook (.xlsx) or a CSV file."));
         }
 
+        /* An empty file reaches the readers as a zero-length buffer and comes back
+         * with a puzzling parser message, so say plainly that it is empty. */
+        if (file.size === 0) {
+          return Promise.reject(new Error(
+            "That file is empty — there is nothing in it to read. Save the inventory again with its "
+            + "column headings and one row per application, then choose it."));
+        }
+
         if (isXlsx) {
           if (!support.supported) return Promise.reject(new Error(support.message));
           return readFileAsArrayBuffer(file).then(function (ab) {
@@ -2911,8 +3022,15 @@
 
         return readFileAsText(file).then(function (text) {
           var grid = readCsv(text);
+          if (!grid.length) {
+            throw new Error("That file holds no readable text — there are no rows in it. Save the inventory "
+              + "again with its column headings and one row per application, then choose it.");
+          }
           var built = arRecordsFromGrid(grid);
-          if (!built.records.length) throw new Error("That CSV file has a header but no data rows.");
+          if (!built.records.length) {
+            throw new Error("That file has column headings but no application rows beneath them. Add one row "
+              + "per application, then choose it again.");
+          }
           return {
             name: file.name,
             sheetName: null,
@@ -3753,12 +3871,20 @@
         var file = fileInput && fileInput.files && fileInput.files[0];
         if (!file) return;
 
+        /* The moment a different file is chosen, whatever is on screen stops being
+         * this page's answer. Clear it now rather than after the read finishes, so
+         * there is no window at all in which one file's name sits above another
+         * file's figures. */
+        clearResults();
         setBanner("sample", "Reading " + file.name + "…", "");
+        setSourceLine("sample", "Reading “" + file.name + "” — no figures below yet",
+          "Nothing below has been computed from this file yet.");
 
         loadFile(file).then(function (loaded) {
           var described = describeFile(loaded);
           if (!described.mapping.scoredFound.length) {
-            reject("Nothing in " + loaded.name + " matches a column the model scores",
+            reject(loaded.name,
+              "Nothing in " + loaded.name + " matches a column the model scores",
               "The file was read without trouble — " + loaded.records.length + " "
               + plural(loaded.records.length, "row") + ", " + loaded.headers.length + " columns"
               + (loaded.sheetName ? ' on sheet "' + esc(loaded.sheetName) + '"' : "")
@@ -3769,7 +3895,10 @@
               + "<code>ov_patient_care_criticality</code>, <code>th_supportability</code>, "
               + "<code>c_cost_per_active_user_vs_peers</code> and <code>r_technical_risk</code>; case, "
               + "spaces, hyphens and underscores do not matter. If this inventory uses different column "
-              + "names, they need mapping to those first.");
+              + "names, they need mapping to those first.",
+              "None of its column headings are ones the model scores, so nothing could be worked out from "
+              + "it. Rename its headings to the ones listed at the top of this page, or choose an inventory "
+              + "that already uses them.");
             return;
           }
           state.file = loaded;
@@ -3777,51 +3906,79 @@
           setBanner("sample", "File ready — press Analyze portfolio",
             described.text + " The figures below stay blank until you press "
             + "<strong>Analyze portfolio</strong>.");
+          setSourceLine("sample", "“" + loaded.name + "” is ready — no figures below yet",
+            "Press <strong>Analyze portfolio</strong> to score it. Until then there is nothing below to read.");
         }).catch(function (err) {
-          reject("That file could not be read",
+          reject(file.name, "“" + file.name + "” could not be read",
             esc(err && err.message ? err.message : String(err))
-            + " The figures below are left exactly as they were.");
+            + " No figures are shown, so nothing on this page can be mistaken for a result.",
+            esc(err && err.message ? err.message : String(err)));
         });
       }
 
       /* Remember why a file was unusable, so pressing Analyze repeats the real reason
-       * instead of claiming no file was chosen. */
-      function reject(title, detail) {
+       * instead of claiming no file was chosen — and leave the page holding no
+       * figures at all, so there is nothing on screen to misread. */
+      function reject(fileName, title, detail, nextStepHtml) {
         state.file = null;
-        state.rejected = { title: title, detail: detail };
+        state.rejected = { fileName: fileName, title: title, detail: detail, nextStep: nextStepHtml };
+        clearResults();
         setBanner("error", title, detail);
+        showRejection(state.rejected);
+      }
+
+      /* The error, repeated where the figures would be. */
+      function showRejection(r) {
+        setSourceLine("error", "No figures below — “" + r.fileName + "” was not analyzed",
+          (r.nextStep || "") + " Every figure on this page has been cleared, so nothing here comes from "
+          + "that file or from any file opened before it.");
       }
 
       function onAnalyzeClick() {
         activateView("overview");
 
         if (!state.file && state.rejected) {
+          /* The figures were already cleared when the file was refused; say so again
+           * in both places, because Analyze is the moment the reader expects numbers. */
+          clearResults();
           setBanner("error", state.rejected.title, state.rejected.detail);
+          showRejection(state.rejected);
           return;
         }
 
         if (!state.file) {
+          clearResults();
           setBanner("error", "Choose an inventory file first",
             "<strong>Analyze portfolio</strong> scores the applications in a file you upload. Press "
             + "<strong>Upload inventory</strong> and choose an Excel workbook (.xlsx) or a CSV, then press "
             + "Analyze. The figures below stay blank."
             + (support.supported ? "" : " " + esc(support.message)));
+          setSourceLine("error", "No figures below — no inventory has been analyzed",
+            "Press <strong>Upload inventory</strong>, choose an Excel workbook (.xlsx) or a CSV, then press "
+            + "<strong>Analyze portfolio</strong>.");
           return;
         }
+
+        var failedName = state.file.name;
 
         var a;
         try {
           a = arAnalyse(state.file.records);
         } catch (err) {
-          setBanner("error", "The analysis could not be completed",
+          reject(failedName, "“" + failedName + "” could not be analyzed",
             esc(err && err.message ? err.message : String(err))
-            + " The figures below are left exactly as they were.");
+            + " No figures are shown, so nothing on this page can be mistaken for a result.",
+            "The file was read but scoring it stopped part-way through. Check the file opens in Excel and "
+            + "that its rows are complete, then choose it again.");
           return;
         }
 
         if (!a.summary.usable) {
-          setBanner("error", "Nothing in that file could be scored",
-            "None of the 18 scored inputs were found, so no decisions were produced.");
+          reject(failedName, "Nothing in “" + failedName + "” could be scored",
+            "None of the 18 scored inputs were found, so no decisions were produced and no figures are "
+            + "shown.",
+            "None of its column headings are ones the model scores. Rename its headings to the ones listed "
+            + "at the top of this page, or choose an inventory that already uses them.");
           return;
         }
 
@@ -3899,6 +4056,11 @@
 
         setBanner("computed", "Computed from " + state.file.name + " · " + s.rowCount + " "
           + plural(s.rowCount, "application") + " scored on " + s.analysisDate, notes.join(" "));
+        /* Name the file beside the figures, not only in the banner at the top, so a
+         * reader who scrolled straight to a number still knows which file it is. */
+        setSourceLine("computed", "Every figure below is computed from “" + state.file.name + "”",
+          s.rowCount + " " + plural(s.rowCount, "application") + " scored"
+          + (state.file.sheetName ? " from sheet “" + esc(state.file.sheetName) + "”" : "") + ".");
         refreshIcons();
       }
 

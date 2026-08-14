@@ -161,6 +161,26 @@ scored inputs were found across how many recognised columns, any dimension that 
 scored, and how confidence came out. Pressing **Analyze portfolio** with no file chosen says so
 and leaves the page as it was.
 
+**Every figure names its file, and a failed upload leaves no figure behind.** A source line sits
+immediately above the figures in all three views, so a reader who scrolled straight to a number
+never has to trust the banner at the top of the page: after an analysis it reads *Every figure
+below is computed from "&lt;file&gt;"*, and before one it says which file is being read or is
+waiting to be analyzed.
+
+Choosing a file is the moment whatever is on screen stops being the answer, so the page clears
+back to its shipped no-figures state right then — before the read even finishes. It does that by
+restoring the results region's original markup, which is why the reset is exact rather than a
+list of figures to keep in step with: headlines back to `—`, no table rows, no clusters, no
+evidence rail, no decision detail, no `data-exact` attribute anywhere on the page, every pill
+back to `Not analyzed`, and the header badge back to `No portfolio analyzed yet`. If the file
+then turns out to be unusable — not a workbook or a CSV, empty, corrupt, truncated, or readable
+but matching none of the scored inputs — the error appears twice: in the banner, and in the
+source line where the figures would have been, naming the file that failed and what to do next.
+Pressing **Analyze portfolio** with an unusable file chosen repeats the same reason in both
+places, and a file that fails during scoring is treated the same way. There is therefore no path
+on which one file's name can appear above another file's numbers, and no path on which a previous
+portfolio's figures can be read as current.
+
 **The file's own provenance label is shown.** Where an uploaded inventory declares its origin in
 a `data_source` column, that text is quoted verbatim beside the savings figures, under
 *What this file says about itself*, with a count of how many rows carry it. In the tuned demo
