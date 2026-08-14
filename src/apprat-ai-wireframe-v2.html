@@ -2515,7 +2515,8 @@
        * as such. */
       var state = {
         mode: "sample",          /* "sample" | "computed" */
-        file: null,              /* { name, records, columnCount, mapping } */
+        file: null,              /* the loaded file, once it has usable columns */
+        rejected: null,          /* { title, detail } for a file we could not use */
         analysis: null,
         detailData: {},
         selected: null
@@ -3209,29 +3210,47 @@
         loadFile(file).then(function (loaded) {
           var described = describeFile(loaded);
           if (!described.mapping.scoredFound.length) {
-            state.file = null;
-            setBanner("error", "That file has none of the columns the model scores",
-              "Read " + esc(loaded.name) + " (" + loaded.records.length + " "
-              + plural(loaded.records.length, "row") + ", " + loaded.headers.length + " columns) but none of "
-              + "its headers match a scored input, so there is nothing to analyse and no results are shown. "
-              + "The model reads column names such as <code>app_id</code>, <code>app_name</code>, "
+            reject("Nothing in " + loaded.name + " matches a column the model scores",
+              "The file was read without trouble — " + loaded.records.length + " "
+              + plural(loaded.records.length, "row") + ", " + loaded.headers.length + " columns"
+              + (loaded.sheetName ? ' on sheet "' + esc(loaded.sheetName) + '"' : "")
+              + " — but none of its column headings match one of the 18 inputs the model scores, so there "
+              + "is nothing to analyse and no results are shown. The figures below are unchanged "
+              + "illustrative sample content. The model looks for headings such as <code>app_id</code>, "
+              + "<code>app_name</code>, <code>primary_capability</code>, "
               + "<code>ov_patient_care_criticality</code>, <code>th_supportability</code>, "
-              + "<code>c_cost_per_active_user_vs_peers</code> and <code>r_technical_risk</code>. "
-              + "Case, spaces, hyphens and underscores do not matter.");
+              + "<code>c_cost_per_active_user_vs_peers</code> and <code>r_technical_risk</code>; case, "
+              + "spaces, hyphens and underscores do not matter. If this inventory uses different column "
+              + "names, they need mapping to those first.");
             return;
           }
           state.file = loaded;
+          state.rejected = null;
           setBanner("sample", "File ready — press Analyze portfolio",
             described.text + " The figures below are still illustrative sample content until you press "
             + "<strong>Analyze portfolio</strong>.");
         }).catch(function (err) {
-          state.file = null;
-          setBanner("error", "That file could not be read", esc(err && err.message ? err.message : String(err)));
+          reject("That file could not be read",
+            esc(err && err.message ? err.message : String(err))
+            + " The figures below are unchanged illustrative sample content.");
         });
+      }
+
+      /* Remember why a file was unusable, so pressing Analyze repeats the real reason
+       * instead of claiming no file was chosen. */
+      function reject(title, detail) {
+        state.file = null;
+        state.rejected = { title: title, detail: detail };
+        setBanner("error", title, detail);
       }
 
       function onAnalyzeClick() {
         activateView("overview");
+
+        if (!state.file && state.rejected) {
+          setBanner("error", state.rejected.title, state.rejected.detail);
+          return;
+        }
 
         if (!state.file) {
           setBanner("error", "Choose an inventory file first",

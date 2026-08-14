@@ -190,6 +190,27 @@ capped at medium on every row (0 high), cost efficiency is reported as unscoreab
 in four places on the page, no cluster columns means the cluster section explains its own
 emptiness, and nothing throws.
 
+### Scale
+
+A 600-row CSV (1.3 MB, the committed 20 rows repeated 30 times with unique ids) parses in
+**189 ms** and scores and renders in **133 ms** — **322 ms end to end**, so there is no progress
+indicator because nothing waits long enough to need one. All 600 rows render in the workbench
+table, a row click opens the evidence rail in 76 ms, and the roll-up is exactly 30× the 20-row
+portfolio on both spend and net saving. The one thing to know at that size is that the table has
+no internal scroll, so 600 rows make a very long page; capping its height is a reasonable future
+change but is not a correctness problem.
+
+### A file in a different column vocabulary
+
+Both Northstar workbooks in `data/northstar/` use a different column vocabulary from the
+synthetic dataset. Given one, the page reads it fine (20 rows, 42 columns, sheet `App Inventory`),
+finds none of the 18 scored inputs, and says exactly that: it names the file, the row and column
+count, lists example headings it does look for, notes that case and separators do not matter, and
+says that an inventory using different names needs mapping first. No results are produced, the
+sample figures stay in place still flagged as samples, and pressing **Analyze portfolio** repeats
+the same reason rather than claiming no file was chosen. Mapping another vocabulary onto these
+column names is a separate job.
+
 ## Known-inert controls
 
 These are still deliberately non-functional and should stay that way until there is something
