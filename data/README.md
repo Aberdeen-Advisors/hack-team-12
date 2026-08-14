@@ -86,12 +86,76 @@ Outputs — produced by running those inputs through the engine:
 | `Northstar-Disposition-Analysis-600.xlsx` + `northstar-dispositions-600.csv` + `northstar-600-summary.md` | **Current** for the 600-application portfolio. Same v3 model, imported unchanged; the run reproduces every one of the 20 shared applications' v3 dispositions. |
 | `Northstar-600-tool-vocabulary.xlsx` + `northstar-600-tool-vocabulary.csv` | The same 600 rows re-expressed in the tool's own snake_case column vocabulary, so the portfolio can be loaded by the wireframe's in-browser Upload and Analyze, which does not read the Northstar layout. A translation, not a second analysis: 78 of the 125 tool columns are populated and the other 47 are deliberately empty, each named on the file's `Column coverage` sheet. Replaying the tool's own dimension arithmetic and both post-lookup guardrails over these columns reproduces the Python run's disposition on all 600 rows. |
 | `Northstar-600-corrected-tool-vocabulary.csv` + `Northstar-600-corrected-tool-vocabulary.xlsx` (plus `Northstar-Disposition-Analysis-600-corrected.xlsx`, `northstar-dispositions-600-corrected.csv`, `northstar-600-corrected-summary.md`) | The 600-application portfolio scored from Bina's **corrected** input workbook, `healthcare_app_rationalization_sample_600_corrected.xlsx`, which she uploaded on 2026-08-14 to replace the earlier file. Same v3 model, imported unchanged; written by `engine/score_northstar_600_corrected.py`. Not a supersession of the row above — a different input. Which of the two is the file the wireframe should demo from is **not settled here**; pick deliberately. The corrected input renames 580 records onto real commercial products and moves their cost mix, so the headline money differs: gross $25,816,000, transition $8,407,000, net first year $17,409,000, spread retain 301 / invest 174 / retire 81 / consolidate 44 / replace 0. Two defects in the earlier export are fixed here: transition-cost columns are empty (never zero) on rows whose disposition removes no run-rate spend, and the contract-urgency columns are derived. Replaying the tool's own dimension arithmetic and both post-lookup guardrails over these columns reproduces the Python run's disposition **and** priority on all 600 rows. |
+| `Northstar-600-tuned-tool-vocabulary.csv` + `.xlsx` (plus `Northstar-Disposition-Analysis-600-tuned.xlsx`, `northstar-dispositions-600-tuned.csv`, `northstar-600-tuned-summary.md`, `northstar-600-tuned-change-log.md`) | **TUNED DEMO FIXTURE — NOT A COMPUTED RESULT.** See the subsection immediately below before using any number from these files. |
 | `Northstar-Disposition-Analysis-v2.xlsx` + `northstar-dispositions-v2.csv` | **Superseded.** Run 2, which promoted risk to a gated dimension. |
 | `Northstar-Disposition-Analysis-v1.xlsx` + `northstar-dispositions.csv` | **Superseded.** Run 1, the first pass. |
 | `scoring-model-review.md` | A review of the scoring weights: what they are, and whether re-weighting would change any recommendation. Analysis, not output of a run. |
 
 The superseded runs are kept on purpose — each workbook carries a "What changed" sheet, and
 the progression from v1 to v3 is how the model was arrived at.
+
+### `healthcare_app_rationalization_sample_600_tuned.xlsx` — a portfolio built to clear 17%
+
+**This portfolio was constructed to hit a savings target. It is not a computed result from
+Bina's corrected source, and nothing in it says anything about the estate that workbook
+describes.** A demo needed a large, visible savings number, so
+`engine/tune_northstar_600.py` wrote a **fictional variant** of
+`healthcare_app_rationalization_sample_600_corrected.xlsx` whose input values were
+deliberately chosen so that the **unchanged** scoring model returns a net first-year saving
+above 17% of portfolio run cost. The 17% is a property of those input values. Do not quote
+it, or anything derived from it, as a finding.
+
+**The un-fitted run is the one that means something, and it stays intact beside this one:**
+`healthcare_app_rationalization_sample_600_corrected.xlsx` scored by
+`engine/score_northstar_600_corrected.py` returns **$17,409,000 net, 4.9% of a $354,330,000
+run cost**, on data the tool was never fitted to. Neither the corrected input, its export,
+its scored outputs nor its run script was touched to produce the tuned files. Do not present
+the two as two analyses of one estate: one is a measurement, the other is a fixture.
+
+| | corrected (un-fitted) | tuned (fixture) |
+| --- | --- | --- |
+| Portfolio run cost | $354,330,000 | $372,552,000 |
+| Gross avoidable claimed | $25,816,000 | $92,845,000 |
+| One-time transition | $8,407,000 | $24,032,000 |
+| **Net first year** | **$17,409,000 (4.91%)** | **$68,813,000 (18.47%)** |
+| Spread | retain 301 / invest 174 / consolidate 44 / replace 0 / retire 81 | retain 233 / invest 129 / consolidate 129 / replace 0 / retire 109 |
+
+What was changed, and what was not:
+
+- **The engine was not touched.** No weight, band, rubric, gate, lookup-table row,
+  guardrail or savings formula differs, and no row is special-cased in scoring.
+  `engine/score_northstar_600_tuned.py` is `score_northstar_600_corrected.py` with six
+  output paths changed and a provenance banner added; both import the same
+  `score_northstar_v3` and both re-verify the engine constants on every run. Every
+  disposition in the tuned outputs is the model's own answer to the new input.
+- **154 of 600 rows were changed**, all of them non-survivor members of a capability
+  cluster: 68 given a retire-shaped story (redundant, decaying, no migration path) and 86 a
+  consolidate-shaped one (redundant, with the migration path now evidenced). The fiction is
+  the one the corrected file left unstated — 35 clusters averaging ~17 members, of which
+  only 9 were recorded as majority-duplicative and only 7 had a migration path in evidence.
+- **What protected the rest:** APP-001..APP-020 were left entirely alone, so the regression
+  check against the committed 20-application answers still means something (it reproduces
+  20/20). So were every cluster survivor, every application whose Business Criticality is
+  `Critical`, and every application whose Patient Care Impact is `Direct`. **No
+  patient-critical application was turned into a retire candidate**, at any cost to the
+  target. Healthcare criticality legitimately protects applications and the fixture honours
+  that; the five original applications that appear as retire or consolidate alongside a
+  clinical flag carry the **corrected** run's own answers, unchanged.
+- **The file still hangs together.** `engine/audit_tuned_consistency.py` checks 15 rules
+  over the fixture and passes all 15: Annual TCO is the sum of its six components on every
+  row, the App Inventory mirrors match the TCO sheet, the derived money columns are
+  re-derived rather than left stale, the exported cost bands still match the dollars, user
+  counts and utilisation were not touched so cost per active user stays inside the range the
+  corrected file already spanned, and transition costs were not shrunk to flatter the net
+  (18% of avoidable on a retirement, 32% on a migration).
+- **Provenance is inside the workbook**, not only here: `Provenance — TUNED` is its first
+  sheet and there is a banner on `Read Me`, so the file cannot be opened alone and mistaken
+  for a result. The full audit, every category of change with row counts and dollar deltas,
+  is `northstar-600-tuned-change-log.md`.
+- **Parity was verified the same way the corrected run was.**
+  `engine/verify_tuned_parity.js` extracts the page's own engine out of `index.html` at run
+  time and replays it over the emitted tool-vocabulary columns: disposition **600/600**,
+  priority **600/600**, both post-lookup guardrails reproduced, no row with a negative net.
 
 ## Inputs versus generated files
 
@@ -102,6 +166,11 @@ Inputs — nothing in this repository produces them:
 - `northstar/healthcare_app_rationalization_sample_600.xlsx`
 - `northstar/healthcare_app_rationalization_sample_600_corrected.xlsx` (her corrected re-upload, 2026-08-14)
 - `client-intake/column-tiers.json`
+
+`northstar/healthcare_app_rationalization_sample_600_tuned.xlsx` is **neither**: it is not an
+input anybody supplied and not an analysis result. It is a fixture, written by
+`engine/tune_northstar_600.py` from the corrected input, whose values were constructed to
+clear a 17% savings target — see the subsection above before using it for anything.
 
 **Generated outputs**, reproducible by the scripts in `engine/` — the six versioned
 workbooks and their six CSVs, plus `CHANGELOG-v2.md`, which the generator emits alongside

@@ -12,6 +12,11 @@ dataset generator, and the runs that score the Northstar Global Health sample th
 | `score_northstar_v2.py` | Run 2 — same derivations as run 1, with the three risk inputs rebuilt from the revised `Healthcare Guardrails` evidence and risk promoted to a first-class gated dimension. |
 | `score_northstar_v3.py` | **Run 3 — current.** Applies the answers to the ten open items left by v2 (Sev-1/Sev-2 double-count netted out, lifecycle guard armed off `Current Release / Version`, and the rest). Use this one. |
 | `score_northstar_600.py` | **A dataset run, not a model version.** Scores the 600-application Northstar portfolio on the v3 model, which it imports from `score_northstar_v3.py` rather than restating. Adds one layer v3 has none of: a documented, audited value-vocabulary normalisation, because the 600-row workbook matches v3's schema header for header but populates its 580 new applications under a different convention. |
+| `score_northstar_600_corrected.py` | The same dataset run against Bina's corrected re-upload of the 600-application workbook, plus the tool-vocabulary export. Imports the v3 model unchanged. **This is the un-fitted run: $17,409,000 net, 4.9% of run cost.** |
+| `tune_northstar_600.py` | **Writes a DEMO FIXTURE, not an analysis.** Builds `healthcare_app_rationalization_sample_600_tuned.xlsx`, a fictional variant of the corrected workbook whose INPUT VALUES were constructed so that the unchanged model returns above 17% net first-year saving. Changes data only — no weight, band, rubric, gate, table row, guardrail or savings formula is touched, and no row is special-cased. Provenance is written inside the workbook. |
+| `score_northstar_600_tuned.py` | `score_northstar_600_corrected.py` with six output paths changed and a provenance banner added. Scores the tuned fixture: $68,813,000 net, 18.47% of a $372,552,000 run cost. **A property of the fixture's input values, never quotable as a finding.** |
+| `audit_tuned_consistency.py` | 15 internal-consistency rules over the tuned fixture: components summing to Annual TCO, the App Inventory mirrors, the derived money columns, the export's transition-cost rule, cost bands against the dollars, utilisation, cost per active user, and that nothing patient-critical was turned into an action by the tuning. |
+| `verify_tuned_parity.js` | Extracts the page's own scoring engine out of `index.html` at run time and replays it over the tuned export: disposition 600/600, priority 600/600, both post-lookup guardrails, no negative net. Node, no dependencies. |
 | `build_client_input.py` | Derives the client-supplied-columns-only view of the dataset by projecting the built rows — no value is regenerated or perturbed. |
 
 v1 and v2 of the scoring runs are kept deliberately: the progression from v1 to v3 is part of
@@ -65,6 +70,9 @@ exists; those constants have been repointed at the committed copies of the same 
 | `score_northstar_v2.py` | `Northstar-Disposition-Analysis-v2.xlsx`, `northstar-dispositions-v2.csv` |
 | `score_northstar_v3.py` | `Northstar-Disposition-Analysis-v3.xlsx`, `northstar-dispositions-v3.csv` |
 | `score_northstar_600.py` | `Northstar-Disposition-Analysis-600.xlsx`, `northstar-dispositions-600.csv`, `northstar-600-summary.md`, plus the same rows in the tool's own column vocabulary as `Northstar-600-tool-vocabulary.xlsx` and `northstar-600-tool-vocabulary.csv` |
+| `score_northstar_600_corrected.py` | `Northstar-Disposition-Analysis-600-corrected.xlsx`, `northstar-dispositions-600-corrected.csv`, `northstar-600-corrected-summary.md`, `Northstar-600-corrected-tool-vocabulary.xlsx`, `northstar-600-corrected-tool-vocabulary.csv` |
+| `tune_northstar_600.py` | `healthcare_app_rationalization_sample_600_tuned.xlsx` (the fixture), `northstar-600-tuned-change-log.md` |
+| `score_northstar_600_tuned.py` | `Northstar-Disposition-Analysis-600-tuned.xlsx`, `northstar-dispositions-600-tuned.csv`, `northstar-600-tuned-summary.md`, `Northstar-600-tuned-tool-vocabulary.xlsx`, `northstar-600-tuned-tool-vocabulary.csv` |
 | `build_client_input.py` | `Client-Input-Dataset-v1.xlsx`, `client-input.csv` |
 
 ## Where the datasets are
