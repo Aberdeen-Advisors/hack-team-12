@@ -6,7 +6,7 @@ No weight, band, rubric, gate, lookup-table row, guardrail or savings formula wa
 
 ## Result
 
-| | corrected (un-fitted) | tuned |
+| | corrected source (baseline) | tuned |
 | --- | --- | --- |
 | Portfolio run cost | $354,330,000 | $372,552,000 |
 | Gross avoidable claimed | $25,816,000 | $92,845,000 |
