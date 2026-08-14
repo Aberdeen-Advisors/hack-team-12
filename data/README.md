@@ -85,6 +85,7 @@ Outputs — produced by running those inputs through the engine:
 | `Northstar-Disposition-Analysis-v3.xlsx` + `northstar-dispositions-v3.csv` | **Current** for the 20-application sample. Run 3. |
 | `Northstar-Disposition-Analysis-600.xlsx` + `northstar-dispositions-600.csv` + `northstar-600-summary.md` | **Current** for the 600-application portfolio. Same v3 model, imported unchanged; the run reproduces every one of the 20 shared applications' v3 dispositions. |
 | `Northstar-600-tool-vocabulary.xlsx` + `northstar-600-tool-vocabulary.csv` | The same 600 rows re-expressed in the tool's own snake_case column vocabulary, so the portfolio can be loaded by the wireframe's in-browser Upload and Analyze, which does not read the Northstar layout. A translation, not a second analysis: 78 of the 125 tool columns are populated and the other 47 are deliberately empty, each named on the file's `Column coverage` sheet. Replaying the tool's own dimension arithmetic and both post-lookup guardrails over these columns reproduces the Python run's disposition on all 600 rows. |
+| `Northstar-600-corrected-tool-vocabulary.csv` + `Northstar-600-corrected-tool-vocabulary.xlsx` (plus `Northstar-Disposition-Analysis-600-corrected.xlsx`, `northstar-dispositions-600-corrected.csv`, `northstar-600-corrected-summary.md`) | The 600-application portfolio scored from Bina's **corrected** input workbook, `healthcare_app_rationalization_sample_600_corrected.xlsx`, which she uploaded on 2026-08-14 to replace the earlier file. Same v3 model, imported unchanged; written by `engine/score_northstar_600_corrected.py`. Not a supersession of the row above — a different input. Which of the two is the file the wireframe should demo from is **not settled here**; pick deliberately. The corrected input renames 580 records onto real commercial products and moves their cost mix, so the headline money differs: gross $25,816,000, transition $8,407,000, net first year $17,409,000, spread retain 301 / invest 174 / retire 81 / consolidate 44 / replace 0. Two defects in the earlier export are fixed here: transition-cost columns are empty (never zero) on rows whose disposition removes no run-rate spend, and the contract-urgency columns are derived. Replaying the tool's own dimension arithmetic and both post-lookup guardrails over these columns reproduces the Python run's disposition **and** priority on all 600 rows. |
 | `Northstar-Disposition-Analysis-v2.xlsx` + `northstar-dispositions-v2.csv` | **Superseded.** Run 2, which promoted risk to a gated dimension. |
 | `Northstar-Disposition-Analysis-v1.xlsx` + `northstar-dispositions.csv` | **Superseded.** Run 1, the first pass. |
 | `scoring-model-review.md` | A review of the scoring weights: what they are, and whether re-weighting would change any recommendation. Analysis, not output of a run. |
@@ -98,6 +99,8 @@ Inputs — nothing in this repository produces them:
 
 - `northstar/healthcare_app_rationalization_sample_20.xlsx`
 - `northstar/healthcare_app_rationalization_sample_20-with-risk.xlsx`
+- `northstar/healthcare_app_rationalization_sample_600.xlsx`
+- `northstar/healthcare_app_rationalization_sample_600_corrected.xlsx` (her corrected re-upload, 2026-08-14)
 - `client-intake/column-tiers.json`
 
 **Generated outputs**, reproducible by the scripts in `engine/` — the six versioned
