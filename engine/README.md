@@ -11,6 +11,7 @@ dataset generator, and the runs that score the Northstar Global Health sample th
 | `score_northstar.py` | Run 1 — scores the separately-built 20-application Northstar sample through the engine. |
 | `score_northstar_v2.py` | Run 2 — same derivations as run 1, with the three risk inputs rebuilt from the revised `Healthcare Guardrails` evidence and risk promoted to a first-class gated dimension. |
 | `score_northstar_v3.py` | **Run 3 — current.** Applies the answers to the ten open items left by v2 (Sev-1/Sev-2 double-count netted out, lifecycle guard armed off `Current Release / Version`, and the rest). Use this one. |
+| `score_northstar_600.py` | **A dataset run, not a model version.** Scores the 600-application Northstar portfolio on the v3 model, which it imports from `score_northstar_v3.py` rather than restating. Adds one layer v3 has none of: a documented, audited value-vocabulary normalisation, because the 600-row workbook matches v3's schema header for header but populates its 580 new applications under a different convention. |
 | `build_client_input.py` | Derives the client-supplied-columns-only view of the dataset by projecting the built rows — no value is regenerated or perturbed. |
 
 v1 and v2 of the scoring runs are kept deliberately: the progression from v1 to v3 is part of
@@ -63,6 +64,7 @@ exists; those constants have been repointed at the committed copies of the same 
 | `score_northstar.py` | `Northstar-Disposition-Analysis-v1.xlsx`, `northstar-dispositions.csv` |
 | `score_northstar_v2.py` | `Northstar-Disposition-Analysis-v2.xlsx`, `northstar-dispositions-v2.csv` |
 | `score_northstar_v3.py` | `Northstar-Disposition-Analysis-v3.xlsx`, `northstar-dispositions-v3.csv` |
+| `score_northstar_600.py` | `Northstar-Disposition-Analysis-600.xlsx`, `northstar-dispositions-600.csv`, `northstar-600-summary.md` |
 | `build_client_input.py` | `Client-Input-Dataset-v1.xlsx`, `client-input.csv` |
 
 ## Where the datasets are
