@@ -333,13 +333,15 @@ svg.lucide {
       height: 100%;
     }
 
+    /* Both bars start empty: nothing on this page carries a width until an analysis
+     * has produced one. renderSavings sets these inline from the computed figures. */
     #apprat-wireframe .progress-target {
-      width: 75%;
+      width: 0;
       background: var(--ab-blue);
     }
 
     #apprat-wireframe .progress-identified {
-      width: 83%;
+      width: 0;
       background: var(--ab-teal);
     }
 
@@ -366,6 +368,25 @@ svg.lucide {
       margin: 0.65rem 0 0;
     }
 
+    /* The label an uploaded file carries about its own origin, shown verbatim beside
+     * the results so the reader learns what the input is from the page rather than
+     * from whoever happens to be presenting it. */
+    #apprat-wireframe .provenance-note {
+      margin: 0.65rem 0 0;
+      padding: 0.5rem 0.65rem;
+      border-left: 3px solid var(--ab-gold);
+      border-radius: 0 var(--radius, 0.5rem) var(--radius, 0.5rem) 0;
+      background: color-mix(in srgb, var(--card) 88%, var(--ab-gold));
+    }
+
+    #apprat-wireframe .provenance-note[hidden] { display: none; }
+
+    #apprat-wireframe .provenance-source {
+      display: block;
+      margin-top: 0.2rem;
+      font-style: italic;
+    }
+
     #apprat-wireframe .overview-grid {
       display: grid;
       grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
@@ -384,12 +405,14 @@ svg.lucide {
       background: var(--muted);
     }
 
-    #apprat-wireframe .mix-invest { width: 14.6%; background: var(--ab-jade); }
-    #apprat-wireframe .mix-retain { width: 26.7%; background: var(--ab-blue); }
-    #apprat-wireframe .mix-consolidate { width: 19.7%; background: var(--ab-teal); }
-    #apprat-wireframe .mix-replace { width: 7%; background: var(--ab-sky); }
-    #apprat-wireframe .mix-retire { width: 16%; background: var(--ab-jasper); }
-    #apprat-wireframe .mix-validate { width: 16%; background: var(--ab-gold); }
+    /* Zero-width until renderMix sets each segment from a real count, so the bar
+     * shows its empty track rather than a made-up spread. */
+    #apprat-wireframe .mix-invest { width: 0; background: var(--ab-jade); }
+    #apprat-wireframe .mix-retain { width: 0; background: var(--ab-blue); }
+    #apprat-wireframe .mix-consolidate { width: 0; background: var(--ab-teal); }
+    #apprat-wireframe .mix-replace { width: 0; background: var(--ab-sky); }
+    #apprat-wireframe .mix-retire { width: 0; background: var(--ab-jasper); }
+    #apprat-wireframe .mix-validate { width: 0; background: var(--ab-gold); }
 
     #apprat-wireframe .legend-grid {
       display: grid;
@@ -736,7 +759,7 @@ svg.lucide {
       </div>
     </div>
     <div class="header-actions">
-      <span class="viz-badge" data-portfolio-badge>Sample portfolio · 600 tools</span>
+      <span class="viz-badge" data-portfolio-badge>No portfolio analyzed yet</span>
       <input type="file" accept=".xlsx,.csv" class="visually-hidden" id="apprat-file-input" data-file-input
              aria-label="Choose an application inventory file, Excel workbook or CSV">
       <button type="button" class="btn" data-action="upload"><i data-lucide="upload" aria-hidden="true"></i> Upload inventory</button>
@@ -747,8 +770,8 @@ svg.lucide {
   <div class="data-banner" data-data-banner role="status" aria-live="polite">
     <i class="data-banner-icon" data-lucide="circle-alert" aria-hidden="true"></i>
     <div>
-      <span class="data-banner-title" data-banner-title>Illustrative sample content — not computed from any file</span>
-      <p class="data-banner-detail text-small text-muted" data-banner-detail>Every figure below is placeholder copy describing a fictional 600-application portfolio. Choose <strong>Upload inventory</strong> to load your own inventory as an Excel workbook (.xlsx) or a CSV, then <strong>Analyze portfolio</strong> to replace these numbers with real ones.</p>
+      <span class="data-banner-title" data-banner-title>No analysis yet — every figure below is blank until a file is scored</span>
+      <p class="data-banner-detail text-small text-muted" data-banner-detail>This page shows no numbers until it computes them, so nothing here can be mistaken for a result. Choose <strong>Upload inventory</strong> to load an application inventory as an Excel workbook (.xlsx) or a CSV, then <strong>Analyze portfolio</strong>. The file is parsed and scored in this browser and is never uploaded anywhere. <strong>The scoring in this page reproduces the Python engine's output value-for-value</strong>, field for field, on a reference portfolio — the figures you get here are the engine's own. The demo inventory in this repository is <code>data/northstar/northstar-600-tuned-tool-vocabulary.csv</code>, with a matching <code>.xlsx</code> beside it.</p>
     </div>
   </div>
 
@@ -762,52 +785,53 @@ svg.lucide {
     <section class="view is-active" data-panel="overview">
       <div class="page-intro">
         <div>
-          <h2>Portfolio decision overview<span class="sample-flag" data-sample-flag>Sample</span></h2>
+          <h2>Portfolio decision overview<span class="sample-flag" data-sample-flag>Not analyzed</span></h2>
           <p class="text-muted">Explainable recommendations that protect critical business operations.</p>
         </div>
-        <span class="status-badge" data-critical-badge><i data-lucide="shield-check" aria-hidden="true"></i> 74 critical apps protected</span>
+        <span class="status-badge" data-critical-badge><i data-lucide="shield-check" aria-hidden="true"></i> No applications scored</span>
       </div>
 
       <div class="kpi-grid">
         <div class="card viz-stat">
-          <div class="text-muted">Annual technology spend<span class="scope-flag">Portfolio total</span><span class="sample-flag" data-sample-flag>Sample</span></div>
-          <div class="viz-stat-value numeric" data-kpi="spend">$42.8M</div>
-          <div class="text-small text-muted" data-kpi-sub="spend">600 applications, SaaS and AI tools</div>
+          <div class="text-muted">Annual technology spend<span class="scope-flag">Portfolio total</span><span class="sample-flag" data-sample-flag>Not analyzed</span></div>
+          <div class="viz-stat-value numeric" data-kpi="spend">—</div>
+          <div class="text-small text-muted" data-kpi-sub="spend">Recurring annual cost of every application in the file you analyze.</div>
         </div>
         <div class="card viz-stat">
-          <div class="text-muted">CIO savings target<span class="scope-flag">Portfolio total</span><span class="sample-flag" data-sample-flag>Sample</span></div>
-          <div class="viz-stat-value numeric" data-kpi="target">$6.42M</div>
-          <div class="text-small text-muted" data-kpi-sub="target">15.0% of annual spend</div>
+          <div class="text-muted">CIO savings target<span class="scope-flag">Portfolio total</span><span class="sample-flag" data-sample-flag>Not analyzed</span></div>
+          <div class="viz-stat-value numeric" data-kpi="target">—</div>
+          <div class="text-small text-muted" data-kpi-sub="target">15.0% of annual spend.</div>
         </div>
         <div class="card viz-stat">
-          <div class="text-muted" data-kpi-label="saving">Safe savings identified<span class="scope-flag">Portfolio total</span><span class="sample-flag" data-sample-flag>Sample</span></div>
-          <div class="viz-stat-value target-value numeric" data-kpi="saving">$7.10M</div>
-          <div class="text-small text-muted" data-kpi-sub="saving">16.6% · high-confidence actions</div>
+          <div class="text-muted" data-kpi-label="saving">Net annual saving identified<span class="scope-flag">Portfolio total</span><span class="sample-flag" data-sample-flag>Not analyzed</span></div>
+          <div class="viz-stat-value target-value numeric" data-kpi="saving">—</div>
+          <div class="text-small text-muted" data-kpi-sub="saving">Avoidable annual cost of the retire, consolidate and replace decisions, net of successor, transition and archival costs.</div>
         </div>
       </div>
 
       <section class="card section-card" aria-label="Savings progress">
         <div class="progress-labels">
-          <strong data-progress-heading>Safe savings progress</strong>
+          <strong data-progress-heading>Savings against the 15% target</strong>
           <span class="text-small">Common scale: 20% of annual spend</span>
         </div>
-        <div class="savings-comparison" role="img" data-savings-comparison aria-label="CIO target is 6.42 million dollars or 15 percent of spend. Safe savings identified are 7.10 million dollars or 16.6 percent of spend.">
+        <div class="savings-comparison" role="img" data-savings-comparison aria-label="Both bars are empty: no file has been analyzed, so there is no target and no saving to show.">
           <div class="savings-row">
-            <div class="savings-label"><span>CIO target</span><strong class="numeric" data-savings-label="target">$6.42M · 15.0%</strong></div>
+            <div class="savings-label"><span>CIO target</span><strong class="numeric" data-savings-label="target">—</strong></div>
             <div class="progress-track"><div class="progress-target" data-progress="target"></div></div>
           </div>
           <div class="savings-row">
-            <div class="savings-label"><span data-savings-row-label="identified">Safe savings identified</span><strong class="numeric" data-savings-label="identified">$7.10M · 16.6%</strong></div>
+            <div class="savings-label"><span data-savings-row-label="identified">Net saving identified</span><strong class="numeric" data-savings-label="identified">—</strong></div>
             <div class="progress-track"><div class="progress-identified" data-progress="identified"></div></div>
           </div>
         </div>
-        <p class="savings-note text-small text-muted" data-savings-note><strong>Safe savings</strong> are avoidable annual savings from high-confidence actions that pass critical-operation and dependency guardrails. One-time transition costs are tracked separately.</p>
+        <p class="savings-note text-small text-muted" data-savings-note><strong>Net annual saving</strong> is the gross avoidable annual cost of every retire, consolidate and replace decision, less any successor's running cost, amortised transition cost and residual archival cost. One-time costs are amortised, never ignored.</p>
+        <p class="provenance-note text-small text-muted" data-provenance-note hidden></p>
       </section>
 
       <div class="overview-grid">
         <section class="card section-card">
           <h3 class="section-title">Recommended decision mix</h3>
-          <div class="mix-bar" role="img" data-mix-bar aria-label="88 invest, 160 retain, 118 consolidate, 42 replace, 96 retire, and 96 need validation">
+          <div class="mix-bar" role="img" data-mix-bar aria-label="The bar is empty: no file has been analyzed, so there are no decisions to count.">
             <div class="mix-invest" data-mix="invest"></div>
             <div class="mix-retain" data-mix="retain"></div>
             <div class="mix-consolidate" data-mix="consolidate"></div>
@@ -816,12 +840,12 @@ svg.lucide {
             <div class="mix-validate" data-mix="validate"></div>
           </div>
           <div class="legend-grid text-small">
-            <div class="legend-item"><span class="legend-dot mix-invest"></span><span data-legend="invest">Invest · 88</span></div>
-            <div class="legend-item"><span class="legend-dot mix-retain"></span><span data-legend="retain">Retain · 160</span></div>
-            <div class="legend-item"><span class="legend-dot mix-consolidate"></span><span data-legend="consolidate">Consolidate · 118</span></div>
-            <div class="legend-item"><span class="legend-dot mix-replace"></span><span data-legend="replace">Replace · 42</span></div>
-            <div class="legend-item"><span class="legend-dot mix-retire"></span><span data-legend="retire">Retire · 96</span></div>
-            <div class="legend-item" data-legend-item="validate"><span class="legend-dot mix-validate"></span><span data-legend="validate">Needs validation · 96</span></div>
+            <div class="legend-item"><span class="legend-dot mix-invest"></span><span data-legend="invest">Invest</span></div>
+            <div class="legend-item"><span class="legend-dot mix-retain"></span><span data-legend="retain">Retain</span></div>
+            <div class="legend-item"><span class="legend-dot mix-consolidate"></span><span data-legend="consolidate">Consolidate</span></div>
+            <div class="legend-item"><span class="legend-dot mix-replace"></span><span data-legend="replace">Replace</span></div>
+            <div class="legend-item"><span class="legend-dot mix-retire"></span><span data-legend="retire">Retire</span></div>
+            <div class="legend-item" data-legend-item="validate"><span class="legend-dot mix-validate"></span><span data-legend="validate">Flagged for validation</span></div>
           </div>
           <p class="savings-note text-small text-muted" data-mix-note><strong>Retain</strong> means keep as-is; <strong>Invest</strong> means keep and strengthen because it is strategic or needs improvement.</p>
         </section>
@@ -829,37 +853,17 @@ svg.lucide {
         <section class="card section-card">
           <h3 class="section-title">Critical-operation guardrails</h3>
           <ul class="guardrail-list text-small">
-            <li class="guardrail-item"><i class="guardrail-icon" data-lucide="shield-check" aria-hidden="true"></i><span data-guardrail="capabilities"><strong>0 critical capabilities</strong> left without a primary application.</span></li>
-            <li class="guardrail-item"><i class="guardrail-icon" data-lucide="git-branch" aria-hidden="true"></i><span data-guardrail="blocked"><strong>12 retirements blocked</strong> by unresolved downstream dependencies.</span></li>
-            <li class="guardrail-item"><i class="guardrail-icon" data-lucide="circle-alert" aria-hidden="true"></i><span data-guardrail="held"><strong>96 tools held</strong> for missing usage, cost or risk evidence.</span></li>
+            <li class="guardrail-item"><i class="guardrail-icon" data-lucide="shield-check" aria-hidden="true"></i><span data-guardrail="capabilities"><strong>Capability cover</strong> is checked after the decisions are made: no business capability may be left without an application that keeps it.</span></li>
+            <li class="guardrail-item"><i class="guardrail-icon" data-lucide="git-branch" aria-hidden="true"></i><span data-guardrail="blocked"><strong>Retire and replace decisions</strong> are held back where a lifecycle guard or a live retention obligation stands in the way.</span></li>
+            <li class="guardrail-item"><i class="guardrail-icon" data-lucide="circle-alert" aria-hidden="true"></i><span data-guardrail="held"><strong>Applications with incomplete evidence</strong> are flagged rather than acted on, and the page names what is missing.</span></li>
           </ul>
         </section>
       </div>
 
       <section class="card section-card">
-        <h3 class="section-title" data-cluster-heading>Highest-value redundancy clusters</h3>
+        <h3 class="section-title" data-cluster-heading>Redundancy clusters</h3>
         <div class="cluster-list" data-cluster-list>
-          <div class="cluster-row">
-            <div class="cluster-title"><span class="cluster-count">8</span><span><strong>Enterprise collaboration</strong><br><span class="text-small text-muted">Microsoft 365, Slack, Webex and niche messaging tools</span></span></div>
-            <div class="cluster-metric"><div class="metric-label text-small">Spend</div><div class="cluster-value numeric">$3.8M</div></div>
-            <div class="cluster-metric"><div class="metric-label text-small">Savings</div><div class="cluster-value numeric">$1.2M</div></div>
-            <div class="cluster-metric"><div class="metric-label text-small">Risk</div><div><span class="status-badge">Guarded</span></div></div>
-            <button type="button" class="btn btn-ghost table-row-action" data-cluster="collaboration">Review</button>
-          </div>
-          <div class="cluster-row">
-            <div class="cluster-title"><span class="cluster-count">6</span><span><strong>AI meeting assistants</strong><br><span class="text-small text-muted">Recording, transcription and action-item agents</span></span></div>
-            <div class="cluster-metric"><div class="metric-label text-small">Spend</div><div class="cluster-value numeric">$1.4M</div></div>
-            <div class="cluster-metric"><div class="metric-label text-small">Savings</div><div class="cluster-value numeric">$0.7M</div></div>
-            <div class="cluster-metric"><div class="metric-label text-small">Risk</div><div><span class="status-badge">Low</span></div></div>
-            <button type="button" class="btn btn-ghost table-row-action" data-cluster="ai-meetings">Review</button>
-          </div>
-          <div class="cluster-row">
-            <div class="cluster-title"><span class="cluster-count">5</span><span><strong>Contract management</strong><br><span class="text-small text-muted">Enterprise CLM and departmental SaaS products</span></span></div>
-            <div class="cluster-metric"><div class="metric-label text-small">Spend</div><div class="cluster-value numeric">$2.2M</div></div>
-            <div class="cluster-metric"><div class="metric-label text-small">Savings</div><div class="cluster-value numeric">$0.6M</div></div>
-            <div class="cluster-metric"><div class="metric-label text-small">Risk</div><div><span class="status-badge status-validate">Validate</span></div></div>
-            <button type="button" class="btn btn-ghost table-row-action" data-cluster="contracts">Review</button>
-          </div>
+          <p class="text-small text-muted">Clusters appear here once a file is analyzed. They are read from the file's own cluster columns (<code>overlap_cluster_id</code> and <code>cluster_role</code>), which say which applications cover the same capability and which one keeps it; the spend and saving on each row are summed from the applications in it.</p>
         </div>
       </section>
     </section>
@@ -867,7 +871,7 @@ svg.lucide {
     <section class="view" data-panel="workbench">
       <div class="page-intro">
         <div>
-          <h2>Rationalization workbench<span class="sample-flag" data-sample-flag>Sample</span></h2>
+          <h2>Rationalization workbench<span class="sample-flag" data-sample-flag>Not analyzed</span></h2>
           <p class="text-muted">Move from portfolio evidence to an auditable recommendation.</p>
         </div>
         <button type="button" class="btn"><i data-lucide="download" aria-hidden="true"></i> Export decisions</button>
@@ -913,19 +917,14 @@ svg.lucide {
       <div class="workbench-layout">
         <section class="card section-card">
           <div class="table-meta" aria-live="polite">
-            <span class="table-meta-count text-small" data-table-count>Showing 5 of 5 applications</span>
+            <span class="table-meta-count text-small" data-table-count>Showing 0 of 0 applications</span>
             <span class="text-small text-muted" data-table-scope>Filters scope this table only; the portfolio figures above stay whole.</span>
           </div>
           <div class="table-responsive">
             <table class="table table-sm">
               <thead><tr><th>Application</th><th>Capability</th><th>Decision</th><th class="text-end" data-tooltip="Recurring annual run-rate spend that disappears after the action is completed; excludes one-time transition costs.">Avoidable annual savings</th><th>Confidence</th></tr></thead>
               <tbody data-app-table>
-                <tr data-app="slack" data-capability="Enterprise collaboration" data-decision="consolidate" data-critical=""><td><button type="button" class="btn btn-ghost table-row-action" data-select-app="slack">Slack Enterprise</button></td><td>Enterprise collaboration</td><td><span class="status-badge">Consolidate</span></td><td class="text-end numeric">$820K</td><td>High</td></tr>
-                <tr data-app="notetaker" data-capability="Meeting assistance" data-decision="retire" data-critical=""><td><button type="button" class="btn btn-ghost table-row-action" data-select-app="notetaker">AI NoteTaker Pro</button></td><td>Meeting assistance</td><td><span class="status-badge status-retire">Retire</span></td><td class="text-end numeric">$310K</td><td>High</td></tr>
-                <tr data-app="legacy-clm" data-capability="Contract management" data-decision="needs validation" data-critical=""><td><button type="button" class="btn btn-ghost table-row-action" data-select-app="legacy-clm">Legacy CLM</button></td><td>Contract management</td><td><span class="status-badge status-validate">Needs validation</span></td><td class="text-end numeric">—</td><td>Low</td></tr>
-                <tr data-app="patient-flow" data-capability="Clinical operations" data-decision="invest" data-critical=""><td><button type="button" class="btn btn-ghost table-row-action" data-select-app="patient-flow">Patient Flow Hub</button></td><td>Clinical operations</td><td><span class="status-badge status-invest">Invest</span></td><td class="text-end numeric">$0</td><td>High</td></tr>
-                <tr data-app="workday" data-capability="Human capital management" data-decision="retain" data-critical=""><td><button type="button" class="btn btn-ghost table-row-action" data-select-app="workday">Workday HCM</button></td><td>Human capital management</td><td><span class="status-badge status-retain">Retain</span></td><td class="text-end numeric">$0</td><td>High</td></tr>
-                <tr data-table-empty hidden><td colspan="5" class="table-empty"><p data-table-empty-text>No application matches these filters.</p><button type="button" class="btn btn-ghost" data-filter-clear>Clear filters</button></td></tr>
+                <tr data-table-empty><td colspan="5" class="table-empty"><p data-table-empty-text>There are no applications to show yet. Upload an inventory and press Analyze portfolio.</p><button type="button" class="btn btn-ghost" data-filter-clear>Clear filters</button></td></tr>
               </tbody>
             </table>
           </div>
@@ -942,7 +941,7 @@ svg.lucide {
     <section class="view" data-panel="detail">
       <div class="page-intro">
         <div>
-          <h2>Decision detail<span class="sample-flag" data-sample-flag>Sample</span></h2>
+          <h2>Decision detail<span class="sample-flag" data-sample-flag>Not analyzed</span></h2>
           <p class="text-muted">A defensible recommendation with target, rationale, guardrails and savings.</p>
         </div>
         <button type="button" class="btn"><i data-lucide="file-text" aria-hidden="true"></i> Generate executive readout</button>
@@ -951,29 +950,28 @@ svg.lucide {
       <section class="card section-card">
         <div class="detail-heading">
           <div>
-            <div class="text-small text-muted" data-detail="meta">APP-0148 · Enterprise collaboration</div>
-            <h3 data-detail="name">Slack Enterprise</h3>
+            <div class="text-small text-muted" data-detail="meta">No application selected</div>
+            <h3 data-detail="name">—</h3>
           </div>
-          <span class="status-badge" data-detail="badge">Consolidate into Microsoft Teams</span>
+          <span class="status-badge" data-detail="badge">Awaiting analysis</span>
         </div>
 
         <div class="detail-grid" data-detail="grid">
-          <div><div class="field-label text-small">Annual run-rate cost</div><strong class="numeric">$1.05M</strong></div>
-          <div><div class="field-label text-small" data-tooltip="Recurring annual run-rate spend eliminated after consolidation; one-time migration costs are tracked separately.">Avoidable annual savings</div><strong class="numeric target-value">$820K</strong></div>
-          <div><div class="field-label text-small">90-day active usage</div><strong>38% of licensed users</strong></div>
-          <div><div class="field-label text-small">Recommendation confidence</div><strong>High · 92%</strong></div>
+          <div><div class="field-label text-small">Annual run-rate cost</div><strong class="numeric">—</strong></div>
+          <div><div class="field-label text-small" data-tooltip="Recurring annual run-rate spend that disappears once the action is completed; one-time transition costs are tracked separately.">Net annual saving</div><strong class="numeric target-value">—</strong></div>
+          <div><div class="field-label text-small">Priority</div><strong>—</strong></div>
+          <div><div class="field-label text-small">Recommendation confidence</div><strong>—</strong></div>
         </div>
 
         <div class="rationale-box">
           <strong>Why this decision</strong>
-          <p data-detail="rationale">Slack and Microsoft Teams support the same enterprise collaboration capability for substantially the same user population. Teams has broader adoption, lower incremental cost and meets the required security controls.</p>
+          <p data-detail="rationale">Analyze an inventory, then pick a row in the workbench. This panel then shows that application's own decision: the four dimension scores with the gate each one passed or failed, the pattern the scores make, the priority, the confidence and a written rationale — all of it computed from the file, never written in advance.</p>
         </div>
 
         <div class="evidence-list" data-detail="evidence">
-          <div class="evidence-row"><i class="evidence-check" data-lucide="circle-check" aria-hidden="true"></i><span><strong>Capability coverage:</strong> Teams covers messaging, channels, meetings and external collaboration.</span></div>
-          <div class="evidence-row"><i class="evidence-check" data-lucide="circle-check" aria-hidden="true"></i><span><strong>Critical operations:</strong> No unique critical capability depends exclusively on Slack.</span></div>
-          <div class="evidence-row"><i class="evidence-warning" data-lucide="triangle-alert" aria-hidden="true"></i><span><strong>Dependency precondition:</strong> Migrate 14 workflow integrations and archive regulated channel history before contract exit.</span></div>
-          <div class="evidence-row"><i class="evidence-check" data-lucide="circle-check" aria-hidden="true"></i><span><strong>Contract timing:</strong> Complete migration before the January 31 renewal date.</span></div>
+          <div class="evidence-row"><i class="evidence-check" data-lucide="circle-check" aria-hidden="true"></i><span><strong>Value, health, cost and risk</strong> are each scored as a weighted mean of the inputs the file actually populates, and each is gated at 3.0.</span></div>
+          <div class="evidence-row"><i class="evidence-check" data-lucide="circle-check" aria-hidden="true"></i><span><strong>Capability cover and retention obligations</strong> are checked before any retire or replace is allowed to stand.</span></div>
+          <div class="evidence-row"><i class="evidence-warning" data-lucide="triangle-alert" aria-hidden="true"></i><span><strong>A dimension with no populated inputs</strong> gates as a fail, and the page says so on the row rather than reporting a decision as though the evidence were there.</span></div>
         </div>
       </section>
     </section>
@@ -992,8 +990,10 @@ svg.lucide {
      *   2. a port of engine/generate_dataset.py's scoring core
      *   3. the UI wiring for Upload inventory and Analyze portfolio
      *
-     * Part 2 is a faithful port, verified row by row against the Python
-     * engine's own output on data/synthetic-portfolio/applications-v2.csv.
+     * Part 2 is a faithful port: the scoring done here reproduces the Python
+     * engine's output value-for-value, field for field, on a reference portfolio
+     * — verified row by row in a real browser by driving the file input and
+     * scraping the rendered page, not by unit-testing the port in isolation.
      * See docs/wireframe-README.md for the measured parity result.
      * ====================================================================== */
     (function () {
@@ -2794,10 +2794,10 @@ svg.lucide {
       var bannerDetail = root.querySelector("[data-banner-detail]");
 
       /* Everything the page knows. `mode` is the honesty switch: until an analysis
-       * has run the figures on the page are the shipped sample copy and are labelled
-       * as such. */
+       * has run there are no figures on the page at all — every headline reads "—"
+       * and carries a "Not analyzed" pill — so nothing here can be read as a result. */
       var state = {
-        mode: "sample",          /* "sample" | "computed" */
+        mode: "sample",          /* "sample" (nothing computed yet) | "computed" */
         file: null,              /* the loaded file, once it has usable columns */
         rejected: null,          /* { title, detail } for a file we could not use */
         analysis: null,
@@ -2870,14 +2870,15 @@ svg.lucide {
         if (bannerDetail) bannerDetail.innerHTML = detailHtml || "";
       }
 
-      /* The little "Sample" pills next to every figure. */
+      /* The little pill next to every figure: "Not analyzed" while the page holds no
+       * numbers, "Computed" once every figure beside it came out of a scored file. */
       function setSampleFlags(mode) {
         root.querySelectorAll("[data-sample-flag]").forEach(function (el) {
           if (mode === "computed") {
             el.textContent = "Computed";
             el.classList.add("is-computed");
           } else {
-            el.textContent = "Sample";
+            el.textContent = "Not analyzed";
             el.classList.remove("is-computed");
           }
         });
@@ -3084,6 +3085,55 @@ svg.lucide {
                 + plural(constrained.length, "decision") + " (" + esc(constrained.join(", ")) + ")."
               : ".");
         }
+      }
+
+      /* ------------------------------------------------------------------ *
+       * The label a file carries about itself
+       *
+       * An inventory may declare its own origin in a `data_source` column: a demo
+       * fixture says it is one, an extract from a real estate says where it came
+       * from. That is the single most important thing to know about a set of
+       * results, and in the files this tool is given it sits in column 123 of 126
+       * where no reader will ever meet it. So it is quoted beside the results
+       * verbatim, rather than left to whoever happens to be presenting to mention.
+       * ------------------------------------------------------------------ */
+      function renderProvenance(a) {
+        var el = root.querySelector("[data-provenance-note]");
+        if (!el) return;
+
+        /* Distinct labels, in the order the rows first state them. */
+        var order = [];
+        var counts = {};
+        a.rows.forEach(function (r) {
+          var label = arText(r.data_source);
+          if (!label) return;
+          if (!(label in counts)) { counts[label] = 0; order.push(label); }
+          counts[label] += 1;
+        });
+
+        /* No label in the file: say nothing rather than invent a reassurance. */
+        if (!order.length) {
+          el.hidden = true;
+          el.innerHTML = "";
+          return;
+        }
+
+        var labelled = order.reduce(function (n, k) { return n + counts[k]; }, 0);
+        var total = a.rows.length;
+        var scope = labelled === total
+          ? "Every row of this file carries a <code>data_source</code> label"
+          : labelled + " of " + total + " " + plural(total, "row") + " in this file carry a "
+            + "<code>data_source</code> label";
+
+        el.innerHTML = "<strong>What this file says about itself.</strong> " + scope
+          + (order.length === 1
+            ? ", quoted here exactly as it is written:"
+            : " across " + order.length + " different labels"
+              + (order.length > 3 ? "; the first three read" : ", reading") + ":")
+          + order.slice(0, 3).map(function (k) {
+            return '<span class="provenance-source">&ldquo;' + esc(k) + '&rdquo;</span>';
+          }).join("");
+        el.hidden = false;
       }
 
       function renderMix(a) {
@@ -3352,9 +3402,13 @@ svg.lucide {
             sel.disabled = true;
             sel.value = "";
             if (hint) {
-              hint.textContent = facet === "capability"
-                ? "No capability column in this data, so this filter is off."
-                : "No process-centrality column in this data, so this filter is off.";
+              /* Before an analysis there is no data to be missing a column, so say
+               * that rather than blaming a file nobody has chosen. */
+              hint.textContent = rows.length === 0
+                ? "Available once an inventory is analyzed."
+                : (facet === "capability"
+                  ? "No capability column in this data, so this filter is off."
+                  : "No process-centrality column in this data, so this filter is off.");
             }
           }
         });
@@ -3576,8 +3630,7 @@ svg.lucide {
             var app = state.detailData[key];
             if (!app) return;
             state.selected = key;
-            if (state.mode === "computed") renderInlineDetail(app);
-            else renderSampleInlineDetail(app);
+            renderInlineDetail(app);
           });
         });
       }
@@ -3601,32 +3654,6 @@ svg.lucide {
         });
       }
 
-      /* The shipped sample rows keep their original behaviour before an upload. */
-      var SAMPLE_DETAIL = {
-        slack: { title: "Slack Enterprise", decision: "Consolidate", target: "Microsoft Teams", savings: "$820K", reason: "Same capability and user population; Teams has broader adoption and lower incremental cost." },
-        notetaker: { title: "AI NoteTaker Pro", decision: "Retire", target: "Microsoft Teams transcription", savings: "$310K", reason: "Low usage and fully replaceable meeting-transcription capability with no critical dependency." },
-        "legacy-clm": { title: "Legacy CLM", decision: "Needs validation", target: "Pending evidence", savings: "Not committed", reason: "Contract exit date and two legal-system dependencies are unresolved." },
-        "patient-flow": { title: "Patient Flow Hub", decision: "Invest", target: "Retain and modernize", savings: "$0", reason: "Primary support for a critical clinical operation with high usage and no viable replacement." },
-        workday: { title: "Workday HCM", decision: "Retain", target: "Keep as-is", savings: "$0", reason: "Healthy cost, usage and risk profile with no stronger consolidation target." }
-      };
-
-      function renderSampleInlineDetail(app) {
-        var panel = root.querySelector("#inline-detail");
-        if (!panel) return;
-        panel.className = "";
-        panel.innerHTML =
-          '<div class="detail-heading"><div><div class="text-small text-muted">Sample application — not from a file</div><h3>' + esc(app.title) + '</h3></div></div>'
-          + '<div class="detail-grid"><div><div class="field-label text-small">Decision</div><strong>' + esc(app.decision) + '</strong></div>'
-          + '<div><div class="field-label text-small">Target</div><strong>' + esc(app.target) + '</strong></div>'
-          + '<div><div class="field-label text-small">Savings</div><strong class="numeric">' + esc(app.savings) + '</strong></div>'
-          + '<div><div class="field-label text-small">Confidence</div><strong>' + (app.decision === "Needs validation" ? "Low" : "High") + '</strong></div></div>'
-          + '<div class="rationale-box"><strong>Rationale</strong><p>' + esc(app.reason) + '</p></div>'
-          + '<button type="button" class="btn btn-primary btn-block" data-open-detail>Open full decision</button>';
-        var openButton = panel.querySelector("[data-open-detail]");
-        if (openButton) openButton.addEventListener("click", function () { activateView("detail"); });
-        refreshIcons();
-      }
-
       wireFilters();
 
       root.querySelectorAll("[data-view]").forEach(function (button) {
@@ -3635,7 +3662,7 @@ svg.lucide {
         });
       });
 
-      state.detailData = SAMPLE_DETAIL;
+      /* No rows exist until a file is scored, so there is nothing to select yet. */
       wireRowButtons();
       wireClusterButtons();
 
@@ -3676,8 +3703,8 @@ svg.lucide {
               + plural(loaded.records.length, "row") + ", " + loaded.headers.length + " columns"
               + (loaded.sheetName ? ' on sheet "' + esc(loaded.sheetName) + '"' : "")
               + " — but none of its column headings match one of the 18 inputs the model scores, so there "
-              + "is nothing to analyse and no results are shown. The figures below are unchanged "
-              + "illustrative sample content. The model looks for headings such as <code>app_id</code>, "
+              + "is nothing to analyse and no results are shown. The figures below stay blank. "
+              + "The model looks for headings such as <code>app_id</code>, "
               + "<code>app_name</code>, <code>primary_capability</code>, "
               + "<code>ov_patient_care_criticality</code>, <code>th_supportability</code>, "
               + "<code>c_cost_per_active_user_vs_peers</code> and <code>r_technical_risk</code>; case, "
@@ -3688,12 +3715,12 @@ svg.lucide {
           state.file = loaded;
           state.rejected = null;
           setBanner("sample", "File ready — press Analyze portfolio",
-            described.text + " The figures below are still illustrative sample content until you press "
+            described.text + " The figures below stay blank until you press "
             + "<strong>Analyze portfolio</strong>.");
         }).catch(function (err) {
           reject("That file could not be read",
             esc(err && err.message ? err.message : String(err))
-            + " The figures below are unchanged illustrative sample content.");
+            + " The figures below are left exactly as they were.");
         });
       }
 
@@ -3717,7 +3744,7 @@ svg.lucide {
           setBanner("error", "Choose an inventory file first",
             "<strong>Analyze portfolio</strong> scores the applications in a file you upload. Press "
             + "<strong>Upload inventory</strong> and choose an Excel workbook (.xlsx) or a CSV, then press "
-            + "Analyze. The figures below remain illustrative sample content."
+            + "Analyze. The figures below stay blank."
             + (support.supported ? "" : " " + esc(support.message)));
           return;
         }
@@ -3728,7 +3755,7 @@ svg.lucide {
         } catch (err) {
           setBanner("error", "The analysis could not be completed",
             esc(err && err.message ? err.message : String(err))
-            + " The figures below are unchanged illustrative sample content.");
+            + " The figures below are left exactly as they were.");
           return;
         }
 
@@ -3745,6 +3772,7 @@ svg.lucide {
 
         renderKpis(a);
         renderSavings(a);
+        renderProvenance(a);
         renderMix(a);
         renderGuardrails(a);
         renderClusters(a);
@@ -3810,10 +3838,10 @@ svg.lucide {
       if (!support.supported) {
         var uploadButton = root.querySelector('[data-action="upload"]');
         if (uploadButton) uploadButton.setAttribute("title", support.message);
-        setBanner("sample", "Illustrative sample content — not computed from any file",
-          "Every figure below is placeholder copy describing a fictional 600-application portfolio. "
-          + "<strong>" + esc(support.message) + "</strong> Choose <strong>Upload inventory</strong> to load a "
-          + "CSV, then <strong>Analyze portfolio</strong>.");
+        setBanner("sample", "No analysis yet — every figure below is blank until a file is scored",
+          "<strong>" + esc(support.message) + "</strong> Choose <strong>Upload inventory</strong> to load a "
+          + "CSV, then <strong>Analyze portfolio</strong>. The scoring in this page reproduces the Python "
+          + "engine's output value-for-value on a reference portfolio.");
       }
 
     })();

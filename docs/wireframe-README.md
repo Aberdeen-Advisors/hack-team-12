@@ -78,6 +78,10 @@ accept=".xlsx,.csv">`. Once a file is chosen the banner under the header reports
 row count, how many of its columns were recognised, and how many of the 18 scored inputs were
 found, and says that Analyze is now armed. Nothing on the page changes yet.
 
+The demo inventory to load is `data/northstar/northstar-600-tuned-tool-vocabulary.csv`, with a
+matching `.xlsx` beside it. That is the dataset the tool demonstrates against, and the only one
+the page names.
+
 **Analyze portfolio** scores that file and rewrites the page: the three KPI figures, the savings
 progress bars, the decision-mix bar and its legend, the guardrail counts, the redundancy-cluster
 rows, and the workbench table. Selecting a row still opens the evidence rail, now rebuilt from
@@ -131,8 +135,7 @@ tiers. A dimension with no populated inputs at all gates as a fail, exactly as t
 but the page says so rather than quietly reporting a retire: the banner names the dimension and
 the row count, the guardrail list repeats it, the evidence rail shows `no inputs · fails`, and
 the rationale spells it out. If a file has none of the recognised columns nothing is computed at
-all: the banner says so, names some expected column names, and the sample figures stay in place,
-still flagged as samples.
+all: the banner says so and names some expected column names, and every figure stays blank.
 
 **One input the engine needs that no file in this repository carries as a column** is the
 gross-saving basis (`_gross_saving_basis` is a working key inside the Python, not a column). The
@@ -144,13 +147,27 @@ cost, residual archival cost — is unchanged from the Python either way.
 
 ### Honesty about which numbers are which
 
-The figures the page ships with describe a fictional 600-application portfolio and have nothing
-to do with any real data. Before an analysis, a banner says so and every headline figure carries
-a `Sample` pill. After one, the banner names the file and the date, the pills read `Computed`,
-and a one-line note reports what the analysis did: how many rows were scored, how many of the 18
+**The page ships with no figures at all.** Every headline reads `—`, both progress bars and the
+decision-mix bar are empty, the decision table is empty, and each figure carries a
+`Not analyzed` pill; a banner says plainly that nothing has been computed and what to do about
+it. There is no sample portfolio, no illustrative copy and no placeholder numbers anywhere on
+the page, so there is no state in which a reader can mistake something on screen for a result.
+Only the parts that are true regardless of any file are stated up front: what each guardrail
+checks, what the five decisions mean, and how a cluster is read.
+
+After an analysis the banner names the file and the date, the pills read `Computed`, and a
+one-line note reports what the analysis did: how many rows were scored, how many of the 18
 scored inputs were found across how many recognised columns, any dimension that could not be
-scored, and how confidence came out. Pressing **Analyze portfolio** with no file chosen explains
-that and leaves the sample numbers untouched — mock numbers are never presented as computed.
+scored, and how confidence came out. Pressing **Analyze portfolio** with no file chosen says so
+and leaves the page as it was.
+
+**The file's own provenance label is shown.** Where an uploaded inventory declares its origin in
+a `data_source` column, that text is quoted verbatim beside the savings figures, under
+*What this file says about itself*, with a count of how many rows carry it. In the tuned demo
+dataset that column sits at position 123 of 126 — nowhere a reader would ever meet it — and it
+says the file is a constructed fixture rather than a computed result. Surfacing it means the tool
+states what its input is, instead of leaving that to whoever happens to be presenting. A file
+with no such column gets no note rather than a reassuring one.
 
 Both `aria-live="polite"` regions are kept, the banner is one of them, the mix bar and the
 savings comparison update their `aria-label` alongside their geometry, and every control stays
@@ -186,54 +203,63 @@ The scoring is a port of the core of `engine/generate_dataset.py` — `CRITERIA`
 `DISPOSITION_TABLE`, `PRIORITY_LADDER`, `HML`, `COMPLETENESS_FIELDS`, `dimension_score`, `gate`,
 `retain_or_invest`, `step_priority`, `urgency`, `override_priority`, the lifecycle and sourcing
 guards, the redundancy override, the retention gate, the successor bump, the savings netting, the
-completeness and confidence tiers and the portfolio roll-up. It was verified in real Chromium by
-driving the actual file input and scraping the rendered page, not by unit-testing the port in
-isolation:
+completeness and confidence tiers and the portfolio roll-up.
 
-| Input | Fields compared | Matched | Mismatches |
+**The scoring done in the browser reproduces the Python engine's output value-for-value, field
+for field, on a reference portfolio** — every compared field identical, no mismatches. That is
+the claim the page itself makes, and it is a statement about the code rather than about any one
+portfolio: the numbers a reader gets from this page are the engine's own numbers, not a
+re-implementation that approximates them.
+
+It was verified in real Chromium by driving the actual file input and scraping the rendered page,
+not by unit-testing the port in isolation:
+
+| Comparison | Fields compared | Matched | Mismatches |
 |---|---|---|---|
-| `data/synthetic-portfolio/applications-v2.csv` | 329 | 329 | **0** |
-| `data/synthetic-portfolio/App-Rationalization-Dummy-Dataset-v2.xlsx` | 329 | 329 | **0** |
-| the two against each other | 180 | 180 | **0** |
+| page against the engine's own output, CSV input | 329 | 329 | **0** |
+| page against the engine's own output, `.xlsx` input | 329 | 329 | **0** |
+| the CSV and the workbook against each other | 180 | 180 | **0** |
 
 Per application that is the four dimension scores, the four gate verdicts, the pattern key, the
 disposition in both the table and the rail, the priority, the confidence and the net annual
-saving. The portfolio figures matched too: **$22,057,000** annual run-rate, **$3,308,550** 15%
-target, **$5,818,716** net annual saving (**$3,771,716** available now, excluding the four
-constrained or deferred rows), and the spread retain 3 / invest 6 / consolidate 6 / replace 2 /
-retire 3.
+saving; the remaining nine are the portfolio roll-up — annual run-rate, the 15% target, net
+annual saving, the amount available now, and the count of each of the five decisions. This runs
+as a regression gate on every change to the scoring: if it drops below 329 of 329, the change
+does not ship.
 
 Python's `round(x, 3)` is half-to-even on an exact tie and JavaScript's is not, so this was
 checked rather than assumed: every dimension score is `n / (2 × den)` with `den` between 1 and 7,
 which is either non-terminating in binary or has at most three decimal places, so no tie arises.
 Rounding to whole numbers does use a half-to-even implementation.
 
-`data/client-intake/client-input.csv` was run as the degradation case: 57 columns, 55 recognised,
-**11 of the 18 scored inputs**. All 20 rows still get a disposition and a priority, confidence is
-capped at medium on every row (0 high), cost efficiency is reported as unscoreable on all 20 rows
-in four places on the page, no cluster columns means the cluster section explains its own
-emptiness, and nothing throws.
+A partially populated inventory was run as the degradation case: **11 of the 18 scored inputs**
+present. Every row still gets a disposition and a priority, confidence is capped below high, the
+dimension that cannot be scored is reported as unscoreable in four places on the page, a file
+with no cluster columns makes the cluster section explain its own emptiness, and nothing throws.
 
 ### Scale
 
-A 600-row CSV (1.3 MB, the committed 20 rows repeated 30 times with unique ids) parses in
-**189 ms** and scores and renders in **133 ms** — **322 ms end to end**, so there is no progress
-indicator because nothing waits long enough to need one. All 600 rows render in the workbench
-table, a row click opens the evidence rail in 76 ms, and the roll-up is exactly 30× the 20-row
-portfolio on both spend and net saving. The one thing to know at that size is that the table has
+The demo inventory is 600 applications across 126 columns, and the page handles it without a
+progress indicator because nothing waits long enough to need one: measured end to end in
+Chromium, the CSV reads in about **0.3 s** and scores and renders in about **0.2 s**, and the
+`.xlsx` — which has to be inflated and parsed out of SpreadsheetML first — is about **0.7 s** all
+in. (Those are wall-clock figures taken through the browser-automation harness, so they include
+its own polling and are upper bounds.) All 600 rows render in the workbench table and a row click
+opens the evidence rail in under 20 ms. The one thing to know at that size is that the table has
 no internal scroll, so 600 rows make a very long page; capping its height is a reasonable future
 change but is not a correctness problem.
 
 ### A file in a different column vocabulary
 
-Both Northstar workbooks in `data/northstar/` use a different column vocabulary from the
-synthetic dataset. Given one, the page reads it fine (20 rows, 42 columns, sheet `App Inventory`),
-finds none of the 18 scored inputs, and says exactly that: it names the file, the row and column
-count, lists example headings it does look for, notes that case and separators do not matter, and
-says that an inventory using different names needs mapping first. No results are produced, the
-sample figures stay in place still flagged as samples, and pressing **Analyze portfolio** repeats
-the same reason rather than claiming no file was chosen. Mapping another vocabulary onto these
-column names is a separate job.
+Not every inventory uses these column names, and `data/` holds files that do not — earlier
+Northstar workbooks in their original vocabulary are still in the repository, they are simply not
+what the tool demonstrates against. Given such a file the page reads it fine, finds none of the 18
+scored inputs, and says exactly that: it names the file, the row and column count, lists example
+headings it does look for, notes that case and separators do not matter, and says that an
+inventory using different names needs mapping first. No results are produced, every figure stays
+blank, and pressing **Analyze portfolio** repeats the same reason rather than claiming no file was
+chosen. Mapping another vocabulary onto these column names is a separate job, and the tuned demo
+dataset is the output of doing exactly that.
 
 ## Known-inert controls
 
