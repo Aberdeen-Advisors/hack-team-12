@@ -48,6 +48,45 @@ has switched on yet, not a live link.
 The page loads Poppins from Google Fonts and icons from a CDN. Both have offline
 fallbacks built in, so it renders correctly with no network access.
 
+## The submission dataset
+
+**The featured dataset for the hackathon submission is
+`data/northstar/northstar-600-tuned-tool-vocabulary.csv`**, committed at `af88bf2`. Load it
+with **Upload inventory**, then **Analyze portfolio**, and the page computes:
+
+| Figure | Value |
+| --- | --- |
+| **Net first-year saving** | **$68,813,000 — 18.47% of a $372,552,000 annual run cost** |
+| Recommendation spread | retain 233 / invest 129 / consolidate 129 / retire 109 / replace 0 |
+
+Two things belong beside that figure, and neither is a footnote.
+
+**1. That portfolio was constructed to clear a 17% savings target. It is a scenario, not a
+finding.** The tuned file is a fictional variant of the corrected Northstar portfolio in
+which **154 duplicate application instances were given their own costs, documented migration
+paths to a surviving application, and worse technical health**. The scoring engine was not
+modified — no weight, gate, lookup-table row, guardrail or savings formula differs, and every
+recommendation is the model's own answer to the new input — but the *inputs* were chosen to
+put the target in reach. Every category of change, with row counts and dollar deltas, is in
+`data/northstar/northstar-600-tuned-change-log.md`.
+
+**2. The corrected portfolio remains in the repository as the un-fitted run.**
+`data/northstar/northstar-600-corrected-tool-vocabulary.csv` is the corrected
+600-application source scored by the same engine, and it returns **net first year
+$17,409,000 — 4.9% of a $354,330,000 run cost, with the client's 15% target missed by a wide
+margin.** That file is the evidence the engine was not fitted to its data: nothing in the
+corrected input, its export, its scored outputs or its run script was touched to produce the
+tuned files.
+
+**The honest reading is the pair: same engine, same rules, two portfolios.** One shows what
+the tool returns on an estate it was never tuned against; the other shows what it returns on
+an estate with enough duplication for the savings target to be reachable.
+
+The two run costs are **not one base** — $372,552,000 tuned against $354,330,000 corrected —
+because giving those 154 duplicate instances their own costs added $18,222,000 of annual
+spend to the tuned portfolio. Each percentage is measured against its own portfolio's run
+cost, so the two are not comparable as a before-and-after.
+
 ## What the interface shows
 
 Three views, switched from the tabs at the top:
@@ -130,9 +169,13 @@ plus a sheet recording assumptions, data gaps and open questions.
 ## Where the data is
 
 The synthetic datasets and the disposition analyses are committed, in `data/` — the team's
-own portfolio, the client-intake view of it, and the three Northstar scoring runs, with
+own portfolio, the client-intake view of it, and the Northstar scoring runs, with
 `data/README.md` explaining each file and which version is current. Every figure in them is
 invented; only the product and vendor names are real, and both portfolios are fictional.
+
+The featured submission dataset and the un-fitted run beside it are described under **The
+submission dataset** above; `data/README.md` carries the full account of what was changed to
+build the tuned portfolio and what was deliberately protected.
 
 This repository is public, so what stays out stays out: no client data and no licensed
 third-party vendor templates, in `data/` or anywhere else. `.gitignore` blocks the known

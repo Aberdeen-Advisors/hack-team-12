@@ -85,8 +85,8 @@ Outputs — produced by running those inputs through the engine:
 | `Northstar-Disposition-Analysis-v3.xlsx` + `northstar-dispositions-v3.csv` | **Current** for the 20-application sample. Run 3. |
 | `Northstar-Disposition-Analysis-600.xlsx` + `northstar-dispositions-600.csv` + `northstar-600-summary.md` | **Current** for the 600-application portfolio. Same v3 model, imported unchanged; the run reproduces every one of the 20 shared applications' v3 dispositions. |
 | `Northstar-600-tool-vocabulary.xlsx` + `northstar-600-tool-vocabulary.csv` | The same 600 rows re-expressed in the tool's own snake_case column vocabulary, so the portfolio can be loaded by the wireframe's in-browser Upload and Analyze, which does not read the Northstar layout. A translation, not a second analysis: 78 of the 125 tool columns are populated and the other 47 are deliberately empty, each named on the file's `Column coverage` sheet. Replaying the tool's own dimension arithmetic and both post-lookup guardrails over these columns reproduces the Python run's disposition on all 600 rows. |
-| `Northstar-600-corrected-tool-vocabulary.csv` + `Northstar-600-corrected-tool-vocabulary.xlsx` (plus `Northstar-Disposition-Analysis-600-corrected.xlsx`, `northstar-dispositions-600-corrected.csv`, `northstar-600-corrected-summary.md`) | The 600-application portfolio scored from Bina's **corrected** input workbook, `healthcare_app_rationalization_sample_600_corrected.xlsx`, which she uploaded on 2026-08-14 to replace the earlier file. Same v3 model, imported unchanged; written by `engine/score_northstar_600_corrected.py`. Not a supersession of the row above — a different input. Which of the two is the file the wireframe should demo from is **not settled here**; pick deliberately. The corrected input renames 580 records onto real commercial products and moves their cost mix, so the headline money differs: gross $25,816,000, transition $8,407,000, net first year $17,409,000, spread retain 301 / invest 174 / retire 81 / consolidate 44 / replace 0. Two defects in the earlier export are fixed here: transition-cost columns are empty (never zero) on rows whose disposition removes no run-rate spend, and the contract-urgency columns are derived. Replaying the tool's own dimension arithmetic and both post-lookup guardrails over these columns reproduces the Python run's disposition **and** priority on all 600 rows. |
-| `Northstar-600-tuned-tool-vocabulary.csv` + `.xlsx` (plus `Northstar-Disposition-Analysis-600-tuned.xlsx`, `northstar-dispositions-600-tuned.csv`, `northstar-600-tuned-summary.md`, `northstar-600-tuned-change-log.md`) | **TUNED DEMO FIXTURE — NOT A COMPUTED RESULT.** See the subsection immediately below before using any number from these files. |
+| `northstar-600-corrected-tool-vocabulary.csv` + `Northstar-600-corrected-tool-vocabulary.xlsx` (plus `Northstar-Disposition-Analysis-600-corrected.xlsx`, `northstar-dispositions-600-corrected.csv`, `northstar-600-corrected-summary.md`) | The 600-application portfolio scored from Bina's **corrected** input workbook, `healthcare_app_rationalization_sample_600_corrected.xlsx`, which she uploaded on 2026-08-14 to replace the earlier file. Same v3 model, imported unchanged; written by `engine/score_northstar_600_corrected.py`. Not a supersession of the row above — a different input. **This is the un-fitted run**: the featured submission dataset is the tuned export in the row below, and this file is what the engine returns on data it was not fitted to. The corrected input renames 580 records onto real commercial products and moves their cost mix, so the headline money differs: gross $25,816,000, transition $8,407,000, net first year $17,409,000, spread retain 301 / invest 174 / retire 81 / consolidate 44 / replace 0. Two defects in the earlier export are fixed here: transition-cost columns are empty (never zero) on rows whose disposition removes no run-rate spend, and the contract-urgency columns are derived. Replaying the tool's own dimension arithmetic and both post-lookup guardrails over these columns reproduces the Python run's disposition **and** priority on all 600 rows. |
+| `northstar-600-tuned-tool-vocabulary.csv` + `Northstar-600-tuned-tool-vocabulary.xlsx` (plus `Northstar-Disposition-Analysis-600-tuned.xlsx`, `northstar-dispositions-600-tuned.csv`, `northstar-600-tuned-summary.md`, `northstar-600-tuned-change-log.md`) | **The featured submission dataset — and a TUNED DEMO FIXTURE, NOT A COMPUTED RESULT.** Net first year $68,813,000 = 18.47% of a $372,552,000 run cost; retain 233 / invest 129 / consolidate 129 / retire 109 / replace 0. The portfolio was built to clear a 17% target. See the subsection immediately below before using any number from these files. |
 | `Northstar-Disposition-Analysis-v2.xlsx` + `northstar-dispositions-v2.csv` | **Superseded.** Run 2, which promoted risk to a gated dimension. |
 | `Northstar-Disposition-Analysis-v1.xlsx` + `northstar-dispositions.csv` | **Superseded.** Run 1, the first pass. |
 | `scoring-model-review.md` | A review of the scoring weights: what they are, and whether re-weighting would change any recommendation. Analysis, not output of a run. |
@@ -94,7 +94,19 @@ Outputs — produced by running those inputs through the engine:
 The superseded runs are kept on purpose — each workbook carries a "What changed" sheet, and
 the progression from v1 to v3 is how the model was arrived at.
 
-### `healthcare_app_rationalization_sample_600_tuned.xlsx` — a portfolio built to clear 17%
+### `healthcare_app_rationalization_sample_600_tuned.xlsx` — a portfolio built to clear 17%, and the featured submission dataset
+
+**This is the featured dataset for the hackathon submission.** The file the page is demoed
+from is `northstar/northstar-600-tuned-tool-vocabulary.csv`, committed at `af88bf2`, and it
+computes **net first year $68,813,000 = 18.47% of a $372,552,000 annual run cost**, spread
+**retain 233 / invest 129 / consolidate 129 / retire 109 / replace 0**.
+
+Being the featured dataset changes nothing about what it is. **It was constructed to clear a
+17% savings target — 154 duplicate application instances given their own costs, documented
+migration paths to a surviving application, and worse technical health — so it is a scenario,
+not a finding**, and the corrected portfolio stays in this directory as the un-fitted run.
+**The honest reading is the pair: same engine, same rules, two portfolios.** Read the rest of
+this subsection before quoting any figure from either.
 
 **This portfolio was constructed to hit a savings target. It is not a computed result from
 Bina's corrected source, and nothing in it says anything about the estate that workbook
@@ -108,9 +120,12 @@ it, or anything derived from it, as a finding.
 **The un-fitted run is the one that means something, and it stays intact beside this one:**
 `healthcare_app_rationalization_sample_600_corrected.xlsx` scored by
 `engine/score_northstar_600_corrected.py` returns **$17,409,000 net, 4.9% of a $354,330,000
-run cost**, on data the tool was never fitted to. Neither the corrected input, its export,
-its scored outputs nor its run script was touched to produce the tuned files. Do not present
-the two as two analyses of one estate: one is a measurement, the other is a fixture.
+run cost — the client's 15% target missed by a wide margin** — on data the tool was never
+fitted to. Its export, `northstar/northstar-600-corrected-tool-vocabulary.csv`, stays in this
+directory for exactly that reason: it is the evidence the engine was not fitted to its data.
+Neither the corrected input, its export, its scored outputs nor its run script was touched to
+produce the tuned files. Do not present the two as two analyses of one estate: one is a
+measurement, the other is a fixture.
 
 | | corrected (un-fitted) | tuned (fixture) |
 | --- | --- | --- |
@@ -119,6 +134,12 @@ the two as two analyses of one estate: one is a measurement, the other is a fixt
 | One-time transition | $8,407,000 | $24,032,000 |
 | **Net first year** | **$17,409,000 (4.91%)** | **$68,813,000 (18.47%)** |
 | Spread | retain 301 / invest 174 / consolidate 44 / replace 0 / retire 81 | retain 233 / invest 129 / consolidate 129 / replace 0 / retire 109 |
+
+**The two percentages are measured against different bases, so they are not a
+before-and-after.** Portfolio run cost is $372,552,000 in the fixture against $354,330,000 in
+the corrected run, because giving the 154 duplicate instances their own costs added
+**$18,222,000** of annual spend to the tuned portfolio. Each net is divided by its own
+portfolio's run cost.
 
 What was changed, and what was not:
 
