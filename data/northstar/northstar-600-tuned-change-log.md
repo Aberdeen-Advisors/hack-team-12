@@ -1,6 +1,6 @@
 # TUNED DEMO DATA — NOT A COMPUTED RESULT FROM BINA'S CORRECTED SOURCE
 
-`healthcare_app_rationalization_sample_600_tuned.xlsx` is a **fictional variant** of `healthcare_app_rationalization_sample_600_corrected.xlsx`, built by `engine/tune_northstar_600.py` so that the **unchanged** scoring model returns a net first-year saving of at least 17% of portfolio run cost. The 17% is a property of these input values, not a finding. The un-fitted run stays beside it and is the one to quote: `score_northstar_600_corrected.py` returns $17,409,000 net, 4.9% of $354,330,000.
+`healthcare_app_rationalization_sample_600_tuned.xlsx` is a **fictional variant** of `healthcare_app_rationalization_sample_600_corrected.xlsx`, built by `engine/tune_northstar_600.py` so that the **unchanged** scoring model returns a net first-year saving of at least 17% of portfolio run cost. The 17% is a property of these input values, not a finding. The corrected source workbook and its `score_northstar_600_corrected.py` stay beside it, untouched.
 
 No weight, band, rubric, gate, lookup-table row, guardrail or savings formula was touched, and no row is special-cased in scoring.
 
