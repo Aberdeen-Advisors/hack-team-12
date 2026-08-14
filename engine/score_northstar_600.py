@@ -384,6 +384,333 @@ def money(x):
     return None if x is None else round(float(x), 2)
 
 
+# =====================================================================================
+# The tool-vocabulary translation
+# =====================================================================================
+#
+# The wireframe's in-browser Upload/Analyze reads the tool's OWN snake_case column
+# vocabulary — the one the committed synthetic-portfolio and client-input files use — so a
+# workbook in Bina's Northstar layout is refused by it. This emits her 600 applications in
+# that vocabulary so the portfolio can be loaded in the UI.
+#
+# THE COLUMN LIST IS NOT HARD-CODED. It is read from the committed
+# App-Rationalization-Dummy-Dataset-v2.xlsx at run time, so the emitted file carries the
+# tool's real vocabulary in the tool's real order and cannot drift from it.
+#
+# RULES FOLLOWED, and they are the same rules the scoring run follows:
+#   * A column is populated only where her workbook, or a value this run computed FROM her
+#     workbook, actually supports it. Everything else is left EMPTY.
+#   * Empty means empty. No column is defaulted to zero, to a neutral score or to a
+#     plausible-looking string, because a zero in a cost or score column reads as data.
+#     The `Column coverage` sheet names every unpopulated column and why, so a reader
+#     cannot mistake a blank for a measurement.
+#   * The 18 criterion columns carry the scores this run derived. Where an input was not
+#     derivable the cell is BLANK, which is what the UI's own dimension arithmetic expects:
+#     it skips a null in both the numerator and the denominator, exactly as the Python
+#     engine renormalises. A 0 there would score the row down instead.
+#   * `lifecycle_stage` is left EMPTY DELIBERATELY. It is the column the Python run holds
+#     out as circular, and the UI reads it for its lifecycle exclusion, so populating it
+#     with her disposition-like labels would feed her own answers into a guard. Her label
+#     travels in a clearly-marked non-vocabulary column instead, which the UI carries
+#     through untouched and never scores.
+#   * `owner_stated_strategic_importance` is left EMPTY because it is an interview field and
+#     Bina's standing constraint is that no stakeholder or owner is interviewed.
+#
+# Her six TCO components are folded onto the tool's five cost categories so that the five
+# still sum to her Annual TCO — the mapping is recorded on the coverage sheet, and the
+# round-trip is asserted per row.
+
+TOOL_DATASET = os.path.join(HERE, os.pardir, "data", "synthetic-portfolio",
+                            "App-Rationalization-Dummy-Dataset-v2.xlsx")
+OUT_TOOL_XLSX = os.path.join(DATA, "Northstar-600-tool-vocabulary.xlsx")
+OUT_TOOL_CSV = os.path.join(DATA, "northstar-600-tool-vocabulary.csv")
+HER_LABEL_COL = "her_lifecycle_stage_comparison_only_not_scored"
+
+
+def tool_vocabulary():
+    """The tool's own column band and header rows, read from its committed dataset."""
+    wb = openpyxl.load_workbook(TOOL_DATASET, read_only=True, data_only=True)
+    ws = wb["Applications"]
+    it = ws.iter_rows(min_row=1, max_row=2, values_only=True)
+    bands = [s(x) for x in next(it)]
+    headers = [s(x) for x in next(it)]
+    wb.close()
+    return bands, headers
+
+
+def build_tool_rows(rows, apps_by_id, ctx, clusters_by_app, src):
+    """One dict per application, keyed by the tool's column names."""
+    inv = {s(r["App ID"]): r for r in src["App Inventory"]}
+    tco = {s(r["App ID"]): r for r in src["TCO"] if s(r["App ID"]).startswith("APP-")}
+    caps_by_app = defaultdict(list)
+    for c in ctx["caps"]:
+        caps_by_app[s(c["App ID"])].append(c)
+    has_dependents = {aid for aid, ds in ctx["deps_by_tgt"].items() if ds}
+
+    out = []
+    for r in sorted(rows, key=lambda x: x["app_id"]):
+        a, base, sav = r["app"], r["_base"], r["_savings"]
+        aid = a["app_id"]
+        iv, tc = inv.get(aid, {}), tco.get(aid, {})
+        cl = clusters_by_app.get(aid)
+
+        lic = f(iv.get("Entitled Users"))
+        act = f(iv.get("Active Users (90d)"))
+        # Her six components onto the tool's five, sum preserved.
+        c_lic = f(tc.get("Annual License / Subscription"))
+        c_vendor = f(tc.get("Annual Vendor Services"))
+        c_maint = f(tc.get("Annual Maintenance"))
+        c_labour = f(tc.get("Annual Internal Labor"))
+        c_infra = f(tc.get("Annual Infrastructure / Hosting"))
+        c_train = f(tc.get("Annual Education / Training"))
+        maint_dev = (None if c_maint is None and c_labour is None
+                     else (c_maint or 0) + (c_labour or 0))
+        five = [c_lic, c_vendor, maint_dev, c_infra, c_train]
+        subtotal = None if all(x is None for x in five) else sum(x or 0 for x in five)
+
+        secondary = sorted({s(c["Capability"]) for c in caps_by_app[aid]
+                            if s(c["Support Role"]) != "Primary" and s(c["Capability"])})
+        patterns = sorted({s(d.get("Dependency Type")) for d in ctx["deps_by_src"].get(aid, [])
+                           if s(d.get("Dependency Type"))})
+        tool_type = s(iv.get("Tool Type"))
+
+        rec = {
+            # --- identity
+            "app_id": aid,
+            "app_name": a["name"],
+            "vendor_name": a["vendor"],
+            "description": s(iv.get("Description")),
+            "is_ai_tool": "True" if "AI" in tool_type else "False",
+            "deployment_model": a["hosting_model"],
+            "sourcing_type": a["commercial_model"],
+            # lifecycle_stage: NOT her Lifecycle Stage label, which stays held out as
+            # circular. Populated ONLY where her release string independently evidences an
+            # early-life product, using the guard's own signal function, so the UI's
+            # lifecycle exclusion arms on the same evidence the Python guard armed on and
+            # reproduces the same suppression. Blank everywhere else, because her file
+            # carries no other non-circular maturity evidence.
+            "lifecycle_stage": "Birth" if v3.lifecycle_early_signal(a, ctx)[0] else None,
+            "version_installed": s(ctx["perf"].get(aid, {}).get("Current Release / Version")),
+            "vendor_eos_date": s(ctx["perf"].get(aid, {}).get("Vendor Support End"))[:10] or None,
+            # --- ownership
+            "business_owner": s(iv.get("Application Owner")),
+            "technical_owner": s(iv.get("Technical SME")),
+            "business_unit": a["business_unit"],
+            # --- capability
+            "primary_capability": a["primary_capability"],
+            "secondary_capabilities": "; ".join(secondary) or None,
+            # --- usage
+            "licences_purchased": lic,
+            "active_users": act,
+            "licence_utilisation_rate": (round(a["utilisation"], 4)
+                                         if a["utilisation"] is not None else None),
+            "unused_licence_count": (None if lic is None or act is None
+                                     else max(0, int(round(lic - act)))),
+            # --- cost
+            "cost_licence_subscription": money(c_lic),
+            "cost_upgrade_and_modules": money(c_vendor),
+            "cost_maintenance_dev_labour": money(maint_dev),
+            "cost_infrastructure_peripherals": money(c_infra),
+            "cost_indirect_and_training": money(c_train),
+            "tco_five_category_subtotal": money(subtotal),
+            "annual_tco_recurring": money(a["annual_tco"]),
+            "five_year_cumulative_tco": (money(a["annual_tco"] * 5)
+                                         if a["annual_tco"] is not None else None),
+            "cost_per_active_user": (money(a["cost_per_active_user"])
+                                     if a["cost_per_active_user"] is not None else None),
+            # --- contract
+            "term_end": a["contract_renewal"].isoformat() if a["contract_renewal"] else None,
+            "auto_renewal_flag": ("True" if a["auto_renew"] == "Yes"
+                                  else "False" if a["auto_renew"] else None),
+            "renewal_notice_days": a["exit_notice_days"],
+            # --- dependencies
+            "has_downstream_dependents": "True" if aid in has_dependents else "False",
+            "dependency_count": a["dependency_count"],
+            "integration_pattern": "; ".join(patterns) or None,
+            "data_types_held": a["data_classification"] or None,
+            "information_classification": a["data_classification"] or None,
+            # --- gate output, from this run
+            "business_value_score": a["business_value_score"],
+            "technical_health_score": a["technical_health_score"],
+            "cost_efficiency_score": a["cost_efficiency_score"],
+            "risk_posture_score": a["risk_posture_score"],
+            "v_pass": a["v_pass"], "t_pass": a["t_pass"],
+            "c_pass": a["c_pass"], "r_pass": a["r_pass"],
+            "vtcr_key": a["vtcr_key"],
+            "retain_or_invest_basis": base.get("retain_or_invest_basis") or None,
+            "disposition": base["disposition"],
+            "priority": base["priority"],
+            "action": r["recommendation"],
+            "rationale": r["rationale"],
+            "confidence": r["confidence"],
+            "redundancy_override_applied": str(bool(base["redundancy_override_applied"])),
+            "lifecycle_exclusion_applied": str(bool(base["lifecycle_suppressed"])),
+            # --- clusters and savings
+            "overlap_cluster_id": cl["cluster_id"] if cl else None,
+            "cluster_role": cl["roles"][aid]["role"] if cl else None,
+            "replacement_app_id": sav["successor"] or None,
+            "replacement_cost_already_in_baseline": ("True" if sav["successor"] else None),
+            "gross_saving_annual": money(sav["gross_saving_annual"]),
+            "amortised_one_time_migration_cost": money(sav["one_time_transition_cost"]),
+            "net_saving_annual": money(sav["net_first_year_saving"]),
+            "saving_type": ("safe" if sav["safe_saving"] else
+                            "potential" if sav["gross_saving_annual"] else None),
+            "data_source": "Northstar 600-application sample workbook (synthetic)",
+            # --- her held-out label, outside the tool's vocabulary and never scored
+            HER_LABEL_COL: a["_her_lifecycle_stage"],
+        }
+        for name, _d, _l, _fn in v3.SCORERS:
+            rec[name] = a["_inputs"][name]["score"]      # None stays None: blank, not zero
+        # round-trip: the five categories must still reproduce her Annual TCO
+        if subtotal is not None and a["annual_tco"] is not None:
+            assert abs(subtotal - a["annual_tco"]) < 1.0, (
+                f"{aid}: five cost categories sum to {subtotal}, her Annual TCO is "
+                f"{a['annual_tco']}")
+        out.append(rec)
+    return out
+
+
+COVERAGE_WHY = {
+    "lifecycle_stage": "NOT her Lifecycle Stage label. That column stays held out as "
+                       "circular — the tool reads this field for its lifecycle exclusion, so "
+                       "putting her disposition-like labels in it would feed her own answers "
+                       "back into a guard. Instead this is populated only where her "
+                       "`Current Release / Version` string independently evidences a "
+                       "pre-GA pilot line, using the same signal function the Python "
+                       "lifecycle guard arms on, so the tool suppresses the same row. Blank "
+                       "elsewhere: her file carries no other non-circular maturity evidence. "
+                       "Her own label travels in " + HER_LABEL_COL + ", never scored.",
+    "owner_stated_strategic_importance":
+        "LEFT EMPTY DELIBERATELY. An interview field, and this iteration interviews nobody.",
+    "consumption_based_cost":
+        "no metered or consumption cost line anywhere in her workbook. Left empty rather "
+        "than zeroed: a 0 here would assert she has no consumption spend, which her file "
+        "does not say.",
+    "process_centrality":
+        "her Capability Criticality uses a four-step ladder including Critical, which the "
+        "tool's three-step High/Medium/Low field has no slot for. Mapping it would be a "
+        "judgement, so it is left empty.",
+}
+
+
+def emit_tool_vocabulary(rows, apps_by_id, ctx, clusters_by_app, src, spread):
+    """Write the portfolio in the tool's own column vocabulary: workbook plus CSV."""
+    bands, headers = tool_vocabulary()
+    recs = build_tool_rows(rows, apps_by_id, ctx, clusters_by_app, src)
+    n = len(recs)
+
+    populated, empty = [], []
+    coverage = []
+    for i, h in enumerate(headers):
+        if not h:
+            continue
+        filled = sum(1 for rec in recs
+                     if rec.get(h) is not None and s(rec.get(h)) != "")
+        (populated if filled else empty).append(h)
+        coverage.append({
+            "Section": bands[i] if i < len(bands) else "",
+            "Tool column": h,
+            "Rows populated": filled,
+            "Rows empty": n - filled,
+            "Status": "populated" if filled == n else
+                      "partly populated" if filled else "EMPTY — not supported by her file",
+            "Where it comes from, or why it is empty":
+                COVERAGE_WHY.get(h) or (
+                    "derived by this run from her workbook" if filled else
+                    "no column in her workbook supports it, and nothing was invented to "
+                    "fill it — a blank here means she has not told us, not that the value "
+                    "is zero"),
+        })
+    coverage.append({
+        "Section": "outside the tool vocabulary",
+        "Tool column": HER_LABEL_COL,
+        "Rows populated": sum(1 for rec in recs if s(rec.get(HER_LABEL_COL))),
+        "Rows empty": 0,
+        "Status": "populated — carried through, never scored",
+        "Where it comes from, or why it is empty":
+            "her Lifecycle Stage label, kept for comparison only. The UI carries a column "
+            "it does not recognise through untouched and never scores it.",
+    })
+
+    notes = [
+        ("h1", f"Northstar Global Health — {n} applications in the tool's own column "
+               f"vocabulary"),
+        ("p", "This is a TRANSLATION, not a second analysis. The authoritative numbers are "
+              "the Python run in Northstar-Disposition-Analysis-600.xlsx; this file carries "
+              "the same rows and the same derived scores, re-expressed in the snake_case "
+              "column vocabulary the tool's own datasets use, so the portfolio can be loaded "
+              "by the wireframe's in-browser Upload and Analyze."),
+        ("p", "The column list and its order are read at run time from the committed "
+              "App-Rationalization-Dummy-Dataset-v2.xlsx, so this file cannot drift from the "
+              "tool's real vocabulary."),
+        ("p", ""),
+        ("h2", "Read the blanks correctly"),
+        ("p", f"{len(populated)} of the {len(populated) + len(empty)} tool columns are "
+              f"populated. {len(empty)} are EMPTY, because nothing in her workbook supports "
+              f"them. A blank means she has not told us — it does NOT mean zero, and no "
+              f"column was defaulted to zero, to a neutral score or to a plausible string. "
+              f"The Column coverage sheet names every column, how many rows carry a value, "
+              f"and where that value came from or why there is none."),
+        ("p", "The 18 criterion columns carry the scores this run derived from her evidence. "
+              "Where an input was not derivable the cell is blank, which is what the tool's "
+              "own dimension arithmetic expects: it skips a null in both the numerator and "
+              "the denominator, so the dimension renormalises instead of scoring the row "
+              "down. A zero there would quietly change the answer."),
+        ("p", "Two columns are empty ON PURPOSE rather than for want of data: "
+              "lifecycle_stage, which the scoring run holds out as circular and the tool "
+              "reads for its lifecycle exclusion, and owner_stated_strategic_importance, "
+              "which is an interview field in an iteration that interviews nobody."),
+        ("p", ""),
+        ("h2", "Cost"),
+        ("p", "Her six annual TCO components are folded onto the tool's five cost "
+              "categories — vendor services onto upgrades and modules, internal labour onto "
+              "maintenance and development labour, the rest one-for-one. The fold is checked "
+              "per row: the five categories still sum to her own Annual TCO, or the run "
+              "stops."),
+        ("p", ""),
+        ("h2", "What the tool should reproduce"),
+        ("p", "  ".join(f"{d} {spread.get(d, 0)}" for d in v3.DISPOSITIONS)
+              + f" across {n} applications. The tool recomputes dimensions, gates and terms "
+              f"from the criterion columns using the same weights and the same 3.0 gate, so "
+              f"loading this file should return these same counts."),
+    ]
+
+    wb = openpyxl.Workbook()
+    wb.remove(wb.active)
+    v3.write_prose(wb.create_sheet("Read me first"), notes)
+    ws = wb.create_sheet("Applications")
+    ws.append(bands)
+    for i, b in enumerate(bands, start=1):
+        c = ws.cell(row=1, column=i)
+        c.font = Font(bold=True, size=9, color="1F3864")
+        c.alignment = Alignment(vertical="top", wrap_text=True)
+    ws.append(headers)
+    for i, h in enumerate(headers, start=1):
+        c = ws.cell(row=2, column=i)
+        c.fill = v3.HDR_FILL
+        c.font = v3.HDR_FONT
+        c.alignment = Alignment(vertical="top", wrap_text=True)
+    for rec in recs:
+        ws.append([rec.get(h) for h in headers])
+    for i, h in enumerate(headers, start=1):
+        ws.column_dimensions[v3.get_column_letter(i)].width = \
+            max(12, min(32, len(h) + 4)) if h else 12
+    ws.freeze_panes = "C3"
+    v3.write_sheet(wb.create_sheet("Column coverage"), list(coverage[0].keys()), coverage,
+                   widths={"Section": 22, "Tool column": 34,
+                           "Where it comes from, or why it is empty": 95, "Status": 30},
+                   wrap_cols=("Where it comes from, or why it is empty", "Status"))
+    wb.save(OUT_TOOL_XLSX)
+
+    csv_headers = [h for h in headers if h] + [HER_LABEL_COL]
+    with open(OUT_TOOL_CSV, "w", newline="", encoding="utf-8") as fh:
+        w = csv.DictWriter(fh, fieldnames=csv_headers, extrasaction="ignore")
+        w.writeheader()
+        for rec in recs:
+            w.writerow(rec)
+    return populated, empty, coverage
+
+
 def pct(n, d):
     return 0.0 if not d else round(100.0 * n / d, 1)
 
@@ -1046,6 +1373,10 @@ def main():
         for rec in dispo_records:
             w.writerow(rec)
 
+    # the same rows, re-expressed in the tool's own column vocabulary for the wireframe
+    tool_populated, tool_empty, _tool_cov = emit_tool_vocabulary(
+        rows, apps_by_id, ctx, clusters_by_app, src, spread)
+
     runtime_total = time.perf_counter() - t0
 
     # ---------------------------------------------------------------- summary markdown
@@ -1107,13 +1438,38 @@ def main():
         for m in vocab_audit:
             wl(f"- {m['Sheet']} · {m['Column']}: {m['Her value']} -> "
                f"{m['Read by the model as']} ({m['Rows']} rows)\n")
-        wl("\n## Outputs\n\n")
+        wl("\n## Tool-vocabulary translation (for the wireframe's Upload / Analyze)\n\n")
+        wl(f"The same 600 rows are also emitted in the tool's own snake_case column "
+           f"vocabulary, read at run time from the committed "
+           f"`App-Rationalization-Dummy-Dataset-v2.xlsx` so it cannot drift from it. "
+           f"{len(tool_populated)} of {len(tool_populated) + len(tool_empty)} tool columns "
+           f"are populated; the other {len(tool_empty)} are **empty because her workbook "
+           f"does not support them**. A blank is not a zero: no column was defaulted to "
+           f"zero, to a neutral score or to a plausible string. The 18 criterion columns "
+           f"carry this run's derived scores, and are blank where an input was not "
+           f"derivable — which is what the tool's arithmetic expects, since it skips a null "
+           f"in both numerator and denominator and renormalises.\n\n")
+        wl("Unpopulated tool columns, so nobody reads a blank as data:\n\n")
+        for h in tool_empty:
+            why = COVERAGE_WHY.get(h)
+            wl(f"- `{h}`" + (f" — {why.split('.')[0]}." if why else "") + "\n")
+        wl("\nTwo of those are empty on purpose rather than for want of data: "
+           "`lifecycle_stage`, which the scoring run holds out as circular and the UI reads "
+           "for its lifecycle exclusion, and `owner_stated_strategic_importance`, an "
+           "interview field in an iteration that interviews nobody. Her lifecycle label "
+           f"travels in `{HER_LABEL_COL}`, outside the tool's vocabulary, never scored.\n\n")
+        wl("## Outputs\n\n")
         wl(f"- `{os.path.basename(OUT_XLSX)}`\n- `{os.path.basename(OUT_CSV)}`\n"
+           f"- `{os.path.basename(OUT_TOOL_XLSX)}`\n- `{os.path.basename(OUT_TOOL_CSV)}`\n"
            f"- this file\n")
 
     print(f"Wrote {OUT_XLSX}")
     print(f"Wrote {OUT_CSV}")
+    print(f"Wrote {OUT_TOOL_XLSX}")
+    print(f"Wrote {OUT_TOOL_CSV}")
     print(f"Wrote {OUT_MD}")
+    print(f"TOOL_VOCAB populated={len(tool_populated)} empty={len(tool_empty)}")
+    print("TOOL_VOCAB_EMPTY " + ", ".join(tool_empty))
     print(f"RUNTIME_TOTAL_SECONDS {runtime_total:.3f}")
     print(f"RUNTIME_SCORING_SECONDS {runtime_scoring:.3f}")
     print("DISPOSITIONS " + " ".join(f"{d}={spread.get(d, 0)}" for d in v3.DISPOSITIONS))

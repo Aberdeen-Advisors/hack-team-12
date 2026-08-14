@@ -1,6 +1,6 @@
 # Northstar Global Health — 600-application run
 
-Model: `score_northstar_v3.py`, imported unchanged. Input: `healthcare_app_rationalization_sample_600.xlsx`. Run date 2026-08-14. Wall clock 8.09s for 600 rows (2.78s to load, normalise, score and decide).
+Model: `score_northstar_v3.py`, imported unchanged. Input: `healthcare_app_rationalization_sample_600.xlsx`. Run date 2026-08-14. Wall clock 8.62s for 600 rows (2.52s to load, normalise, score and decide).
 
 ## Schema
 
@@ -90,8 +90,66 @@ Support Role after normalisation: Secondary 1424, Duplicative 254, Primary 119.
 - App Inventory · Hosting Model: On-premises -> Customer-hosted on-premises (54 rows)
 - App Inventory · Hosting Model: Private cloud -> LEFT UNSCORED — deliberately not mapped (54 rows)
 
+## Tool-vocabulary translation (for the wireframe's Upload / Analyze)
+
+The same 600 rows are also emitted in the tool's own snake_case column vocabulary, read at run time from the committed `App-Rationalization-Dummy-Dataset-v2.xlsx` so it cannot drift from it. 78 of 125 tool columns are populated; the other 47 are **empty because her workbook does not support them**. A blank is not a zero: no column was defaulted to zero, to a neutral score or to a plausible string. The 18 criterion columns carry this run's derived scores, and are blank where an input was not derivable — which is what the tool's arithmetic expects, since it skips a null in both numerator and denominator and renormalises.
+
+Unpopulated tool columns, so nobody reads a blank as data:
+
+- `ai_delivery_form`
+- `ai_capability_class`
+- `ai_host_app_id`
+- `ai_already_entitled_elsewhere`
+- `ai_entitled_alternative_app_id`
+- `implementation_date`
+- `version_vendor_supported`
+- `technical_obsolescence_flag`
+- `legal_entity`
+- `department`
+- `cost_centre`
+- `is_orphaned`
+- `governance_visibility`
+- `is_shadow_it`
+- `capability_tag_confidence`
+- `last_signin_date`
+- `process_centrality` — her Capability Criticality uses a four-step ladder including Critical, which the tool's three-step High/Medium/Low field has no slot for.
+- `owner_stated_strategic_importance` — LEFT EMPTY DELIBERATELY.
+- `consumption_based_cost` — no metered or consumption cost line anywhere in her workbook.
+- `one_time_implementation_cost`
+- `unused_licence_spend`
+- `contract_id`
+- `annual_contract_value`
+- `term_start`
+- `notice_deadline_date`
+- `in_notice_window_now`
+- `licence_metric`
+- `early_termination_penalty`
+- `contract_runway_months`
+- `c_consumption_price_variance`
+- `r_end_user_perceived_quality`
+- `sourcing_exclusion_applied`
+- `retention_override_applied`
+- `suppressed_recommendation`
+- `suppression_reason`
+- `consolidation_saving`
+- `retention_obligation_flag`
+- `retention_expiry_date`
+- `residual_archival_cost`
+- `replacement_ongoing_tco`
+- `net_saving_five_year`
+- `realization_lag_months`
+- `urg_timeline_sensitivity`
+- `urg_risk_pain_severity`
+- `urgency_score`
+- `completeness_score`
+- `missing_fields`
+
+Two of those are empty on purpose rather than for want of data: `lifecycle_stage`, which the scoring run holds out as circular and the UI reads for its lifecycle exclusion, and `owner_stated_strategic_importance`, an interview field in an iteration that interviews nobody. Her lifecycle label travels in `her_lifecycle_stage_comparison_only_not_scored`, outside the tool's vocabulary, never scored.
+
 ## Outputs
 
 - `Northstar-Disposition-Analysis-600.xlsx`
 - `northstar-dispositions-600.csv`
+- `Northstar-600-tool-vocabulary.xlsx`
+- `northstar-600-tool-vocabulary.csv`
 - this file

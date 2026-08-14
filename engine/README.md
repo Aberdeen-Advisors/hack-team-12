@@ -64,7 +64,7 @@ exists; those constants have been repointed at the committed copies of the same 
 | `score_northstar.py` | `Northstar-Disposition-Analysis-v1.xlsx`, `northstar-dispositions.csv` |
 | `score_northstar_v2.py` | `Northstar-Disposition-Analysis-v2.xlsx`, `northstar-dispositions-v2.csv` |
 | `score_northstar_v3.py` | `Northstar-Disposition-Analysis-v3.xlsx`, `northstar-dispositions-v3.csv` |
-| `score_northstar_600.py` | `Northstar-Disposition-Analysis-600.xlsx`, `northstar-dispositions-600.csv`, `northstar-600-summary.md` |
+| `score_northstar_600.py` | `Northstar-Disposition-Analysis-600.xlsx`, `northstar-dispositions-600.csv`, `northstar-600-summary.md`, plus the same rows in the tool's own column vocabulary as `Northstar-600-tool-vocabulary.xlsx` and `northstar-600-tool-vocabulary.csv` |
 | `build_client_input.py` | `Client-Input-Dataset-v1.xlsx`, `client-input.csv` |
 
 ## Where the datasets are

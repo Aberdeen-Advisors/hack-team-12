@@ -84,6 +84,7 @@ Outputs — produced by running those inputs through the engine:
 | --- | --- |
 | `Northstar-Disposition-Analysis-v3.xlsx` + `northstar-dispositions-v3.csv` | **Current** for the 20-application sample. Run 3. |
 | `Northstar-Disposition-Analysis-600.xlsx` + `northstar-dispositions-600.csv` + `northstar-600-summary.md` | **Current** for the 600-application portfolio. Same v3 model, imported unchanged; the run reproduces every one of the 20 shared applications' v3 dispositions. |
+| `Northstar-600-tool-vocabulary.xlsx` + `northstar-600-tool-vocabulary.csv` | The same 600 rows re-expressed in the tool's own snake_case column vocabulary, so the portfolio can be loaded by the wireframe's in-browser Upload and Analyze, which does not read the Northstar layout. A translation, not a second analysis: 78 of the 125 tool columns are populated and the other 47 are deliberately empty, each named on the file's `Column coverage` sheet. Replaying the tool's own dimension arithmetic and both post-lookup guardrails over these columns reproduces the Python run's disposition on all 600 rows. |
 | `Northstar-Disposition-Analysis-v2.xlsx` + `northstar-dispositions-v2.csv` | **Superseded.** Run 2, which promoted risk to a gated dimension. |
 | `Northstar-Disposition-Analysis-v1.xlsx` + `northstar-dispositions.csv` | **Superseded.** Run 1, the first pass. |
 | `scoring-model-review.md` | A review of the scoring weights: what they are, and whether re-weighting would change any recommendation. Analysis, not output of a run. |
