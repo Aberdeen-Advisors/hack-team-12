@@ -127,7 +127,7 @@ V1_RISK_SHEET = "Risks"
 # SECTION 1 — the engine, restated verbatim from generate_dataset.py
 # =====================================================================================
 
-PASS_THRESHOLD = 3.0                 # Info-Tech comparison is >=, so exactly 3.0 passes
+PASS_THRESHOLD = 3.0                 # the comparison is >=, so exactly 3.0 passes
 SCORE_STEPS = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0]
 
 DIMENSIONS = [
@@ -161,30 +161,34 @@ CRITERIA = [
 
 DISPOSITIONS = ("retain", "invest", "consolidate", "replace", "retire")
 
+# key -> (our disposition, our priority). The 16 keys are the exhaustive enumeration of four
+# pass/fail gates; the words and priorities are the team's own, restated from
+# generate_dataset.py. The licensed Info-Tech tool whose structure the gated approach follows
+# is cited there, not reproduced: none of its vocabulary or values appears here.
 DISPOSITION_TABLE = {
-    "PPPP": ("Reward",    "Moderate",  "retain",      "Very Low"),
-    "PPPF": ("Reward",    "Moderate",  "invest",      "High"),
-    "PPFP": ("Refresh",   "High",      "invest",      "Moderate"),
-    "PPFF": ("Refresh",   "High",      "invest",      "High"),
-    "PFPP": ("Remediate", "Very High", "invest",      "Moderate"),
-    "PFPF": ("Remediate", "Very High", "invest",      "High"),
-    "PFFP": ("Replace",   "Very High", "replace",     "High"),
-    "PFFF": ("Replace",   "Very High", "replace",     "Very High"),
-    "FPPP": ("Refocus",   "Very Low",  "consolidate", "Low"),
-    "FPPF": ("Refocus",   "Moderate",  "consolidate", "Moderate"),
-    "FPFP": ("Refocus",   "High",      "retire",      "High"),
-    "FPFF": ("Refocus",   "Very High", "retire",      "Very High"),
-    "FFPP": ("Retire",    "Very High", "consolidate", "Moderate"),
-    "FFPF": ("Retire",    "Very High", "retire",      "High"),
-    "FFFP": ("Retire",    "Very High", "retire",      "Very High"),
-    "FFFF": ("Retire",    "Very High", "retire",      "Very High"),
+    "PPPP": ("retain",      "Very Low"),
+    "PPPF": ("invest",      "High"),
+    "PPFP": ("invest",      "Moderate"),
+    "PPFF": ("invest",      "High"),
+    "PFPP": ("invest",      "Moderate"),
+    "PFPF": ("invest",      "High"),
+    "PFFP": ("replace",     "High"),
+    "PFFF": ("replace",     "Very High"),
+    "FPPP": ("consolidate", "Low"),
+    "FPPF": ("consolidate", "Moderate"),
+    "FPFP": ("retire",      "High"),
+    "FPFF": ("retire",      "Very High"),
+    "FFPP": ("consolidate", "Moderate"),
+    "FFPF": ("retire",      "High"),
+    "FFFP": ("retire",      "Very High"),
+    "FFFF": ("retire",      "Very High"),
 }
 
 PRIORITY_LADDER = ["Very Low", "Low", "Moderate", "High", "Very High"]
 
 
 def gate(score):
-    """The Info-Tech comparison is >=, so exactly 3.0 passes."""
+    """The comparison is >=, so exactly 3.0 passes."""
     if score is None:
         return "F"
     return "P" if score >= PASS_THRESHOLD else "F"
@@ -257,7 +261,7 @@ def verify_engine_constants():
     problems = []
     if "PASS_THRESHOLD = 3.0" not in src:
         problems.append("PASS_THRESHOLD")
-    for key, (_tw, _tp, disp, prio) in DISPOSITION_TABLE.items():
+    for key, (disp, prio) in DISPOSITION_TABLE.items():
         needle = f'"{key}": ('
         i = src.find(needle)
         if i == -1:
@@ -1509,9 +1513,8 @@ def score_app(app, ctx):
 
 
 def apply_lookup(app, key):
-    tmpl_word, tmpl_prio, disposition, priority = DISPOSITION_TABLE[key]
-    return {"template_word": tmpl_word, "template_priority": tmpl_prio,
-            "disposition": disposition, "priority": priority}
+    disposition, priority = DISPOSITION_TABLE[key]
+    return {"disposition": disposition, "priority": priority}
 
 
 def decide(app, clusters_by_app, variant=False):

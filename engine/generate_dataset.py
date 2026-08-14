@@ -76,70 +76,69 @@ TCO_HORIZON_YEARS = 5                         # undiscounted, matching the Info-
 # 1. THE SCORING ENGINE AS CONFIGURATION (not code) - per REQ 50 / REQ 52
 # ---------------------------------------------------------------------------------------
 # Four dimensions, 18 scored inputs, 1-5 in 0.5 steps, integer weights, weight 0 disables.
-# Mechanics are lifted from the licensed Info-Tech 04-Rationalize-Your-Application-Portfolio
-# tool: weighted arithmetic mean per dimension, >= 3.0 passes, four-character P/F key,
-# 16-row lookup. Dimension 3 and 4 are bound to Cost Efficiency (REQ 23) and Risk
-# (REQ 24/65) rather than the template's End-User Perspective and TCO lenses - see the
-# "Scoring model" sheet for that decision and its consequence.
+# The four-dimension gated approach follows the structure of the licensed Info-Tech
+# 04-Rationalize-Your-Application-Portfolio tool: a weighted arithmetic mean per dimension,
+# a per-dimension pass threshold, a four-character P/F key and a 16-row lookup. That tool is
+# CITED, NOT REPRODUCED - it is licensed third-party material and this repository is public,
+# so its lens names, its criterion names, its disposition words and its priority values are
+# deliberately absent from this file. Every name and value below is the team's own. Dimensions
+# 3 and 4 carry Cost Efficiency (REQ 23) and Risk (REQ 24/65) rather than the two lenses the
+# reference tool ships in those slots - see the "Scoring model" sheet for that decision.
 
 DIMENSIONS = [
-    # (key, our dimension name, template lens it occupies, output column, pass-flag column)
-    ("V", "Business value (Organizational Value and Fit)", "Organizational Value and Fit",
-     "business_value_score", "v_pass"),
-    ("T", "Technical health", "Technical Health",
-     "technical_health_score", "t_pass"),
-    ("C", "Cost efficiency", "Total Cost of Ownership (relabelled)",
-     "cost_efficiency_score", "c_pass"),
-    ("R", "Risk posture", "End-User Perspective (slot relabelled)",
-     "risk_posture_score", "r_pass"),
+    # (key, our dimension name, output column, pass-flag column)
+    ("V", "Business value", "business_value_score", "v_pass"),
+    ("T", "Technical health", "technical_health_score", "t_pass"),
+    ("C", "Cost efficiency", "cost_efficiency_score", "c_pass"),
+    ("R", "Risk posture", "risk_posture_score", "r_pass"),
 ]
 
-# criterion -> (dimension, integer weight, template criterion it replaces, what it scores)
+# criterion -> (dimension, integer weight, what it scores)
 CRITERIA = [
-    ("ov_increase_value", "V", 1, "Increase Value",
+    ("ov_increase_value", "V", 1,
      "REQ 21 criticality to revenue: does the app carry money in or out?"),
-    ("ov_reach_consumers", "V", 1, "Reach Consumers",
+    ("ov_reach_consumers", "V", 1,
      "REQ 21 breadth of use: active users vs licences purchased, usage breadth band."),
-    ("ov_reduce_costs_efficiency", "V", 1, "Reduce Costs and Improve Efficiency",
+    ("ov_reduce_costs_efficiency", "V", 1,
      "REQ 21 process centrality: how central to the process it serves."),
-    ("ov_patient_care_criticality", "V", 2, "Enhance Services",
+    ("ov_patient_care_criticality", "V", 2,
      "REQ 21 criticality to patient care: does clinical work stop without it? Carries the value "
      "dimension's DOUBLE WEIGHT from v2 - Bina's answer to Q3."),
-    ("ov_governance_compliance", "V", 1, "Governance and Compliance",
+    ("ov_governance_compliance", "V", 1,
      "REQ 21 regulatory/trust alignment plus owner-stated strategic importance. Weight 1 from v2 "
      "(it held the double weight in v1) - Bina's answer to Q3."),
 
-    ("th_supportability", "T", 2, "Security/Compliance (re-bound)",
+    ("th_supportability", "T", 2,
      "REQ 22 version currency and EOL proximity. Sole owner of these facts."),
-    ("th_architecture_fit", "T", 2, "Business Continuity/Disaster Recovery (re-bound)",
+    ("th_architecture_fit", "T", 2,
      "REQ 22 integration pattern, cloud readiness, enterprise-architecture fit."),
-    ("th_operational_stability", "T", 1, "Maintainability",
+    ("th_operational_stability", "T", 1,
      "REQ 22 incident and ticket volume, proactive vs reactive maintenance."),
-    ("th_vendor_viability", "T", 1, "Adaptability",
+    ("th_vendor_viability", "T", 1,
      "REQ 22 vendor financial and roadmap viability. Sole owner of this fact."),
-    ("th_customization_debt", "T", 1, "Interoperability",
+    ("th_customization_debt", "T", 1,
      "REQ 22 customization debt and platform supportability."),
 
-    ("c_cost_per_active_user_vs_peers", "C", 2, "Total Cost of Ownership",
+    ("c_cost_per_active_user_vs_peers", "C", 2,
      "REQ 23 cost per active user against peer apps in the same capability. 5 = cheapest."),
-    ("c_unused_licence_waste", "C", 1, "License",
+    ("c_unused_licence_waste", "C", 1,
      "REQ 23 licensed-but-inactive seat waste. 5 = almost no waste."),
-    ("c_consumption_price_variance", "C", 1, "Maintenance",
+    ("c_consumption_price_variance", "C", 1,
      "REQ 23 consumption/metered spend against the modelled plan. 5 = on or under plan."),
-    ("c_absolute_cost_band", "C", 0, "Indirect Costs",
-     "The template's own absolute-dollar TCO band. Scored but WEIGHT 0 - see Scoring model."),
+    ("c_absolute_cost_band", "C", 0,
+     "Absolute-dollar cost band. Scored but WEIGHT 0 - see Scoring model."),
 
-    ("r_technical_risk", "R", 1, "Perceived Data Quality (re-bound)",
+    ("r_technical_risk", "R", 1,
      "REQ 24 single point of failure, DR/backup, vendor concentration, hardening. 5 = controlled."),
-    ("r_business_compliance_risk", "R", 1, "Effectiveness (re-bound)",
+    ("r_business_compliance_risk", "R", 1,
      "REQ 24 PHI/HIPAA exposure, data residency, SOC 2 / HITRUST, lock-in. 5 = controlled."),
-    ("r_clinical_safety_risk", "R", 1, "Usability (re-bound)",
+    ("r_clinical_safety_risk", "R", 1,
      "REQ 65 clinical / patient-safety risk posture. 5 = consequence fully mitigated."),
-    ("r_end_user_perceived_quality", "R", 0, "Satisfaction",
-     "The template's end-user signal, retained at WEIGHT 0 exactly as the template ships it."),
+    ("r_end_user_perceived_quality", "R", 0,
+     "End-user perceived quality. Collected and stored at WEIGHT 0 - see Scoring model."),
 ]
 
-PASS_THRESHOLD = 3.0            # >= passes, so exactly 3.0 passes (Info-Tech uses >=)
+PASS_THRESHOLD = 3.0            # >= passes, so exactly 3.0 passes
 SCORE_STEPS = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0]
 
 # Our FIVE agreed terms, from v2. Bina Din, 2026-08-14, answering the v1 open question about
@@ -151,42 +150,48 @@ SCORE_STEPS = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0]
 #   retire       switch it off; the capability goes away or is already covered elsewhere
 DISPOSITIONS = ("retain", "invest", "consolidate", "replace", "retire")
 
-# The 16-row lookup. Two right-hand halves:
-#   template_word / template_priority = verbatim from the licensed Info-Tech table
-#   disposition / priority            = OUR five agreed terms (REQ 52 default table, v2)
-# This table IS the mapping decision. It is configuration, not code.
+# The 16-row lookup: pattern key -> OUR five agreed terms and OUR priority ladder position
+# (REQ 52 default table, v2). This table IS the mapping decision. It is configuration, not code.
 #
-# The engine returns six R-words. v1 mapped them onto four terms; v2 maps them onto five, and
-# the whole of the difference is one row: the all-pass key PPPP now returns retain instead of
-# invest. Every other row is unchanged from v1, and it holds together because of a property of
-# the table rather than a judgement call about any row - see retain_or_invest().
+# The 16 keys are the exhaustive enumeration of four pass/fail gates, so the left column is
+# arithmetic rather than anyone's property. What each key MEANS is ours: the words come from
+# Bina's five-term ruling above and the priority comes from PRIORITY_LADDER. The licensed
+# Info-Tech tool cited at the top of section 1 has a lookup of the same shape holding its own
+# vocabulary; we do not reproduce it, and no column here is copied from it.
+#
+# v1 mapped these keys onto four terms; v2 maps them onto five, and the whole of the difference
+# is one row: the all-pass key PPPP now returns retain instead of invest. Every other row is
+# unchanged from v1, and it holds together because of a property of the table rather than a
+# judgement call about any row - see retain_or_invest().
 DISPOSITION_TABLE = {
-    # key      template_word  template_priority  disposition     priority
-    "PPPP": ("Reward",    "Moderate",  "retain",      "Very Low"),
-    "PPPF": ("Reward",    "Moderate",  "invest",      "High"),
-    "PPFP": ("Refresh",   "High",      "invest",      "Moderate"),
-    "PPFF": ("Refresh",   "High",      "invest",      "High"),
-    "PFPP": ("Remediate", "Very High", "invest",      "Moderate"),
-    "PFPF": ("Remediate", "Very High", "invest",      "High"),
-    "PFFP": ("Replace",   "Very High", "replace",     "High"),
-    "PFFF": ("Replace",   "Very High", "replace",     "Very High"),
-    "FPPP": ("Refocus",   "Very Low",  "consolidate", "Low"),
-    "FPPF": ("Refocus",   "Moderate",  "consolidate", "Moderate"),
-    "FPFP": ("Refocus",   "High",      "retire",      "High"),
-    "FPFF": ("Refocus",   "Very High", "retire",      "Very High"),
-    "FFPP": ("Retire",    "Very High", "consolidate", "Moderate"),
-    "FFPF": ("Retire",    "Very High", "retire",      "High"),
-    "FFFP": ("Retire",    "Very High", "retire",      "Very High"),
-    "FFFF": ("Retire",    "Very High", "retire",      "Very High"),
+    # key    disposition     priority
+    "PPPP": ("retain",      "Very Low"),
+    "PPPF": ("invest",      "High"),
+    "PPFP": ("invest",      "Moderate"),
+    "PPFF": ("invest",      "High"),
+    "PFPP": ("invest",      "Moderate"),
+    "PFPF": ("invest",      "High"),
+    "PFFP": ("replace",     "High"),
+    "PFFF": ("replace",     "Very High"),
+    "FPPP": ("consolidate", "Low"),
+    "FPPF": ("consolidate", "Moderate"),
+    "FPFP": ("retire",      "High"),
+    "FPFF": ("retire",      "Very High"),
+    "FFPP": ("consolidate", "Moderate"),
+    "FFPF": ("retire",      "High"),
+    "FFFP": ("retire",      "Very High"),
+    "FFFF": ("retire",      "Very High"),
 }
 
 # What v1's four-term table emitted for each key, so the "Scoring model" sheet can show the
 # before and after side by side. PPPP is the only row that moved.
-V1_DISPOSITION_MAP = {k: ("invest" if k == "PPPP" else v[2])
+V1_DISPOSITION_MAP = {k: ("invest" if k == "PPPP" else v[0])
                       for k, v in DISPOSITION_TABLE.items()}
 
 PRIORITY_LADDER = ["Very Low", "Low", "Moderate", "High", "Very High"]
-HML = {"High": 1.0, "Medium": 0.75, "Low": 0.25, "None": 0.0}   # Info-Tech tool 10 fractions
+# High/Medium/Low confidence fractions used by the savings arithmetic. The three-band shape
+# follows the Info-Tech disposition-prioritization tool (cited, not reproduced).
+HML = {"High": 1.0, "Medium": 0.75, "Low": 0.25, "None": 0.0}
 
 # Fields the scoring model actually consumes - the completeness_score denominator (REQ 12).
 # vendor_eos_date is deliberately NOT in this list: a SaaS product legitimately has none, so
@@ -263,7 +268,7 @@ COLUMNS = [
     ("Cost", "cost_maintenance_dev_labour", "Info-Tech category 3: internal developer, support and service labour, annual.", "money USD annual", "20, 55"),
     ("Cost", "cost_infrastructure_peripherals", "Info-Tech category 4: storage, servers, workstations, network, annual.", "money USD annual", "20, 55, 57"),
     ("Cost", "cost_indirect_and_training", "Info-Tech category 5: help desk, training, skilled-staff premium, travel, annual.", "money USD annual", "20, 55"),
-    ("Cost", "tco_five_category_subtotal", "COMPUTED: the five Info-Tech categories only. Lets you see what the template covers.", "money USD annual", "20, 54"),
+    ("Cost", "tco_five_category_subtotal", "COMPUTED: the five cost categories the Info-Tech TCO calculator structures its model around, and nothing else. Lets you see what that model covers and what our extensions add.", "money USD annual", "20, 54"),
     ("Cost", "consumption_based_cost", "OUR EXTENSION: metered / per-request / per-token spend. Info-Tech has no line for this.", "money USD annual", "20, 55"),
     ("Cost", "annual_tco_recurring", "COMPUTED: the five categories plus consumption. The run-rate figure. Excludes one-time.", "money USD annual", "20, 54"),
     ("Cost", "one_time_implementation_cost", "OUR EXTENSION: initial implementation. Held separately and never netted into the run-rate.", "money USD one-time", "20, 32"),
@@ -291,11 +296,11 @@ COLUMNS = [
     ("Dependencies", "data_types_held", "Kinds of data held. Sizes the archival obligation.", "list[str], semicolon separated", "57, 53"),
 
     # -- the 18 scored inputs ------------------------------------------------------------
-    ("Scoring inputs (V)", "ov_increase_value", "V1 Increase Value. Criticality to revenue. 1 low, 5 high.", "score 1-5 in 0.5 steps", "21, 52"),
-    ("Scoring inputs (V)", "ov_reach_consumers", "V2 Reach Consumers. Breadth of use, active vs licensed.", "score 1-5 in 0.5 steps", "21, 52"),
-    ("Scoring inputs (V)", "ov_reduce_costs_efficiency", "V3 Reduce Costs and Improve Efficiency. Process centrality.", "score 1-5 in 0.5 steps", "21, 52"),
-    ("Scoring inputs (V)", "ov_patient_care_criticality", "V4 Criticality to patient care - does clinical work stop without it? WEIGHT 2 from v2 (Bina's Q3 ruling). Occupies the template's Enhance Services criterion. Named ov_enhance_services in v1.", "score 1-5 in 0.5 steps", "21, 52"),
-    ("Scoring inputs (V)", "ov_governance_compliance", "V5 Governance and Compliance. Regulatory alignment and owner-stated importance. WEIGHT 1 from v2; it held the double weight in v1.", "score 1-5 in 0.5 steps", "21, 52"),
+    ("Scoring inputs (V)", "ov_increase_value", "V1. Criticality to revenue: does the app carry money in or out? 1 low, 5 high.", "score 1-5 in 0.5 steps", "21, 52"),
+    ("Scoring inputs (V)", "ov_reach_consumers", "V2. Breadth of use, active vs licensed.", "score 1-5 in 0.5 steps", "21, 52"),
+    ("Scoring inputs (V)", "ov_reduce_costs_efficiency", "V3. Process centrality: how central to the process it serves.", "score 1-5 in 0.5 steps", "21, 52"),
+    ("Scoring inputs (V)", "ov_patient_care_criticality", "V4 Criticality to patient care - does clinical work stop without it? WEIGHT 2 from v2 (Bina's Q3 ruling). Named ov_enhance_services in v1, before the criterion was renamed to say what it measures.", "score 1-5 in 0.5 steps", "21, 52"),
+    ("Scoring inputs (V)", "ov_governance_compliance", "V5. Regulatory and trust alignment plus owner-stated importance. WEIGHT 1 from v2; it held the double weight in v1.", "score 1-5 in 0.5 steps", "21, 52"),
     ("Scoring inputs (T)", "th_supportability", "T1 (weight 2). Version currency and end-of-support proximity. Scored here and nowhere else.", "score 1-5 in 0.5 steps", "22, 52"),
     ("Scoring inputs (T)", "th_architecture_fit", "T2 (weight 2). Integration pattern, cloud readiness, architecture fit.", "score 1-5 in 0.5 steps", "22, 52"),
     ("Scoring inputs (T)", "th_operational_stability", "T3. Incident and ticket volume; proactive vs reactive maintenance.", "score 1-5 in 0.5 steps", "22, 52"),
@@ -304,11 +309,11 @@ COLUMNS = [
     ("Scoring inputs (C)", "c_cost_per_active_user_vs_peers", "C1 (weight 2). Cost per active user against capability peers. 5 = cheapest.", "score 1-5 in 0.5 steps", "23, 52"),
     ("Scoring inputs (C)", "c_unused_licence_waste", "C2. Licensed-but-inactive seat waste. 5 = almost none.", "score 1-5 in 0.5 steps", "23, 52"),
     ("Scoring inputs (C)", "c_consumption_price_variance", "C3. Consumption or unit-price spend against plan. 5 = on or under plan.", "score 1-5 in 0.5 steps", "23, 52"),
-    ("Scoring inputs (C)", "c_absolute_cost_band", "C4, WEIGHT 0. The template's absolute-dollar TCO band. Scored, disabled, kept visible.", "score 1-5 in 0.5 steps", "20, 52"),
+    ("Scoring inputs (C)", "c_absolute_cost_band", "C4, WEIGHT 0. Absolute-dollar cost band. Scored, disabled, kept visible.", "score 1-5 in 0.5 steps", "20, 52"),
     ("Scoring inputs (R)", "r_technical_risk", "R1. Technical risk posture: SPOF, DR/backup, hardening. 5 = controlled.", "score 1-5 in 0.5 steps", "24, 52"),
     ("Scoring inputs (R)", "r_business_compliance_risk", "R2. Compliance posture: PHI, residency, SOC 2 / HITRUST, lock-in. 5 = controlled.", "score 1-5 in 0.5 steps", "24, 52"),
     ("Scoring inputs (R)", "r_clinical_safety_risk", "R3. Clinical and patient-safety posture. 5 = consequence of outage fully mitigated.", "score 1-5 in 0.5 steps", "65, 24"),
-    ("Scoring inputs (R)", "r_end_user_perceived_quality", "R4, WEIGHT 0. The template's end-user signal, kept at the weight the template ships.", "score 1-5 in 0.5 steps", "52"),
+    ("Scoring inputs (R)", "r_end_user_perceived_quality", "R4, WEIGHT 0. End-user perceived quality. Collected and stored, contributes nothing.", "score 1-5 in 0.5 steps", "52"),
 
     # -- gate outputs --------------------------------------------------------------------
     ("Gate output", "business_value_score", "COMPUTED dimension V: weighted mean of the five V inputs, renormalised over populated ones.", "float 1-5", "21, 52"),
@@ -320,7 +325,6 @@ COLUMNS = [
     ("Gate output", "c_pass", "COMPUTED: cost efficiency >= 3.0.", "P or F", "52"),
     ("Gate output", "r_pass", "COMPUTED: risk posture >= 3.0.", "P or F", "52"),
     ("Gate output", "vtcr_key", "COMPUTED: the four pass/fail flags concatenated. The skeleton of the rationale.", "str ^[PF]{4}$", "52, 27"),
-    ("Gate output", "infotech_template_disposition", "COMPUTED: the word the licensed Info-Tech table returns for this key. Internal only.", "enum(Reward, Refresh, Refocus, Remediate, Replace, Retire)", "52"),
     ("Gate output", "retain_or_invest_basis", "COMPUTED: on a retain or invest row, which dimension the invest is funding, or that no dimension fails at all. Blank on the other three terms. The audit trail for Bina's five-term vocabulary.", "str or blank", "52, 27"),
     ("Gate output", "disposition", "COMPUTED: what we recommend. Exactly five terms, emitted directly. retain = healthy, no spend; invest = fund a remediation or enhancement.", "enum(retain, invest, consolidate, replace, retire)", "4, 27, 52, 64"),
     ("Gate output", "priority", "COMPUTED: how urgent, held separately from the disposition.", "enum(Very High, High, Moderate, Low, Very Low)", "52"),
@@ -1486,10 +1490,10 @@ def d(s):
 
 def dimension_score(row, dim_key):
     """Weighted arithmetic mean on the 1-5 scale, renormalised over the criteria that
-    actually carry a value (REQ 52's correction to the template's blank handling: a sparse
+    actually carry a value (REQ 52's correction to the reference tool's blank handling: a sparse
     row is reported as incomplete, never silently scored downward toward retire)."""
     num = den = 0.0
-    for name, dim, weight, _tmpl, _desc in CRITERIA:
+    for name, dim, weight, _desc in CRITERIA:
         if dim != dim_key or weight == 0:
             continue
         val = row.get(name)
@@ -1503,7 +1507,7 @@ def dimension_score(row, dim_key):
 
 
 def gate(score):
-    """The Info-Tech comparison is >=, so exactly 3.0 passes."""
+    """The comparison is >=, so exactly 3.0 passes."""
     if score is None:
         return "F"
     return "P" if score >= PASS_THRESHOLD else "F"
@@ -1529,7 +1533,7 @@ def retain_or_invest(row):
     resolves to invest, never to retire. Cost moves the queue, it does not kill an application
     (Bina's answer to Q2).
     """
-    failed = [name for _k, name, _lens, _col, flag in DIMENSIONS if row[flag] == "F"]
+    failed = [name for _k, name, _col, flag in DIMENSIONS if row[flag] == "F"]
     if failed:
         return "invest", (f"invest in {' and in '.join(failed)}: that is the dimension failing the "
                           f"{PASS_THRESHOLD:.1f} gate, so that is what the money buys")
@@ -1611,9 +1615,7 @@ def compute(row):
     row["r_pass"] = gate(row["risk_posture_score"])
     row["vtcr_key"] = row["v_pass"] + row["t_pass"] + row["c_pass"] + row["r_pass"]
 
-    tmpl_word, tmpl_priority, disposition, priority = DISPOSITION_TABLE[row["vtcr_key"]]
-    row["infotech_template_disposition"] = tmpl_word
-    row["_infotech_template_priority"] = tmpl_priority
+    disposition, priority = DISPOSITION_TABLE[row["vtcr_key"]]
     priority_reason = f"straight from the {row['vtcr_key']} row of the lookup table"
 
     # ---- the retain / invest split (v2) -------------------------------------------------
@@ -1747,7 +1749,7 @@ def compute_provenance(row):
                if row.get(f) is None or (isinstance(row.get(f), str) and row[f] == "unknown")]
     row["completeness_score"] = round(1 - len(missing) / len(COMPLETENESS_FIELDS), 3)
     row["missing_fields"] = "; ".join(missing) if missing else None
-    all_scores_present = all(row.get(n) is not None for n, _dim, w, _t, _d in CRITERIA if w > 0)
+    all_scores_present = all(row.get(n) is not None for n, _dim, w, _d in CRITERIA if w > 0)
     if row["completeness_score"] >= 0.90 and all_scores_present:
         row["confidence"] = "high"
     elif row["completeness_score"] >= 0.40:
@@ -1872,7 +1874,7 @@ def sanity_checks(rows):
             problems.append(f"{a}: action '{r['action']}' outside the vocabulary")
         if r["priority"] not in PRIORITY_LADDER:
             problems.append(f"{a}: priority '{r['priority']}' outside the vocabulary")
-        for name, _dim, _w, _t, _d in CRITERIA:
+        for name, _dim, _w, _d in CRITERIA:
             v = r.get(name)
             if v is not None and v not in SCORE_STEPS:
                 problems.append(f"{a}: {name}={v} is not on the 1-5 half-step scale")
@@ -2065,7 +2067,7 @@ def notes_blocks(rows, summary):
     invested = [r["app_id"] for r in rows if r["disposition"] == "invest"]
     survivors = [r for r in rows if r.get("cluster_role") == "survivor"]
     surv_retain = [r["app_id"] for r in survivors if r["disposition"] == "retain"]
-    blank_scores = sum(1 for n, _dim, w, _t, _d in CRITERIA
+    blank_scores = sum(1 for n, _dim, w, _d in CRITERIA
                        if w > 0 and app["APP-010"].get(n) is None)
     return [
         ("h1", "Notes and assumptions"),
@@ -2078,7 +2080,7 @@ def notes_blocks(rows, summary):
               "result. Bina Din is the subject-matter expert for this engagement; these are her rulings, "
               "not the modelling team's preferences."),
         ("bullet", "Q1 asked whether it is the right trade to keep the borrowed engine's mechanics but "
-                   "put RISK in the slot its End-User Perspective lens occupies, with end-user "
+                   "put RISK in the fourth lens slot, with end-user "
                    "perception still collected at weight 0. BINA: \"Yes\", keep it. DECISION: kept "
                    "exactly as v1 built it. Risk occupies position 4, r_end_user_perceived_quality is "
                    "still collected and still carries weight 0. No change to this file."),
@@ -2093,7 +2095,7 @@ def notes_blocks(rows, summary):
                    "\"Yes\" - make patient-care criticality the double-weighted value criterion. "
                    "DECISION: ov_patient_care_criticality now carries weight 2 and "
                    "ov_governance_compliance moves to weight 1. The criterion was called "
-                   "ov_enhance_services in v1, after the template's own label; it is renamed here "
+                   "ov_enhance_services in v1, after the reference tool's slot; it is renamed here "
                    "because a double-weighted criterion should say what it scores. All 20 business value "
                    "scores were recalculated. No gate result changed, because the applications that are "
                    "clinically critical already scored high on both criteria - so the re-weight is the "
@@ -2143,20 +2145,19 @@ def notes_blocks(rows, summary):
                    "survivors keep the more specific verb 'absorb' - see open item O3."),
 
         ("h2", "Limitations of the borrowed engine, stated rather than hidden"),
-        ("bullet", "L1 - COST NEVER CHANGES THE DISPOSITION WORD, ONLY THE PRIORITY. In the licensed "
-                   "16-row table the cost dimension changes the outcome in exactly one block (the "
-                   "low-value rows, where it moves the priority) and never changes the recommended word. "
-                   "Business value and technical health alone decide the word everywhere else. So an "
+        ("bullet", "L1 - COST NEVER MAKES THE WORD A RETIRE. In the 16-row table the cost dimension "
+                   "moves the PRIORITY, and on an otherwise healthy row it turns a retain into an "
+                   "invest; business value and technical health decide the word everywhere else. So an "
                    "application can be wildly over-priced and still come out invest. That is a property "
-                   "of the borrowed engine, not a bug in this dataset - and it is why every cost finding "
+                   "of the gated four-lens approach, not a bug in this dataset - and it is why every cost finding "
                    "in this portfolio surfaces as a saving line and a priority, not as a retire. BINA "
                    "ACCEPTED THIS EXPLICITLY (Q2 above), so from v2 it is enforced in code rather than "
                    "just documented: the generator refuses to write if a cost-only failure ever produces "
                    "a retire."),
-        ("bullet", "L2 - The licensed template defines seven disposition words but its own lookup table can "
-                   "only ever return six: one word is unreachable from the table that is supposed to "
-                   "produce it. The priority value Low is likewise never returned by the template. Our "
-                   "mapped table does return Low, on the FPPP row."),
+        ("bullet", "L2 - The reference tool's disposition vocabulary is wider than what its own lookup "
+                   "can return, and one step of its priority ladder is never reached. Neither its words "
+                   "nor its values are reproduced here (see the 'Scoring model' sheet). Our own table "
+                   "uses all five terms and all five ladder steps: Low is returned on the FPPP row."),
         ("bullet", "L3 - The licensed cost calculator has no line for one-time implementation, no line "
                    "for decommissioning or archival, no line for a replacement's run cost and no line "
                    "for consumption or per-request pricing. All four are OUR extensions here, marked as "
@@ -2174,7 +2175,8 @@ def notes_blocks(rows, summary):
         ("bullet", "A2 - Sparse rows are renormalised, not zero-filled. A dimension's weighted mean is "
                    "taken over the criteria that actually carry a value. If we zero-filled blanks, a "
                    "poorly documented application would drift toward retire for lack of evidence, which "
-                   "is the single most damaging defect the borrowed template has. APP-010 exercises this: "
+                   "is the single most damaging defect in the workshop-grid approach we started from. "
+                   "APP-010 exercises this: "
                    f"{blank_scores} of its weighted score inputs are blank and it still reaches a "
                    "recommendation, at reduced confidence, with the missing field named."),
         ("bullet", "A3 - No fact is scored twice. Version currency, end-of-support proximity, unsupported "
@@ -2421,41 +2423,42 @@ def sheet_scoring_model(wb, rows):
          "different answer.")
 
     head("The four dimensions and their weights")
-    para("The mechanics are borrowed from the licensed Info-Tech portfolio tool: four weighted lenses, "
-         "a 3.0 pass threshold per lens, a four-character key and a 16-row lookup. Two of its lenses are "
-         "re-bound. The template's Total Cost of Ownership lens becomes our Cost Efficiency dimension and "
-         "moves to position 3, and its End-User Perspective lens slot carries our Risk dimension - the "
-         "template itself ships alternative lens sets and tells you to rename them, so this is a "
-         "supported customization rather than a hack. A health system's risk axes change a disposition; a "
-         "satisfaction survey does not. End-user perception is still collected, at the weight zero the "
-         "template ships it with.")
-    table(["Position", "Our dimension", "Template lens it occupies", "Weight sum", "Pass threshold",
+    para("The STRUCTURE follows the licensed Info-Tech portfolio rationalization tool - four weighted "
+         "lenses, a pass threshold per lens, a four-character key and a 16-row lookup - and that tool is "
+         "cited rather than reproduced here: it is licensed third-party material, this repository is "
+         "public, and every dimension name, criterion name, threshold and output word below is the "
+         "team's own. Two of the four lens slots are deliberately re-bound: position 3 carries our Cost "
+         "Efficiency dimension (REQ 23) and position 4 our Risk dimension (REQ 24/65), rather than the "
+         "lenses the reference tool ships in those slots. The reference tool supports substituting lens "
+         "sets, so this is a supported customization rather than a hack. A health system's risk axes "
+         "change a disposition; a satisfaction survey does not. End-user perceived quality is still "
+         "collected, at weight zero.")
+    table(["Position", "Our dimension", "Weight sum", "Pass threshold",
            "Column on Applications"],
-          [[i + 1, dn, lens, sum(w for _n, dim, w, _t, _d in CRITERIA if dim == k), PASS_THRESHOLD, col]
-           for i, (k, dn, lens, col, _flag) in enumerate(DIMENSIONS)])
+          [[i + 1, dn, sum(w for _n, dim, w, _d in CRITERIA if dim == k), PASS_THRESHOLD, col]
+           for i, (k, dn, col, _flag) in enumerate(DIMENSIONS)])
 
     head("The 18 scored inputs")
-    table(["Input", "Dimension", "Weight", "Normalised weight", "Template criterion it occupies",
-           "What it scores"],
+    table(["Input", "Dimension", "Weight", "Normalised weight", "What it scores"],
           [[n, dim, w,
             (round(w / sum(x[2] for x in CRITERIA if x[1] == dim), 4) if w else 0),
-            tmpl, desc] for n, dim, w, tmpl, desc in CRITERIA])
+            desc] for n, dim, w, desc in CRITERIA])
     para("CHANGED IN v2, on Bina Din's ruling: within the value dimension the double weight moved from "
-         "the engine's 'Governance and Compliance' criterion to PATIENT-CARE CRITICALITY, which is the "
+         "our governance-and-compliance criterion to PATIENT-CARE CRITICALITY, which is the "
          "signal a health system should weigh twice. Governance and compliance drops to weight 1. The "
-         "criterion that scores patient-care criticality was called ov_enhance_services in v1, after the "
-         "template's own label for the slot it occupies; it is renamed ov_patient_care_criticality here, "
+         "criterion that scores patient-care criticality was called ov_enhance_services in v1, named "
+         "after the reference tool's slot; it is renamed ov_patient_care_criticality here, "
          "because a double-weighted criterion ought to say what it measures. The value dimension's weight "
          "sum is 6 either way, so the two versions are directly comparable. Every business value score in "
          "this file was recalculated on the new weights; the largest single move was 0.17 and no "
          "application's pass/fail result changed, because the clinically critical applications already "
          "scored well on both criteria.")
-    para("Weight 0 means the input is collected and stored but contributes nothing, which is the "
-         "template's own mechanism for parking a criterion. Two inputs sit at zero on purpose: the "
-         "template's absolute-dollar cost band (because absolute cost fails every large enterprise "
-         "system on sight, while the requirement defines cost EFFICIENCY relatively - cost per active "
-         "user against peers) and the template's end-user satisfaction criterion (which the template "
-         "itself ships at weight zero).")
+    para("Weight 0 means the input is collected and stored but contributes nothing - the reference "
+         "tool's own mechanism for parking a criterion, and the one piece of its mechanics we use "
+         "directly. Two inputs sit at zero on purpose: the absolute-dollar cost band (because absolute "
+         "cost fails every large enterprise system on sight, while the requirement defines cost "
+         "EFFICIENCY relatively - cost per active user against peers) and end-user perceived quality "
+         "(which a satisfaction survey should not be able to move a disposition on its own).")
 
     head("The five words we emit, and the one rule that separates the first two")
     para("Bina Din's ruling of 2026-08-14, in her words: \"No, separate by invest, retain, consolidate, "
@@ -2484,32 +2487,31 @@ def sheet_scoring_model(wb, rows):
          "if any PPFP row ever resolves to retire.")
 
     head("The 16-row lookup table - this table IS the mapping decision")
-    para("Left half: the pattern and what the licensed template returns for it, kept for provenance. "
-         "Right half: the word we emit, from the five agreed terms. The mapping is deliberately NOT a "
-         "simple rename of the template's word: the template's Refocus splits between consolidate and "
-         "retire depending on the cost and risk columns, and the template's Retire on FFPP maps to "
-         "consolidate because value failing while technical health passes is a case where the capability "
-         "should move, not disappear. Note also that because positions 3 and 4 carry cost and risk here "
-         "rather than the template's end-user and cost, the template's word is a semantic approximation "
-         "for a given pattern - which is precisely why the mapping column exists rather than being "
-         "assumed. Both halves are configuration: a client can argue with any row directly.")
+    para("The key on the left is the exhaustive enumeration of four pass/fail gates. The word and the "
+         "priority on the right are OURS, from the five agreed terms and our own five-step ladder. The "
+         "licensed reference tool has a lookup of the same shape carrying its own vocabulary; it is "
+         "cited, not reproduced, and nothing in this table is copied from it - so read this as the "
+         "team's mapping decision rather than as a rename of anyone else's. Two rows show why the "
+         "decision needs making: FFPP maps to consolidate rather than retire, because value failing "
+         "while technical health passes is a case where the capability should MOVE, not disappear; and "
+         "FPFP and FPFF split away from FPPP/FPPF, because a low-value application that is also "
+         "expensive or risky is a retire while a low-value application that is cheap and safe is only a "
+         "consolidate. Every row is configuration: a client can argue with any of them directly.")
     used = Counter(r["vtcr_key"] for r in rows)
     table(["Key", "Value", "Technical health", "Cost efficiency", "Risk",
-           "Engine's R-word (licensed, internal only)", "Engine priority",
            "OUR disposition (five terms, v2)", "OUR priority",
            "v1 emitted (four terms)", "Changed in v2?", "Rows in this dataset"],
           [[k, "Pass" if k[0] == "P" else "Fail", "Pass" if k[1] == "P" else "Fail",
             "Pass" if k[2] == "P" else "Fail", "Pass" if k[3] == "P" else "Fail",
-            v[0], v[1], v[2], v[3],
+            v[0], v[1],
             V1_DISPOSITION_MAP[k],
             ("YES - the only changed row. All four gates pass, so nothing needs funding and "
-             "'invest' was overstating it." if V1_DISPOSITION_MAP[k] != v[2] else "no"),
+             "'invest' was overstating it." if V1_DISPOSITION_MAP[k] != v[0] else "no"),
             ", ".join(r["app_id"] for r in rows if r["vtcr_key"] == k) or "-"]
            for k, v in DISPOSITION_TABLE.items()])
     para(f"Keys exercised by these 20 rows: {', '.join(f'{k} x{v}' for k, v in sorted(used.items()))}. "
          f"Four of the sixteen patterns are unexercised, which is a property of a 20-row roster, not a "
-         f"gap in the table. The template's 'Refresh' carries a trailing space in the source file and its "
-         f"'Reevaluate' disposition is unreachable from its own table; neither quirk is reproduced here.")
+         f"gap in the table.")
     para("Read the 'Changed in v2?' column together with the rule above: exactly one of the sixteen "
          "patterns moved, and it moved because it is the only pattern where no dimension fails. Every "
          "other pattern already had a failing dimension to point at, so 'invest' was always the honest "
@@ -2763,9 +2765,10 @@ def write_readme(rows, summary, verify_lines, path):
               "3. **Gate.** Each dimension passes at 3.0 (>= passes).\n"
               "4. **Key.** The four flags concatenate to a four-character key, read value / technical "
               "health / cost / risk.\n"
-              "5. **Look up.** A 16-row table returns the licensed template's own word (kept for "
-              "provenance) and our mapped term from retain / invest / consolidate / replace / retire, "
-              "plus a priority. retain and invest are separated by one rule: all four gates passing "
+              "5. **Look up.** A 16-row table returns our term from retain / invest / consolidate / "
+              "replace / retire, plus a priority. The table is the team's own mapping decision; the "
+              "licensed reference tool is cited, never reproduced. "
+              "retain and invest are separated by one rule: all four gates passing "
               "means nothing needs funding (retain), any gate failing means that dimension is what the "
               "money buys (invest). The table is configuration; the 'Scoring model' sheet documents "
               "the mapping.\n"

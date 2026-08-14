@@ -640,7 +640,7 @@ rt = [
     ("p", "These are computed correctly but from broken inputs, so they fail too, and they "
           "will all come right the moment the stages above exist: business_value_score, "
           "technical_health_score, cost_efficiency_score, c_pass, vtcr_key, "
-          "infotech_template_disposition, retain_or_invest_basis, disposition, priority, "
+          "retain_or_invest_basis, disposition, priority, "
           "rationale, confidence, redundancy_override_applied, suppressed_recommendation, "
           "suppression_reason, consolidation_saving, gross_saving_annual, net_saving_annual, "
           "net_saving_five_year, urgency_score, completeness_score, missing_fields."),
