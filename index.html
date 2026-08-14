@@ -3343,7 +3343,11 @@ svg.lucide {
           if (values.length) {
             sel.disabled = false;
             sel.value = values.indexOf(previous) >= 0 ? previous : "";
-            if (hint) hint.textContent = "";
+            if (hint) {
+              hint.textContent = facet === "critical"
+                ? "Process centrality, read from your data."
+                : "";
+            }
           } else {
             sel.disabled = true;
             sel.value = "";

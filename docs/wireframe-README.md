@@ -156,6 +156,30 @@ Both `aria-live="polite"` regions are kept, the banner is one of them, the mix b
 savings comparison update their `aria-label` alongside their geometry, and every control stays
 keyboard-reachable (the file input is visually hidden but focusable, with an `aria-label`).
 
+### The three workbench filters
+
+The Business capability, Recommendation and Critical operation selects narrow the decision table
+on the workbench. They combine with AND, and `Showing N of M applications` above the table is
+derived from the rows actually rendered, so it cannot drift from what is on screen. A combination
+that matches nothing replaces the rows with a sentence saying so and a button that clears all
+three; a **Clear filters** button beside the selects does the same and is disabled while no filter
+is set. Filtering never re-renders a detail panel, so clicking a row in a filtered table opens its
+evidence exactly as before.
+
+Two of the three are populated from the data rather than hardcoded. Business capability lists the
+distinct `primary_capability` values in the analyzed rows; Critical operation lists the distinct
+`process_centrality` values, which is the only critical-operation signal an uploaded inventory
+carries — the select says so underneath. If either column is missing from a file, that select is
+disabled and names the column it wanted. Recommendation stays a fixed list of the five terms plus
+Needs validation, because that vocabulary is the model's, not the file's.
+
+The filters scope the table and nothing else. Every headline figure, the savings comparison, the
+decision mix, the guardrails and the clusters are all rendered from the whole analysis and are
+never recomputed on a filter change; each headline figure carries a `Portfolio total` pill so a
+narrowed table cannot be read as a changed total. A browser test asserts this directly: it
+captures the figures and the mix before and after applying a filter and requires them to be
+identical.
+
 ### Measured parity with the Python engine
 
 The scoring is a port of the core of `engine/generate_dataset.py` — `CRITERIA`, `PASS_THRESHOLD`,
@@ -216,6 +240,5 @@ column names is a separate job.
 These are still deliberately non-functional and should stay that way until there is something
 real behind them:
 
-- the three filter selects — Business capability, Recommendation, Critical operation;
 - **Export decisions**;
 - **Generate executive readout**.
