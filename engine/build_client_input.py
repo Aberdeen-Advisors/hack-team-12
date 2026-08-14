@@ -10,8 +10,14 @@ import json
 import os
 import sys
 
-OUT = "/tmp/claude-0/-home-claude/894f0710-2492-5ee1-ba03-47d6878e86d8/scratchpad/out"
-sys.path.insert(0, OUT)
+# Every input and output is addressed relative to this file, so the run works from any fresh
+# clone: the engine is imported from beside this script, the generated v2 dataset is read from
+# data/synthetic-portfolio/, and the tier map and both outputs live in data/client-intake/.
+HERE = os.path.dirname(os.path.abspath(__file__))
+REPO = os.path.join(HERE, os.pardir)
+PORTFOLIO_DIR = os.path.join(REPO, "data", "synthetic-portfolio")
+OUT = os.path.join(REPO, "data", "client-intake")
+sys.path.insert(0, HERE)
 
 import generate_dataset as g                      # noqa: E402
 from openpyxl import Workbook, load_workbook      # noqa: E402
@@ -23,7 +29,7 @@ TIERS = json.load(open(os.path.join(OUT, "column-tiers.json")))
 # ---------------------------------------------------------------------------------------
 # Tier partition, recounted from the workbook's own "Provided by" column
 # ---------------------------------------------------------------------------------------
-_wb2 = load_workbook(os.path.join(OUT, "App-Rationalization-Dummy-Dataset-v2.xlsx"))
+_wb2 = load_workbook(os.path.join(PORTFOLIO_DIR, "App-Rationalization-Dummy-Dataset-v2.xlsx"))
 _dd = _wb2["Data dictionary"]
 _hdr = [c.value for c in _dd[1]]
 PROVIDED_BY = {r[_hdr.index("Column")]: r[_hdr.index("Provided by")]
@@ -146,7 +152,7 @@ BY_ID = {r["app_id"]: r for r in FULL}
 
 # Confirm the built rows are byte-identical to the published applications-v2.csv,
 # so "same values as the full dataset" is a checked claim, not an assumption.
-with open(os.path.join(OUT, "applications-v2.csv"), newline="", encoding="utf-8") as fh:
+with open(os.path.join(PORTFOLIO_DIR, "applications-v2.csv"), newline="", encoding="utf-8") as fh:
     pub = list(csv.DictReader(fh))
 assert len(pub) == len(FULL) == 20
 csv_diffs = []
@@ -379,7 +385,7 @@ readme = [
     ("h2", "What is in here"),
     ("p", f"20 invented applications and the {len(CLIENT_COLS)} pieces of information we ask "
           f"the client for. The full dataset "
-          f"(App-Rationalization-Dummy-Dataset-v2.xlsx) has 126 columns for the same 20 "
+          f"(App-Rationalization-Dummy-Dataset-v2.xlsx) has {len(g.COLUMN_ORDER)} columns for the same 20 "
           f"applications; the other {len(DERIVED_COLS)} are worked out by the tool from the "
           f"{len(CLIENT_COLS)} here - scores, pass and fail flags, the recommendation, the "
           f"priority, the total cost of ownership, the savings arithmetic and the written "
@@ -443,10 +449,10 @@ readme = [
     ("h2", "Files"),
     ("bullet", "Client-Input-Dataset-v1.xlsx - this workbook."),
     ("bullet", "client-input.csv - the Client input sheet as flat CSV, for loading."),
-    ("bullet", "App-Rationalization-Dummy-Dataset-v2.xlsx - the full 126-column dataset this "
-               "was cut down from."),
-    ("bullet", "column-tiers.json - which of the 126 columns is asked for and which is "
-               "derived, machine readable."),
+    ("bullet", f"App-Rationalization-Dummy-Dataset-v2.xlsx - the full {len(g.COLUMN_ORDER)}-column dataset this "
+               f"was cut down from."),
+    ("bullet", f"column-tiers.json - which of the {len(g.COLUMN_ORDER)} columns is asked for and which is "
+               f"derived, machine readable."),
     ("gap", ""),
     ("p", f"Built {g.dt.date.today().isoformat()} from {g.XLSX_NAME} ({g.DATASET_VERSION}). "
           f"Client input v1."),

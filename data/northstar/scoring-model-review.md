@@ -1,7 +1,8 @@
 # Scoring model review — response to Bina Din's five points
 
-**Scope.** Everything below was read out of `out/generate_dataset.py` (the `CRITERIA` block at
-lines 98–140 and `gate()` at line 1505) and cross-checked against the `Scoring model` sheet of
+**Scope.** Everything below was read out of `engine/generate_dataset.py` (the `CRITERIA` block and
+`gate()`; the line numbers cited throughout are those of the revision reviewed, and have since
+shifted) and cross-checked against the `Scoring model` sheet of
 `App-Rationalization-Dummy-Dataset-v2.xlsx`. The two agree exactly. The sensitivity run was done
 in a scratch copy of the generator; `generate_dataset.py`, the workbook and the CSV are unchanged.
 
@@ -23,43 +24,57 @@ Each dimension is a weighted average of its own inputs. The *normalised* weight 
 divided by that dimension's weight sum, and is the share of the dimension the input actually
 controls. Weight 0 means the input is collected and stored but contributes nothing.
 
+Each of our eighteen inputs sits in a slot that corresponds to a criterion of the licensed
+Info-Tech reference tool whose structure the gated model follows. That tool is cited, not
+reproduced — it is licensed third-party material and this repository is public — so its
+criterion names are not restated in the tables below, and the four dimensions are named in our
+own terms throughout. Where the correspondence matters to an argument, it is described rather
+than named.
+
 ### Business value (V) — weight sum 6
 
-| Input | Raw weight | Normalised | Template criterion it occupies |
-|---|---|---|---|
-| `ov_increase_value` | 1 | **0.1667** | Increase Value |
-| `ov_reach_consumers` | 1 | 0.1667 | Reach Consumers |
-| `ov_reduce_costs_efficiency` | 1 | 0.1667 | Reduce Costs and Improve Efficiency |
-| `ov_patient_care_criticality` | **2** | **0.3333** | Enhance Services |
-| `ov_governance_compliance` | 1 | 0.1667 | Governance and Compliance |
+| Input | Raw weight | Normalised |
+|---|---|---|
+| `ov_increase_value` | 1 | **0.1667** |
+| `ov_reach_consumers` | 1 | 0.1667 |
+| `ov_reduce_costs_efficiency` | 1 | 0.1667 |
+| `ov_patient_care_criticality` | **2** | **0.3333** |
+| `ov_governance_compliance` | 1 | 0.1667 |
 
 ### Technical health (T) — weight sum 7
 
-| Input | Raw weight | Normalised | Template criterion it occupies |
-|---|---|---|---|
-| `th_supportability` | **2** | 0.2857 | Security/Compliance (re-bound) |
-| `th_architecture_fit` | **2** | 0.2857 | Business Continuity/Disaster Recovery (re-bound) |
-| `th_operational_stability` | 1 | 0.1429 | Maintainability |
-| `th_vendor_viability` | 1 | 0.1429 | Adaptability |
-| `th_customization_debt` | 1 | 0.1429 | Interoperability |
+| Input | Raw weight | Normalised |
+|---|---|---|
+| `th_supportability` | **2** | 0.2857 |
+| `th_architecture_fit` | **2** | 0.2857 |
+| `th_operational_stability` | 1 | 0.1429 |
+| `th_vendor_viability` | 1 | 0.1429 |
+| `th_customization_debt` | 1 | 0.1429 |
+
+Two of the five technical-health slots are re-bound: the reference tool ships something else in
+them, and we carry version currency and architecture fit there instead.
 
 ### Cost efficiency (C) — weight sum 4
 
-| Input | Raw weight | Normalised | Template criterion it occupies |
-|---|---|---|---|
-| `c_cost_per_active_user_vs_peers` | **2** | **0.5000** | Total Cost of Ownership |
-| `c_unused_licence_waste` | 1 | **0.2500** | License |
-| `c_consumption_price_variance` | 1 | 0.2500 | Maintenance |
-| `c_absolute_cost_band` | **0** | 0.0000 | Indirect Costs |
+| Input | Raw weight | Normalised |
+|---|---|---|
+| `c_cost_per_active_user_vs_peers` | **2** | **0.5000** |
+| `c_unused_licence_waste` | 1 | **0.2500** |
+| `c_consumption_price_variance` | 1 | 0.2500 |
+| `c_absolute_cost_band` | **0** | 0.0000 |
 
 ### Risk posture (R) — weight sum 3
 
-| Input | Raw weight | Normalised | Template criterion it occupies |
-|---|---|---|---|
-| `r_technical_risk` | 1 | 0.3333 | Perceived Data Quality (re-bound) |
-| `r_business_compliance_risk` | 1 | 0.3333 | Effectiveness (re-bound) |
-| `r_clinical_safety_risk` | 1 | 0.3333 | Usability (re-bound) |
-| `r_end_user_perceived_quality` | **0** | 0.0000 | Satisfaction |
+| Input | Raw weight | Normalised |
+|---|---|---|
+| `r_technical_risk` | 1 | 0.3333 |
+| `r_business_compliance_risk` | 1 | 0.3333 |
+| `r_clinical_safety_risk` | 1 | 0.3333 |
+| `r_end_user_perceived_quality` | **0** | 0.0000 |
+
+The whole R block is re-bound: the reference tool ships an end-user-perspective lens in this
+position, and we carry risk here instead. Only the fourth input, end-user perceived quality,
+still measures what that lens measures — and it is the one sitting at weight 0.
 
 **Both of Bina's figures are confirmed.** `c_cost_per_active_user_vs_peers` is raw weight 2 out of a
 cost weight sum of 4, so its normalised weight is exactly **0.5** — it controls half the cost
@@ -83,19 +98,17 @@ What it measures in our implementation, verbatim from `CRITERIA` (line 100):
 
 > "REQ 21 criticality to revenue: does the app carry money in or out?"
 
-The data dictionary phrases it the same way: *"V1 Increase Value. Criticality to revenue."*
+The data dictionary phrases it the same way: *"V1. Criticality to revenue: does the app carry money
+in or out?"*
 
-The Info-Tech anchor text it inherits is broader than that. The engine's prompt for the criterion is:
+The reference tool's own wording for the slot is broader than ours. Its prompt asks, in general
+terms, how much financial value the application delivers to the organisation and to its customers,
+and it scores that on a generic five-step correlation ladder shared with two of the other value
+criteria. That wording is the licensed tool's and is not reproduced here; what matters for the
+argument is only that it is a general commercial-value question rather than a health-system one.
 
-> "To what degree does the application provide financial value to the organization and provide value
-> to your customers?"
-
-and its 1–5 anchors are the generic correlation ladder shared with Reach Consumers and Enhance
-Services: *Strong correlation / Good correlation / Moderate correlation / Weak correlation / Unknown
-or no correlation.*
-
-**Assessment.** Bina is right that "increase value" as Info-Tech words it — financial value and
-customer value — is not the axis a health system leads with. But our implementation has already
+**Assessment.** Bina is right that a general "increase value" axis — financial value and
+customer value, as the reference tool frames it — is not the axis a health system leads with. But our implementation has already
 narrowed it to something a health system does care about and does not score anywhere else:
 *revenue capture*. Waystar (claims and revenue-cycle) and Solventum 360 Encompass (coding) are the
 rows that depend on it. If the criterion goes to zero, the portfolio loses its only signal for
@@ -113,13 +126,11 @@ Our definition (line 109):
 
 > "REQ 21 regulatory/trust alignment plus owner-stated strategic importance."
 
-The Info-Tech anchor text is likewise generic:
-
-> Prompt: "To what degree does the application align to regulations, build trust and reputation, and
-> mitigate audit risks?"
-> Anchors: "Fully compliant and verified / Fully compliant, not completely verified / Minor, low-risk
-> compliance gaps or incomplete analysis / Significant compliance gaps or partial defined / Critical
-> compliance gaps or undefined."
+The reference tool's wording for the same slot is likewise generic: it asks how well the application
+aligns to regulation, builds trust and reputation and mitigates audit risk, and its five anchors run
+from fully compliant and verified down to critical or undefined compliance gaps. No specific regime
+is named anywhere in it. (That wording belongs to the licensed tool and is deliberately paraphrased
+rather than quoted here.)
 
 So it scores *generic compliance maturity plus what the owner says the application is worth
 strategically*. It does not name HIPAA, PHI, PII, HITRUST, SOC 2 or data residency anywhere.
@@ -161,13 +172,13 @@ The rationale is that REQ 23 defines the dimension as cost efficiency, not cost:
 
 The generator's own justification for the weight-0 on absolute spend (the `Scoring model` sheet):
 
-> "the template's absolute-dollar cost band (because absolute cost fails every large enterprise
+> "the absolute-dollar cost band (because absolute cost fails every large enterprise
 > system on sight, while the requirement defines cost EFFICIENCY relatively — cost per active user
 > against peers)."
 
 Epic Hyperspace is the proof. It is the largest line item in the portfolio, and its
-`c_absolute_cost_band` is **1.0** — the worst possible score, because the template's anchor for the
-band is a flat dollar ladder topping out at *"> $1,000,000"*. Its cost *per active user* is 3.5,
+`c_absolute_cost_band` is **1.0** — the worst possible score, because the band is scored on a flat
+dollar ladder whose worst step is simply "above a million dollars a year". Its cost *per active user* is 3.5,
 mid-band for its peer group, because 17,240 of 18,500 seats are active. On absolute spend Epic looks
 like the portfolio's biggest problem; on cost efficiency it is unremarkable. Trap case T12 exists
 specifically to catch the wrong answer here — *"Recommending action against the largest line item."*
@@ -197,8 +208,8 @@ would slightly dilute the peer-cost comparison, which is the input REQ 23 names 
 pricing as a cost component *with no precedent in any Info-Tech template*: *"Consumption / usage-based
 pricing has no equivalent in the reference cost model and must be modelled from first principles,
 since it is the dominant cost structure for SaaS renewals and the primary one for the AI tools in
-REQ 11."* This is the team's own differentiator, it occupies the template's "Maintenance" slot, and
-the AI rows (REQ 11, REQ 26) are priced this way. **View: this is the stronger candidate for a raise
+REQ 11."* This is the team's own differentiator, it occupies a slot the reference tool uses for a
+conventional recurring-cost line, and the AI rows (REQ 11, REQ 26) are priced this way. **View: this is the stronger candidate for a raise
 to 2** — not because it changes any answer today (it does not, per S3), but because on a real 600-app
 portfolio with consumption-priced AI tooling it is the input most likely to be doing real work, and
 weight 1 of 4 understates a cost structure the reference model does not even have a line for. Waystar
@@ -302,14 +313,15 @@ answer at any weight from 0 to 12. Both weight-0 inputs can change an answer **a
 
 Its definition is *"REQ 22 incident and ticket volume, proactive vs reactive maintenance"* and the
 data dictionary repeats *"Incident and ticket volume."* **There is no incident-count or ticket-volume
-column anywhere in the 126 columns** of `applications-v2.csv`. Nor is one collected on the client
+column anywhere in the 125 columns** of `applications-v2.csv`. Nor is one collected on the client
 intake. So the criterion is an expert judgement wearing the label of a measurement. This is the
 easiest point for a health-system reviewer to puncture — an operations director will ask which
 ITSM queue the number came from. Two honest options: add an `incident_count_12mo` /
 `ticket_volume_12mo` intake field and derive the score from it, or restate the definition as a
-qualitative maintenance-posture assessment and label it as such. Note also that the underlying
-Info-Tech anchor for this slot is quantitative and specific (*"> 90% proactive maintenance and on
-the current release"*), which makes the missing denominator more conspicuous, not less.
+qualitative maintenance-posture assessment and label it as such. Note also that the reference tool's
+own anchor for this slot is quantitative and specific — it asks for a proactive-maintenance
+percentage and current-release status — which makes the missing denominator more conspicuous, not
+less.
 
 ### 3. The premise "cost only moves priority" is not quite what the engine does
 
@@ -371,15 +383,16 @@ Two readings, and both should be said out loud:
 ### 6. Smaller points worth a line each
 
 - **`ov_increase_value` is misnamed for the audience.** It measures revenue-capture criticality but
-  carries Info-Tech's generic "Increase Value" label, which is exactly what triggered Bina's comment.
-  Renaming costs nothing and removes the objection.
+  its name still echoes the generic commercial-value label the reference tool uses for the slot,
+  which is exactly what triggered Bina's comment. Renaming costs nothing and removes the objection.
 - **`ov_governance_compliance` bundles two unlike things** — regulatory alignment *and*
   owner-stated strategic importance. One is an audit fact, the other is an opinion the owner
   volunteered. They are averaged into one 1–5 score with no way to tell which drove it.
-- **The re-bound criterion names are a presentation risk.** The R block occupies template slots
-  labelled Perceived Data Quality, Effectiveness, Usability and Satisfaction. That is a documented
-  and supported customisation, but anyone reading the Info-Tech tool alongside our workbook will see
-  clinical safety risk sitting in a slot called "Usability" and want an explanation.
+- **The re-bound slots are a presentation risk.** All four inputs in the R block sit in slots the
+  reference tool uses for end-user-perception criteria rather than for risk. That is a documented
+  and supported customisation, but anyone reading that tool alongside our workbook will see
+  clinical safety risk sitting in a slot its own documentation describes in end-user terms, and
+  will want an explanation.
 - **The cost weight sum is 4 with only three live inputs**, because the weight-0 band is counted in
   the denominator. The normalised weights (0.5 / 0.25 / 0.25) are internally consistent and sum to
   1.0, so nothing is wrong — but a reviewer adding 2+1+1 and getting 4 while seeing three inputs will

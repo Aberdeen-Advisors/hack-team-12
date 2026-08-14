@@ -8,7 +8,7 @@ Aberdeen Advisors / hack-team-12 · Application Rationalization · as at 2026-08
 
 ## The short answer
 
-The dataset has **126 columns**. A client is asked for **57 of them**. We derive the other **69**.
+The dataset has **125 columns**. A client is asked for **57 of them**. We derive the other **68**.
 
 Of the 57, only **3 are truly unconditional**, and only **21 are needed for a first run** that still produces a defensible disposition and priority for every application.
 
@@ -85,14 +85,14 @@ The guardrails do survive, which is worth saying: `lifecycle_stage` is inferable
 | **2** | Provide if you have it — documented fallback exists | **11** | Optional; each one costs accuracy, not the run |
 | **3** | Comes out of a source system, not a person | **29** | Five extracts, pulled once |
 | **4** | Subject-matter judgement, collected from people | **14** | Interviews or a short form per app |
-| **5** | Tool derives — nothing to send | **69** | None |
-| | **Total** | **126** | 57 asked for, 69 derived |
+| **5** | Tool derives — nothing to send | **68** | None |
+| | **Total** | **125** | 57 asked for, 68 derived |
 
 ### Why this differs from the dataset's own marker
 
-The `Data dictionary` sheet marks **88 input / 38 computed**. That marker means "computed by the generator's engine functions" — it is not the same question as "does the client supply it". Reconciling the two:
+The `Data dictionary` sheet marks **88 input / 37 computed**. That marker means "computed by the generator's engine functions" — it is not the same question as "does the client supply it". Reconciling the two:
 
-- All **38** columns the dictionary calls computed are Tier 5. No exceptions.
+- All **37** columns the dictionary calls computed are Tier 5. No exceptions.
 - **31 of the 88** columns the dictionary calls *input* are also Tier 5, because in the product they are outputs of the enrichment agents rather than client fields. The dummy generator hand-seeds them only because it has no ingestion pipeline in front of it. Examples: `is_shadow_it` (REQ 8 diffs AP spend and SSO activity against the CMDB), `is_orphaned` (REQ 18 triangulation), `overlap_cluster_id` and `cluster_role` (REQ 25 clustering), `technical_obsolescence_flag` (REQ 17), all six AI columns (REQ 11/26), and `data_source` — which is an *output* of intake and can never be an input to it.
 - That leaves **57** client-supplied columns, and the script agrees: nothing in that 57 is written by a function.
 
@@ -100,10 +100,10 @@ The `Data dictionary` sheet marks **88 input / 38 computed**. That marker means 
 
 ### A version note
 
-The workbook on disk is **v1 (125 columns)**. The generator script beside it is **v2 (126 columns)** and is the design authority. This document is written against **v2**. Two differences matter:
+The workbook on disk is **v1 (124 columns)**. The generator script beside it is **v2 (125 columns)** and is the design authority. This document is written against **v2**. Two differences matter:
 
 - `ov_enhance_services` is renamed `ov_patient_care_criticality`, and the value dimension's double weight moves from governance-and-compliance onto patient-care criticality (Bina's v2 ruling). This changes *who we most need in the room*: the heaviest single criterion in the whole value dimension is now a question only clinical leadership can answer.
-- `reward_split_basis` is new, and there are now five disposition terms (retain, invest, consolidate, replace, retire) rather than four. Neither changes the intake.
+- `retain_or_invest_basis` is new, and there are now five disposition terms (retain, invest, consolidate, replace, retire) rather than four. Neither changes the intake.
 
 ---
 
@@ -212,7 +212,7 @@ Two of the four V criteria and one of the three weighted R criteria need a clini
 
 ---
 
-## Tier 5 — Tool derives (69)
+## Tier 5 — Tool derives (68)
 
 Nothing here goes on an intake form. Grouped, with the derivation in one line.
 
@@ -256,9 +256,9 @@ The whole cost-efficiency dimension is machine-scored. A client is never asked t
 
 `licence_utilisation_rate` (active ÷ purchased) · `unused_licence_count` (purchased − active) · `tco_five_category_subtotal` (sum of the five categories) · `annual_tco_recurring` (+ consumption) · `five_year_cumulative_tco` (× 5, undiscounted) · `cost_per_active_user` · `unused_licence_spend` (licence × unused share) · `notice_deadline_date` (term end − notice days) · `in_notice_window_now` (deadline within 180 days) · `contract_runway_months` · `gross_saving_annual` · `net_saving_annual` (gross − successor run cost − amortised one-time − residual archival) · `net_saving_five_year` · `consolidation_saving` (on absorbed rows only, so nothing is double-counted).
 
-### Scores, gates and the recommendation (24)
+### Scores, gates and the recommendation (23)
 
-The four dimension scores (weighted means renormalised over the criteria that actually carry a value) · the four pass flags at the 3.0 gate · `vtcr_key` · `infotech_template_disposition` · `disposition` · `priority` · `reward_split_basis` · `rationale` · `confidence` · `urgency_score` · the four guard flags (`redundancy_override_applied`, `lifecycle_exclusion_applied`, `sourcing_exclusion_applied`, `retention_override_applied`) · `suppressed_recommendation` and `suppression_reason` · `completeness_score` and `missing_fields`.
+The four dimension scores (weighted means renormalised over the criteria that actually carry a value) · the four pass flags at the 3.0 gate · `vtcr_key` · `disposition` · `priority` · `retain_or_invest_basis` · `rationale` · `confidence` · `urgency_score` · the four guard flags (`redundancy_override_applied`, `lifecycle_exclusion_applied`, `sourcing_exclusion_applied`, `retention_override_applied`) · `suppressed_recommendation` and `suppression_reason` · `completeness_score` and `missing_fields`.
 
 Two of these are worth naming to a client because they are the credibility features. `suppressed_recommendation` records every recommendation a guardrail changed, with its reason — REQ 51 requires that a suppressed recommendation with a stated reason is a better artifact than a silently different answer. And `missing_fields` names, per application, exactly which of the 44 model-consumed fields are empty, which is how REQ 28 keeps a thin-evidence recommendation from being presented at the same confidence as a well-evidenced one.
 
@@ -317,6 +317,6 @@ The `ai_delivery_form` distinction — standalone product versus AI feature insi
 
 Neither is in scope to fix here; both are worth a decision before the next dataset build.
 
-1. **`th_operational_stability` has no underlying data column.** The criterion is defined as "incident and ticket volume; proactive vs reactive maintenance" — which is an ITSM extract, not a human judgement. There is no incident-count or ticket-volume column anywhere in the 126, so today it can only be collected as a Tier 4 opinion from the technical owner. Adding an incident-volume field would move a weighted criterion out of the interview burden and into the extract, which is a straight win for intake effort.
+1. **`th_operational_stability` has no underlying data column.** The criterion is defined as "incident and ticket volume; proactive vs reactive maintenance" — which is an ITSM extract, not a human judgement. There is no incident-count or ticket-volume column anywhere in the 125, so today it can only be collected as a Tier 4 opinion from the technical owner. Adding an incident-volume field would move a weighted criterion out of the interview burden and into the extract, which is a straight win for intake effort.
 
 2. **The intake asks for things that are not columns.** REQ 6 expects four to five structured extracts in a watched folder and REQ 9 expects a document repository — architecture diagrams, contracts, SOWs, security reviews, support handbooks. A per-column checklist cannot express either, so the checklist workbook that accompanies this document should be handed over *with* a file-level request, not instead of one.

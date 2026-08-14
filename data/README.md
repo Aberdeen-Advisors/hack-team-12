@@ -31,11 +31,32 @@ real organisation.
 
 | File | What it is |
 | --- | --- |
-| `App-Rationalization-Dummy-Dataset-v2.xlsx` | **Current.** 20 applications, 126 columns, 8 sheets. Uses the agreed five-term vocabulary (retain, invest, consolidate, replace, retire). Generated output. |
+| `App-Rationalization-Dummy-Dataset-v2.xlsx` | **Current.** 20 applications, 125 columns, 8 sheets. Uses the agreed five-term vocabulary (retain, invest, consolidate, replace, retire). Generated output. |
 | `applications-v2.csv` | **Current.** The `Applications` sheet of the above, flat. Generated output. |
-| `App-Rationalization-Dummy-Dataset-v1.xlsx` | **Superseded.** Kept for history. Four-term vocabulary, in which `invest` also meant "healthy, leave alone". |
+| `App-Rationalization-Dummy-Dataset-v1.xlsx` | **Superseded.** Kept for history. 124 columns, four-term vocabulary, in which `invest` also meant "healthy, leave alone". Cannot be regenerated: the generator has no v1 mode, so this file is edited in place when it has to change. |
 | `applications.csv` | **Superseded.** The v1 CSV. |
 | `CHANGELOG-v2.md` | What changed between v1 and v2 and why, including the three applications whose recommendation moved. Read this before comparing the two versions. |
+
+### Read this before you rerun the generator
+
+**The committed v2 workbook has drifted ahead of `engine/generate_dataset.py`, and rerunning the
+generator will silently take content away.** The committed workbook has **8 sheets and a 9-column
+`Data dictionary`**; the generator as committed emits only **7 sheets and 6 dictionary columns**. A
+plain rerun therefore destroys:
+
+- the **`Client intake`** sheet, and
+- the **`Provided by`**, **`Source or who answers`** and **`If not supplied`** columns of the
+  `Data dictionary`.
+
+That is not cosmetic: `engine/build_client_input.py` reads those three columns, so a plain rerun
+also breaks the client-input build with `ValueError: 'Provided by' is not in list`. The 20 rows,
+their 125 columns and every disposition, priority and money figure *are* reproduced faithfully — the
+loss is confined to the extra sheet and those three columns.
+
+Until the generator is taught to emit them, treat the workbook as **generator output plus a
+hand-maintained overlay**: regenerate, then carry the `Client intake` sheet and the three dictionary
+columns back across from the previous version before committing. Closing the gap properly means
+moving that overlay into `generate_dataset.py`, which nobody has done yet.
 
 ## `client-intake/` — what the client is asked for
 
@@ -44,7 +65,7 @@ real organisation.
 | `Client-Input-Dataset-v1.xlsx` | **Current.** The v2 dataset projected down to the 57 client-supplied columns, with a blank template sheet and a round-trip check. Generated output. |
 | `client-input.csv` | **Current.** The same 20 rows, flat. Generated output. |
 | `client-intake-checklist.xlsx` | The intake request as a checklist to hand to a client. |
-| `client-intake-requirements.md` | Which of the 126 columns come from the client (57), which the tool derives (69), and the 21-item minimum needed for a first run. |
+| `client-intake-requirements.md` | Which of the 125 columns come from the client (57), which the tool derives (68), and the 21-item minimum needed for a first run. |
 | `column-tiers.json` | Per-column classification — client-supplied, system extract, or tool-derived — with the source for each. The machine-readable form of the document above. |
 
 ## `northstar/` — the second portfolio and its scoring runs

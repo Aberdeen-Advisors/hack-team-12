@@ -260,7 +260,7 @@
   "disposition": {
     "fallback": "",
     "label": "What we recommend",
-    "source": "vtcr_key looked up in the REQ 52 table, the retain/invest split on a Reward pattern, then the REQ 51 guards and the REQ 25 override",
+    "source": "vtcr_key looked up in the REQ 52 table, the retain/invest split on an all-pass key, then the REQ 51 guards and the REQ 25 override",
     "tier": "tool_derives"
   },
   "early_termination_penalty": {
@@ -310,12 +310,6 @@
     "label": "Most sensitive class of data held",
     "source": "data governance",
     "tier": "system_extract"
-  },
-  "infotech_template_disposition": {
-    "fallback": "",
-    "label": "What the licensed reference table returns",
-    "source": "vtcr_key looked up in the reference 16-row table",
-    "tier": "tool_derives"
   },
   "integration_pattern": {
     "fallback": "",
@@ -559,8 +553,8 @@
   },
   "retain_or_invest_basis": {
     "fallback": "",
-    "label": "Why a Reward row was called retain or invest",
-    "source": "split_reward(): which test of the retain/invest split fired. Blank on every non-Reward pattern",
+    "label": "Why a row was called retain rather than invest",
+    "source": "retain_or_invest(): which dimension fails the gate and is therefore what the money buys, or that none of the four does. Blank on consolidate, replace and retire",
     "tier": "tool_derives"
   },
   "retention_expiry_date": {
@@ -579,12 +573,6 @@
     "fallback": "",
     "label": "A live retention obligation constrains retire",
     "source": "retire + retention_obligation_flag + retention_expiry_date in the future (REQ 53)",
-    "tier": "tool_derives"
-  },
-  "reward_split_basis": {
-    "fallback": "",
-    "label": "Why a Reward row was called retain or invest",
-    "source": "split_reward(): which test of the retain/invest split fired. Blank on every non-Reward pattern",
     "tier": "tool_derives"
   },
   "risk_posture_score": {

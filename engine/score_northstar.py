@@ -59,9 +59,12 @@ from openpyxl.utils import get_column_letter
 warnings.filterwarnings("ignore", category=UserWarning, module="openpyxl")
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SOURCE_XLSX = "/mnt/user-data/uploads/slack/F0BQCGAM8E5/F0BQCGAM8E5.xlsx"
-OUT_XLSX = os.path.join(HERE, "Northstar-Disposition-Analysis-v1.xlsx")
-OUT_CSV = os.path.join(HERE, "northstar-dispositions.csv")
+# Everything this script reads and writes lives in the committed data directory, addressed
+# relative to this file so the run works from any fresh clone.
+DATA = os.path.join(HERE, os.pardir, "data", "northstar")
+SOURCE_XLSX = os.path.join(DATA, "healthcare_app_rationalization_sample_20.xlsx")
+OUT_XLSX = os.path.join(DATA, "Northstar-Disposition-Analysis-v1.xlsx")
+OUT_CSV = os.path.join(DATA, "northstar-dispositions.csv")
 
 ANALYSIS_DATE = dt.date(2026, 8, 14)          # her Read Me / Assumptions "As of" date
 CIO_SAVINGS_TARGET = 0.15                      # her Assumptions sheet

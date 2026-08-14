@@ -34,23 +34,26 @@ python3 engine/score_northstar_v3.py
 python3 engine/build_client_input.py
 ```
 
-### Path assumptions — read before running
+### Paths — read before running
 
-The scripts were written and run in a working directory that no longer exists, and their
-paths have deliberately **not** been repointed, so that the committed code is byte-for-byte
-the code whose output was verified. To run one, you will need to supply the inputs it expects:
+Every path is now resolved relative to the script's own location, so all five scripts run from a
+fresh clone with no editing. The scripts previously pointed at a working directory that no longer
+exists; those constants have been repointed at the committed copies of the same inputs.
 
-- `generate_dataset.py` needs nothing. It writes into the directory holding the script
-  itself (`OUT_DIR`), so run it somewhere you are happy to have four files appear.
-- `score_northstar*.py` each read one workbook at a hardcoded absolute `SOURCE_XLSX` near the
-  top of the file — an ephemeral Slack upload path under `/mnt/user-data/uploads/slack/…`.
-  Point that constant at the Northstar sample workbook (v1 reads the original, v2 and v3 read
-  the revised file) or copy the workbook to that path. The workbook is opened read-only and is
-  never written back to. Outputs land next to the script.
-- `build_client_input.py` has a hardcoded `OUT` directory near the top and expects to find
-  `generate_dataset.py`, `column-tiers.json` and the generator's own
-  `App-Rationalization-Dummy-Dataset-v2.xlsx` / `applications-v2.csv` in it. Easiest path is
-  to run `generate_dataset.py` first into that directory.
+- `generate_dataset.py` needs nothing, but writes into the directory holding the script itself
+  (`OUT_DIR`) — four files, including a generated `README.md` that **would overwrite this file**.
+  Run it in a scratch copy of the directory, then move the two dataset files into
+  `data/synthetic-portfolio/`. See the rerun warning in `data/README.md` first: the committed
+  workbook is ahead of the generator, and a plain rerun drops a sheet and three data-dictionary
+  columns.
+- `score_northstar*.py` read their sample workbook from `data/northstar/` (v1 reads
+  `healthcare_app_rationalization_sample_20.xlsx`, v2 and v3 read `…-with-risk.xlsx`) and write
+  their workbook and CSV back into the same directory, replacing the committed outputs. The samples
+  are opened read-only and are never written back to. Run them in order — v2 diffs against v1's CSV
+  and v3 against v2's.
+- `build_client_input.py` imports the engine from beside itself, reads the generated v2 dataset from
+  `data/synthetic-portfolio/`, and reads `column-tiers.json` and writes both its outputs in
+  `data/client-intake/`. Run `generate_dataset.py` first if the v2 dataset has changed.
 
 ### What each produces
 
@@ -65,9 +68,9 @@ the code whose output was verified. To run one, you will need to supply the inpu
 ## Where the datasets are
 
 The datasets these scripts generate and consume are committed, in `data/` — including the two
-Northstar sample workbooks the `score_northstar*.py` runs read, so point `SOURCE_XLSX` at
-`data/northstar/healthcare_app_rationalization_sample_20.xlsx` (v1) or
-`…-with-risk.xlsx` (v2 and v3). `data/README.md` explains every file. All of it is synthetic:
+Northstar sample workbooks the `score_northstar*.py` runs read, which is why `SOURCE_XLSX` now
+resolves to `data/northstar/healthcare_app_rationalization_sample_20.xlsx` (v1) or
+`…-with-risk.xlsx` (v2 and v3) without anyone editing it. `data/README.md` explains every file. All of it is synthetic:
 invented figures for fictional organisations, with only the product and vendor names real.
 
 This repository is public, and client-supplied material and licensed third-party vendor
